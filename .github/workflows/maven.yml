@@ -7,7 +7,7 @@ on:
      - .github/**
 
 jobs:
-  test:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo 
