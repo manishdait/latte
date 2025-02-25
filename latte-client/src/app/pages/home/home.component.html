@@ -5,14 +5,17 @@
 }
 
 <div class="w-screen h-screen flex wrapper">
-  <input type="checkbox" id="nav-toggle" class="fixed hidden nav-toggle">
-  <div class="bg-white min-w-[min(250px,100%)] flex flex-col gap-4 p-4 shadow-sm sidenav">
-    <div class="flex items-center gap-2">
-      <div class="w-[2rem] h-2[rem] mb-[.7em]">
-        <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
+  <input type="checkbox" id="nav-toggle" class="fixed hidden nav-toggle" #navtoggle>
+
+  <div class="bg-white min-w-[min(250px,100%)] flex flex-col gap-4 px-4 py-2 shadow-sm sidenav">
+    <div>
+      <div class="flex items-end">
+        <div class="w-[1.6rem] h-full my-[.2em]">
+          <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
+        </div>
+        <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
+        <fa-icon class="text-base text-lime-600 cursor-pointer rotate-180 gone" [icon]="'arrow-right-to-bracket'"  (click)="toggleSidenav(false)"></fa-icon>
       </div>
-      <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2">Latte</h1>
-      <label for="nav-toggle" class="cursor-pointer gone"><fa-icon class="text-lime-600" [icon]="'angles-left'"></fa-icon></label>
     </div>
 
     <div class="h-full flex flex-col">
@@ -22,12 +25,12 @@
           <span>Create Ticket</span>
         </a>
   
-        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/dashboard" routerLinkActive="active">
+        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/dashboard" routerLinkActive="active" (click)="toggleSidenav(false)">
           <fa-icon [icon]="'house'"></fa-icon>
           <span>Dashboard</span>
         </a>
   
-        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/tickets" routerLinkActive="active">
+        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/tickets" routerLinkActive="active" (click)="toggleSidenav(false)">
           <fa-icon [icon]="'ticket'"></fa-icon>
           <span>Tickets</span>
         </a>
@@ -36,11 +39,11 @@
       <div class="mt-auto flex flex-col gap-2">
         @if (isAdmin()) {
           <span class="text-gray-800 text-base font-medium px-2 rounded-sm">ADMIN</span>
-          <a class="text-gray-600 text-base px-2 rounded-sm cursor-pointer" routerLink="/home/users">Users</a>
+          <a class="text-gray-600 text-base px-2 rounded-sm cursor-pointer" routerLink="/home/users" (click)="toggleSidenav(false)">Users</a>
         }
         <span class="text-gray-600 text-base px-2 rounded-sm cursor-pointer">Version - <span class="text-sm text-neutral-800 font-bold bg-lime-100 py-1 px-2 rounded-sm">{{ version }}</span></span>
 
-        <div class="flex gap-2 p-2 items-center mt-4 cursor-pointer" routerLink="/home/profile">
+        <div class="flex gap-2 p-2 items-center mt-4 cursor-pointer" routerLink="/home/profile" (click)="toggleSidenav(false)">
           <div class="w-[2.2rem] h-[2.2rem] rounded-[100%] flex items-center justify-center" [style.background-color]="color(firstname)">
             <span class="text-base text-white font-bold">{{ firstname.charAt(0) }}</span>
           </div>
@@ -54,12 +57,14 @@
     </div>
   </div>
 
-  <div class="bg-white shadow-sm navbar p-4 items-center">
-    <div class="w-[2rem] h-2[rem] mb-[.7em]">
-      <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
+  <div class="shadow-sm navbar px-4 py-2">
+    <div class="flex items-end cursor-pointer" (click)="toggleSidenav(true)">
+      <div class="w-[1.6rem] h-full my-[.1em]">
+        <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
+      </div>
+      <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
+      <fa-icon class="text-base text-lime-600" [icon]="'arrow-right-to-bracket'"></fa-icon>
     </div>
-    <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2">Latte</h1>
-    <label for="nav-toggle" class="cursor-pointer"><fa-icon class="text-lime-600" [icon]="'angles-right'"></fa-icon></label>
   </div>
 
   <div class="grow overflow-y-scroll">
