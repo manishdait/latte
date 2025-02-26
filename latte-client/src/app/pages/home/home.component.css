@@ -9,7 +9,7 @@ fa-icon {
 .nav-toggle:checked + .sidenav {
   display: flex;
   left: 0%;
-  transition: all .4s linear;
+  transition: all .3s linear;
 }
 
 .gone {
@@ -31,7 +31,7 @@ fa-icon {
   .sidenav {
     position: fixed;
     left: -100%;
-    transition: all .4s linear;
+    transition: all .3s linear;
     height: 100vh;
   }
   .navbar {

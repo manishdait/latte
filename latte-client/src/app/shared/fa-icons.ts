@@ -2,6 +2,7 @@ import {
   faAngleDown,
   faAnglesLeft, 
   faAnglesRight, 
+  faArrowRightToBracket, 
   faCalendar, 
   faCheck, 
   faCircleCheck, 
@@ -18,5 +19,20 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
-  faHouse, faClose, faPen, faTicket, faAnglesRight, faAnglesLeft, faUnlock, faLock, faCalendar, faCheck, faEye, faEyeSlash, faAngleDown, faEllipsisVertical, faCircleCheck
+  faHouse, 
+  faClose, 
+  faPen, 
+  faTicket, 
+  faAnglesRight, 
+  faAnglesLeft, 
+  faUnlock, 
+  faLock, 
+  faCalendar, 
+  faCheck, 
+  faEye, 
+  faEyeSlash, 
+  faAngleDown, 
+  faEllipsisVertical, 
+  faCircleCheck, 
+  faArrowRightToBracket
 ]

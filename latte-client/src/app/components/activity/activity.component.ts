@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivityService } from '../../service/activity.service';
 import { ActivityResponse, ActivityType } from '../../models/activity.type';
 import { CommentService } from '../../service/comment.service';
@@ -12,6 +12,7 @@ import { getDate } from '../../shared/utils';
   styleUrl: './activity.component.css'
 })
 export class ActivityComponent implements OnInit {
+  @ViewChild('message') message!: ElementRef;
   @Input('ticketId') ticketId: number | undefined;
 
   hasMore: boolean = false;
@@ -43,11 +44,13 @@ export class ActivityComponent implements OnInit {
   }
 
   comment(message: string) {
+    const input = this.message.nativeElement as HTMLInputElement;
     if (this.ticketId && message !== '') {
       const request: CommentRequest = {
         ticketId: this.ticketId,
         message: message
       }
+      input.value = '';
       this.commentService.createComment(request).subscribe({
         next: () => {
           this.ngOnInit();
