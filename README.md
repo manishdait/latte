@@ -2,7 +2,8 @@
 
 This project, is a full-stack ticket management application built to test and demonstrate my skills in Spring Boot and Angular. It provides basic ticket management functionalities, including user management, ticket creation/editing/deletion, and ticket commenting.
 
-<img alt="Version" src="https://img.shields.io/badge/version-0.0.1 snap-blue.svg?cacheSeconds=2592000" />
+[![Java CI with Maven](https://github.com/manishdait/latte/actions/workflows/maven.yml/badge.svg)](https://github.com/manishdait/latte/actions/workflows/maven.yml)
+[![Latest Version](https://img.shields.io/badge/version-0.0.1-blue)](README.md)
 
 ## ✨ Features
 * **User Management:** User creation and deletion.
@@ -30,7 +31,7 @@ services:
       - latte-network
   latte-server:
     container_name: latte-server
-    image: manishdait/latte-api:0.0.1-snap
+    image: manishdait/latte-api:0.0.1
     restart: always
     depends_on:
       - postgres-db
@@ -40,7 +41,7 @@ services:
       - data:/data
   latte-client:
     container_name: latte-client
-    image: manishdait/latte-client:0.0.1-snap
+    image: manishdait/latte-client:0.0.1
     restart: always
     depends_on:
       - latte-server
