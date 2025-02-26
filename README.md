@@ -3,7 +3,7 @@
 This project, is a full-stack ticket management application built to test and demonstrate my skills in Spring Boot and Angular. It provides basic ticket management functionalities, including user management, ticket creation/editing/deletion, and ticket commenting.
 
 [![Java CI with Maven](https://github.com/manishdait/latte/actions/workflows/maven.yml/badge.svg)](https://github.com/manishdait/latte/actions/workflows/maven.yml)
-[![Latest Version](https://img.shields.io/badge/version-0.0.1-blue)](README.md)
+[![Latest Version](https://img.shields.io/github/v/tag/manishdait/latte?label=Version)](README.md)
 
 ## ✨ Features
 * **User Management:** User creation and deletion.
