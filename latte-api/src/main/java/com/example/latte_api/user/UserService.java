@@ -1,5 +1,7 @@
 package com.example.latte_api.user;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -94,5 +96,10 @@ public class UserService implements UserDetailsService {
   public void deleteUser(String _user) {
     User user = userRepository.findByEmail(_user).orElseThrow();
     userRepository.delete(user);
+  }
+
+  public Map<String, Long> getUserCount() {
+    long count = userRepository.count();
+    return Map.of("user_count", count);
   }
 }

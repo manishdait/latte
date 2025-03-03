@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/latte_db
+    username: postgres
+    password: password
+  flyway:
+    user: postgres
+    password: password

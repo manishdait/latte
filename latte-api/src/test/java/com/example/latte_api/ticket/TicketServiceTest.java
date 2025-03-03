@@ -217,24 +217,21 @@ public class TicketServiceTest {
   void shouldReturn_pagedEntity_ofAllTicket_ofAuthenticatedUser() {
     // mock
     final Page<Ticket> page = Mockito.mock(Page.class);
-    final User user = Mockito.mock(User.class);
     final List<Ticket> tickets = List.of(Mockito.mock(Ticket.class));
 
     // given
-    final Authentication authentication = Mockito.mock(Authentication.class);
+    final Status status = Status.CLOSE;
     final int number = 0;
     final int size = 10;
 
     // wheni
-    when(authentication.getPrincipal()).thenReturn(user);
-    when(ticketRepository.findByCreatedBy(any(Pageable.class), eq(user))).thenReturn(page);
+    when(ticketRepository.findByStatus(eq(status), any(Pageable.class))).thenReturn(page);
     when(page.getContent()).thenReturn(tickets);
 
-    final PagedEntity<TicketResponse> result = ticketService.getTicketForUser(number, size, authentication);
+    final PagedEntity<TicketResponse> result = ticketService.getTicketByStatus(status, number, size);
 
     // then
-    verify(authentication, times(1)).getPrincipal();
-    verify(ticketRepository, times(1)).findByCreatedBy(any(Pageable.class), eq(user));
+    verify(ticketRepository, times(1)).findByStatus(eq(status), any(Pageable.class));
     verify(page, times(1)).hasNext();
     verify(page, times(1)).hasPrevious();
     verify(page, times(1)).getContent();
@@ -296,7 +293,7 @@ public class TicketServiceTest {
     verify(ticketRepository, times(1)).findAll();
 
     Assertions.assertThat(result).isNotNull();
-    Assertions.assertThat(result.get("total_tickets")).isEqualTo(1);
+    Assertions.assertThat(result.get("open_tickets")).isEqualTo(1);
     Assertions.assertThat(result.get("completed_tickets")).isEqualTo(1);
   }
 

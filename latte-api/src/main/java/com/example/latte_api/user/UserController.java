@@ -39,6 +39,11 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUserList(page, size));
   }
 
+  @GetMapping("/count")
+  public ResponseEntity<Map<String, Long>> count() {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getUserCount());
+  }
+
   @GetMapping("/info")
   public ResponseEntity<UserDto> getInfo(Authentication authentication) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(authentication));

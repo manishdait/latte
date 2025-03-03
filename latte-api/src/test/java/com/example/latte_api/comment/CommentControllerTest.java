@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -41,6 +42,7 @@ import com.example.latte_api.user.role.RoleRepository;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class CommentControllerTest {
   @Container
   @ServiceConnection
@@ -66,9 +68,6 @@ public class CommentControllerTest {
 
   @BeforeEach
   void setup() {
-    // remove default user
-    userRepository.deleteAll();
-
     Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
     Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
 

@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -35,6 +36,7 @@ import com.example.latte_api.user.role.RoleRepository;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class UserControllerTest {
   @Container
   @ServiceConnection
@@ -54,9 +56,6 @@ public class UserControllerTest {
 
   @BeforeEach
   void setup() {
-    // remove default user
-    userRepository.deleteAll();
-
     Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
     Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
 
@@ -549,6 +548,53 @@ public class UserControllerTest {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.DELETE,
+      new HttpEntity<>(null),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldReturn_userCount_whenRequesteUserIsAdmin() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final ResponseEntity<Map<String, Long>> response = testRestTemplate.exchange(
+      "/latte-api/v1/users/count",
+      HttpMethod.GET,
+      new HttpEntity<>(null, headers),
+      new ParameterizedTypeReference<Map<String, Long>>() {}
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Assertions.assertThat(response.getBody()).isEqualTo(Map.of("user_count", 2L));
+  }
+
+  @Test
+  void shouldGiveForbidden_whenGettingUserCount_whenRequesteUserIsNotAdmin() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/users/count",
+      HttpMethod.GET,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldGiveForbidden_whenGettingUserCount_whenRequesteMissingAuthorizationHeader() {
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/users/count",
+      HttpMethod.GET,
       new HttpEntity<>(null),
       ErrorResponse.class
     );

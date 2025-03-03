@@ -7,3 +7,4 @@ spring:
   flyway:
     user: ${DATASOURCE_USERNAME:postgres}
     password: ${DATASOURCE_PASSWORD:password}
+    

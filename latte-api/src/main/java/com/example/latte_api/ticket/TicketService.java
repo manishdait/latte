@@ -80,10 +80,9 @@ public class TicketService {
     return response;
   }
 
-  public PagedEntity<TicketResponse> getTicketForUser(int number, int size, Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
+  public PagedEntity<TicketResponse> getTicketByStatus(Status status, int number, int size) {
     Pageable pageable = PageRequest.of(number, size);
-    Page<Ticket> page = ticketRepository.findByCreatedBy(pageable, user);
+    Page<Ticket> page = ticketRepository.findByStatus(status, pageable);
 
     PagedEntity<TicketResponse> response = new PagedEntity<>();
     response.setNext(page.hasNext());
@@ -102,7 +101,7 @@ public class TicketService {
     List<Ticket> tickets = ticketRepository.findAll();
     int completed = tickets.stream().filter(t -> t.getStatus().equals(Status.CLOSE)).toList().size();
     int open = tickets.stream().filter(t -> t.getStatus().equals(Status.OPEN)).toList().size();
-    return Map.of("total_tickets", open, "completed_tickets", completed);
+    return Map.of("open_tickets", open, "completed_tickets", completed);
   }
 
   public TicketResponse getTicket(Long id) {

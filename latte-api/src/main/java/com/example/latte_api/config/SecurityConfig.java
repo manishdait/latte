@@ -51,7 +51,8 @@ public class SecurityConfig {
       request.requestMatchers(
         HttpMethod.GET, 
         "/latte-api/v1/users",
-        "/latte-api/v1/users/info/*"
+        "/latte-api/v1/users/info/*",
+        "/latte-api/v1/users/count"
       ).hasRole("ADMIN");
 
       request.requestMatchers(

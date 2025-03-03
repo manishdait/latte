@@ -19,6 +19,7 @@ import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
 import com.example.latte_api.ticket.dto.TicketResponse;
+import com.example.latte_api.ticket.enums.Status;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,11 @@ public class TicketController {
   @GetMapping()
   public ResponseEntity<PagedEntity<TicketResponse>> getTickets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTickets(page, size));
+  }
+
+  @GetMapping("/status/{status}")
+  public ResponseEntity<PagedEntity<TicketResponse>> getTicketByStatus(@PathVariable Status status, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTicketByStatus(status, page, size));
   }
 
   @GetMapping("/info")

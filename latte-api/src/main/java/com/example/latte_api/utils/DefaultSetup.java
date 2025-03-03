@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.UUID;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
 public class DefaultSetup {
   private final RoleRepository roleRepository; 
   private final UserRepository userRepository;
