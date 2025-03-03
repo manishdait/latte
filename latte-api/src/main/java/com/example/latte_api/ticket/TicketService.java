@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +66,7 @@ public class TicketService {
   }
 
   public PagedEntity<TicketResponse> getTickets(int number, int size) {
-    Pageable pageable = PageRequest.of(number, size);
+    Pageable pageable = PageRequest.of(number, size, Sort.by(Direction.DESC, "createdAt"));
     Page<Ticket> page = ticketRepository.findAll(pageable);
 
     PagedEntity<TicketResponse> response = new PagedEntity<>();
@@ -81,7 +83,7 @@ public class TicketService {
   }
 
   public PagedEntity<TicketResponse> getTicketByStatus(Status status, int number, int size) {
-    Pageable pageable = PageRequest.of(number, size);
+    Pageable pageable = PageRequest.of(number, size, Sort.by(Direction.DESC, "createdAt"));
     Page<Ticket> page = ticketRepository.findByStatus(status, pageable);
 
     PagedEntity<TicketResponse> response = new PagedEntity<>();
