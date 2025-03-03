@@ -3,31 +3,44 @@ import { getColor } from '../../shared/utils';
 import { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../../service/auth.service';
 import { TicketService } from '../../service/ticket.service';
+import { Store } from '@ngrx/store';
+import { setTicketCloseCount, setTicketOpenCount } from '../../state/ticket/ticket.action';
+import { Observable } from 'rxjs';
+import { selectTicketCloseCount, selectTicketOpenCount } from '../../state/ticket/ticket.selector';
+import { AppState } from '../../state/app.state';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
   firstname: string;
-  info: any;
 
-  constructor (private authService: AuthService, private ticketServie: TicketService) {
+  openCount$: Observable<number>;
+  closeCount$: Observable<number>;
+
+  constructor (private authService: AuthService, private ticketServie: TicketService, private store: Store<AppState>) {
     const token:any = jwtDecode(authService.getAccessToken());
     this.firstname = token.firstname;
+
+    this.openCount$ = store.select(selectTicketOpenCount);
+    this.closeCount$ = store.select(selectTicketCloseCount);
   }
 
   ngOnInit(): void {
     this.ticketServie.fetchTicktsInfo().subscribe({
       next: (response) => {
-        this.info = response;
+        const info =  response as any;
+        this.store.dispatch(setTicketOpenCount({ticketCount: info.open_tickets}))
+        this.store.dispatch(setTicketCloseCount({ticketCount: info.completed_tickets}))
       },
       error: (err) => {
         console.error(err.error);
       }
-    })
+    });
   }
 
   color(username: any): string {

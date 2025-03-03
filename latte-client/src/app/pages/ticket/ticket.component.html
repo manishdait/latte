@@ -3,8 +3,12 @@
     <div>
       <div class="border-[.1em] border-gray-200 rounded-sm">
         <div class="flex gap-4 bg-gray-50 py-2 px-4">
-          <span class="text-base font-semibold">Open</span>
-          <span>Closed</span>
+          <span class="text-base font-semibold cursor-pointer" [class]="getStatus() === 'OPEN'? 'text-neutral-800' : 'text-neutral-500'" (click)="setStatus('OPEN')">
+            Open <span class="text-[.7rem] text-neutral-600 bg-neutral-200 py-0.5 px-1 rounded-sm">{{ (openCount$ | async) }}</span>
+          </span>
+          <span class="text-base font-semibold cursor-pointer" [class]="getStatus() === 'CLOSE'? 'text-neutral-800' : 'text-neutral-500'" (click)="setStatus('CLOSE')">
+            Closed <span class="text-[.7rem] text-neutral-600 bg-neutral-200 py-0.5 px-1 rounded-sm">{{ (closeCount$ | async) }}</span>
+          </span>
         </div>
 
         @for (ticket of (tickets$ | async); track ticket.id) {

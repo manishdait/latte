@@ -6,8 +6,8 @@ import { provideState, provideStore } from '@ngrx/store';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AccessTokenInterceptor } from './interceptor/access-token.interceptor';
 import { RefreshTokenInterceptor } from './interceptor/refresh-token.interceptor';
-import { ticketReducer } from './state/ticket/ticket.reducer';
-import { userReducer } from './state/user/user.reducer';
+import { ticketCloseCountReducer, ticketOpenCountReducer, ticketReducer } from './state/ticket/ticket.reducer';
+import { userCountReducer, userReducer } from './state/user/user.reducer';
 import { provideNgxWebstorage, withLocalStorage } from 'ngx-webstorage';
 
 export const appConfig: ApplicationConfig = {
@@ -16,7 +16,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStore(),
     provideState({name: 'tickets', reducer: ticketReducer}),
+    provideState({name: 'ticketOpenCount', reducer: ticketOpenCountReducer}),
+    provideState({name: 'ticketCloseCount', reducer: ticketCloseCountReducer}),
     provideState({name: 'users', reducer: userReducer}),
+    provideState({name: 'userCount', reducer: userCountReducer}),
     provideNgxWebstorage(withLocalStorage()),
     provideHttpClient(withInterceptorsFromDi()),
     [

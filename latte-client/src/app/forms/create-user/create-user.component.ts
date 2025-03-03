@@ -7,7 +7,7 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
-import { addUser } from '../../state/user/user.action';
+import { addUser, incrementUserCount } from '../../state/user/user.action';
 import { UserResponse } from '../../models/user.type';
 import { AlertService } from '../../service/alert.service';
 
@@ -66,7 +66,8 @@ export class CreateUserComponent implements OnInit {
           email: request.email,
           role: request.role
         }
-        this.store.dispatch(addUser({user: user}))
+        this.store.dispatch(addUser({user: user}));
+        this.store.dispatch(incrementUserCount());
         this.alertService.alert = `User created with name ${user.firstname}`;
         this.cancel();
       },

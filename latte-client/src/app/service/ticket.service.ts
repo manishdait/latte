@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { Page } from "../models/page.type";
 import { PatchTicketRequest, TicketRequest, TicketResponse } from "../models/ticket.type";
 import { HttpClient } from "@angular/common/http";
+import { Status } from "../models/status.enum";
 
 const URL: string = `${environment.API_ENDPOINT}/tickets`;
 
@@ -19,6 +20,10 @@ export class TicketService {
 
   fetchPagedTickets(page: number, size: number): Observable<Page<TicketResponse>> {
     return this.client.get<Page<TicketResponse>>(`${URL}?page=${page}&size=${size}`);
+  }
+
+  fetchPagedTicketsByStaus(status: Status, page: number, size: number): Observable<Page<TicketResponse>> {
+    return this.client.get<Page<TicketResponse>>(`${URL}/status/${status}?page=${page}&size=${size}`);
   }
 
   fetchTickets(): Observable<Page<TicketResponse>> {

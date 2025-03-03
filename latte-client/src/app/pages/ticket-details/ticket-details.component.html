@@ -1,5 +1,5 @@
 <div class="w-full p-8 flex gap-8 flex-wrap">
-  <div class="grow-1 min-w-[min(600px,100%)]">
+  <div class="grow-1 w-[min(600px,100%)]">
     <div class="py-8 border-b-[.1em] border-gray-300 flex flex-col gap-2">
       <div class="flex gap-1 items-start justify-between">
         <h1 class="text-3xl font-bold">{{ ticket?.title }}</h1>
@@ -11,7 +11,7 @@
             </span>
   
             @if(deleteToggle) {
-              <div class="absolute bg-white shadow-sm p-2 min-w-[min(100vw,120px)] right-0 flex items-center justify-center rounded-sm">
+              <div class="absolute bg-white shadow-sm p-2 w-[min(100vw,120px)] right-0 flex items-center justify-center rounded-sm">
                 <span class="cursor-pointer block w-full text-center text-red-600" (click)="delete()">Delete</span>
               </div>
             }
@@ -23,7 +23,7 @@
 
     <div class="py-8 flex flex-col gap-2 border-b-[.1em] border-gray-300">
       <h1 class="text-3xl font-medium">Issue</h1>
-      <textarea class="text-base border-[.1em] border-transparent cursor-pointer focus:cursor-auto focus:border-lime-500 p-2 outline-none " placeholder="Ticket doesn't have any description" [value]="description" (input)="detectDescription(desc.value)" #desc></textarea>
+      <textarea class="text-base border-[.1em] border-transparent cursor-pointer focus:cursor-auto focus:border-lime-500 p-2 outline-none" placeholder="Ticket doesn't have any description" [value]="description" [style.height]="(desc.scrollHeight + 10) + 'px'" (input)="detectDescription(desc.value)" #desc></textarea>
       @if (descriptionChanged) {
         <div class="flex items-center gap-2">
           <button class="text-base font-medium px-2 py-1 bg-lime-500 border-[.1em] border-lime-500 text-white rounded-sm cursor-pointer hover:bg-lime-600 hover:border-lime-600" type="button" (click)="editDescription()">Edit</button>

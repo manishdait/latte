@@ -14,12 +14,12 @@
   <div class="flex gap-8 flex-wrap">
     <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] border-[.1em] border-gray-200">
       <span class="text-base">Open Tickets</span>
-      <span class="text-4xl font-bold">{{ info?.total_tickets }}</span>
+      <span class="text-4xl font-bold">{{ (openCount$ | async) }}</span>
     </div>
 
     <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] border-[.1em] border-gray-200">
       <span class="text-base">Completed Tickets</span>
-      <span class="text-4xl font-bold">{{ info?.completed_tickets }}</span>
+      <span class="text-4xl font-bold">{{ (closeCount$ | async) }}</span>
     </div>
   </div>
 </div>

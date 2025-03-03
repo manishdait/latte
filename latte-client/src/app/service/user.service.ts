@@ -29,6 +29,10 @@ export class UserService {
     return this.client.get<UserResponse>(`${URL}/info`);
   }
 
+  fetchUserCount(): Observable<Map<string, number>> {
+    return this.client.get<Map<string, number>>(`${URL}/count`);
+  }
+
   updateUser(request: UserResponse): Observable<UserResponse> {
     return this.client.put<UserResponse>(`${URL}`, request);
   }

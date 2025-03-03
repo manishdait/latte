@@ -10,7 +10,7 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
-import { addTicket } from '../../state/ticket/ticket.action';
+import { addTicket, incrementTicketOpenCount } from '../../state/ticket/ticket.action';
 import { AlertService } from '../../service/alert.service';
 
 @Component({
@@ -100,6 +100,7 @@ export class CreateTicketComponent implements OnInit {
     this.ticketService.createTicket(request).subscribe({
       next: (response) => {
         this.store.dispatch(addTicket({ticket: response}));
+        this.store.dispatch(incrementTicketOpenCount());
         this.alertService.alert = `Ticket created`;
         this.cancel();
       },
