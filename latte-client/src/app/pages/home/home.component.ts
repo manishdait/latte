@@ -17,8 +17,6 @@ import { environment } from '../../../environments/environment';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('navtoggle') navToggle!: ElementRef;
-
   version: string = environment.VERSION;
   
   role: Role;
@@ -47,11 +45,5 @@ export class HomeComponent implements OnInit {
 
   createTicket() {
     this.ticketToggle = true;
-    this.toggleSidenav(false);
-  }
-
-  toggleSidenav(state: boolean) {
-    const toggle = this.navToggle.nativeElement as HTMLInputElement;
-    toggle.checked = state;
   }
 }

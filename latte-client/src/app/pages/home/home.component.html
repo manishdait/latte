@@ -4,70 +4,66 @@
   </div>
 }
 
-<div class="w-screen h-screen flex wrapper">
+<div class="w-screen h-screen flex flex-col">
   <input type="checkbox" id="nav-toggle" class="fixed hidden nav-toggle" #navtoggle>
 
-  <div class="bg-white min-w-[min(250px,100%)] flex flex-col gap-4 px-4 py-2 shadow-sm sidenav">
-    <div>
-      <div class="flex items-end">
-        <div class="w-[1.6rem] h-full my-[.2em]">
-          <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
-        </div>
-        <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
-        <fa-icon class="text-base text-lime-600 cursor-pointer rotate-180 gone" [icon]="'arrow-right-to-bracket'"  (click)="toggleSidenav(false)"></fa-icon>
+  <div class="navbar px-4 py-2 border-b-[.1em] border-b-gray-200">
+    <div class="flex items-end">
+      <div class="w-[1.6rem] h-full my-[.1em]">
+        <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
       </div>
+      <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
+      
+      <label for="nav-toggle" class="hide">
+        @if (!navtoggle.checked) {
+          <fa-icon class="text-base text-lime-600 cursor-pointer" [icon]="'arrow-right-to-bracket'"></fa-icon>
+        } @else {
+          <fa-icon class="text-base text-lime-600 cursor-pointer rotate-180" [icon]="'arrow-right-to-bracket'"></fa-icon>
+        }
+      </label>
     </div>
+  </div>
 
-    <div class="h-full flex flex-col">
+  <div class="w-full h-full flex">
+    <div class="bg-white h-full flex flex-col w-[min(100%,280px)] border-r-[.1em] border-r-gray-200 p-4 sidenav">
       <div class="flex flex-col gap-2">
-        <a class="text-gray-600 text-base font-medium  p-2 rounded-sm cursor-pointer flex items-center gap-2" (click)="createTicket()">
+        <a class="text-neutral-600 font-medium  p-2 rounded-sm cursor-pointer flex items-center gap-2" (click)="createTicket()">
           <fa-icon [icon]="'pen'"></fa-icon>
-          <span>Create Ticket</span>
+          <span class="text-base">Create Ticket</span>
         </a>
   
-        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/dashboard" routerLinkActive="active" (click)="toggleSidenav(false)">
+        <a class="text-neutral-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/dashboard" routerLinkActive="active">
           <fa-icon [icon]="'house'"></fa-icon>
           <span>Dashboard</span>
         </a>
   
-        <a class="text-gray-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/tickets" routerLinkActive="active" (click)="toggleSidenav(false)">
+        <a class="text-neutral-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/tickets" routerLinkActive="active">
           <fa-icon [icon]="'ticket'"></fa-icon>
           <span>Tickets</span>
         </a>
       </div>
-  
+
       <div class="mt-auto flex flex-col gap-2">
         @if (isAdmin()) {
-          <span class="text-gray-800 text-base font-medium px-2 rounded-sm">ADMIN</span>
-          <a class="text-gray-600 text-base px-2 rounded-sm cursor-pointer" routerLink="/home/users" (click)="toggleSidenav(false)">Users</a>
+          <span class="text-neutral-800 text-base font-medium px-2 rounded-sm">ADMIN</span>
+          <a class="text-neutral-600 text-base px-2 rounded-sm cursor-pointer" routerLink="/home/users">Users</a>
         }
-        <span class="text-gray-600 text-base px-2 rounded-sm cursor-pointer">Version - <span class="text-sm text-neutral-800 font-bold bg-lime-100 py-1 px-2 rounded-sm">{{ version }}</span></span>
+        <span class="text-neutral-600 text-base px-2 rounded-sm cursor-pointer">Version - <span class="text-sm text-neutral-800 font-bold bg-lime-100 py-1 px-2 rounded-sm">{{ version }}</span></span>
 
-        <div class="flex gap-2 p-2 items-center mt-4 cursor-pointer" routerLink="/home/profile" (click)="toggleSidenav(false)">
+        <div class="flex gap-2 p-2 items-center mt-4 cursor-pointer" routerLink="/home/profile">
           <div class="w-[2.2rem] h-[2.2rem] rounded-[100%] flex items-center justify-center" [style.background-color]="color(firstname)">
             <span class="text-base text-white font-bold">{{ firstname.charAt(0) }}</span>
           </div>
 
           <div class="flex flex-col gap-1">
-            <span class="text-sm text-gray-600">{{ firstname }}</span>
-            <span class="text-sm text-gray-600 font-medium">View Profile</span>
+            <span class="text-sm text-neutral-600">{{ firstname }}</span>
+            <span class="text-sm text-neutral-600 font-medium">View Profile</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="shadow-sm navbar px-4 py-2">
-    <div class="flex items-end cursor-pointer" (click)="toggleSidenav(true)">
-      <div class="w-[1.6rem] h-full my-[.1em]">
-        <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
-      </div>
-      <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
-      <fa-icon class="text-base text-lime-600" [icon]="'arrow-right-to-bracket'"></fa-icon>
+    <div class="grow overflow-y-scroll">
+      <router-outlet></router-outlet>
     </div>
-  </div>
-
-  <div class="grow overflow-y-scroll">
-    <router-outlet></router-outlet>
-  </div>
 </div>

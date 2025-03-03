@@ -1,48 +1,44 @@
 <div class="w-full h-full p-8">
   @if ((tickets$ | async)?.length != 0) {
     <div>
-      <table class="rounded-sm overflow-hidden">
-        <thead class="border-b-[.1em] border-gray-200">
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Created By</th>
-            <th>Priority</th>
-            <th></th>
-          </tr>
-        </thead>
-  
-        <tbody>
-          @for (ticket of (tickets$ | async); track ticket.id) {
-            <tr>
-              <td data-title="Id: ">{{ ticket.id }}</td>
-              <td data-title="Title: ">{{ ticket.title }}</td>
-              <td data-title="Created By: ">{{ ticket.createdBy.firstname }}</td>
-              <td data-title="Priority: ">
-                <span class="text-[.8rem] py-2 px-4 rounded-[4em]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ ticket.priority }}</span>
-              </td>
-              <td><a class="text-base text-blue-700 cursor-pointer" routerLink="{{ ticket.id }}">View</a></td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
-      @if(page['next'] || page['prev']) {
-        <div class="flex gap-4 py-4">
-          @if(page['prev']) {
-            <span class="text-base font-medium cursor-pointer p-1 rounded-full hover:bg-gray-200" (click)="prev()">
-              <fa-icon [icon]="'angles-left'"></fa-icon>
-            </span>
-          }
-          <span class="text-base font-bold cursor-pointer py-1">{{ count+1 }}</span>
-  
-          @if(page['next']) {
-            <span class="text-base font-medium cursor-pointer p-1 rounded-full hover:bg-gray-200" (click)="next()">
-              <fa-icon [icon]="'angles-right'"></fa-icon>
-            </span>
-          }
+      <div class="border-[.1em] border-gray-200 rounded-sm">
+        <div class="flex gap-4 bg-gray-50 py-2 px-4">
+          <span class="text-base font-semibold">Open</span>
+          <span>Closed</span>
         </div>
-      }
+
+        @for (ticket of (tickets$ | async); track ticket.id) {
+          <div class="flex gap-4 py-3 px-4 border-t-[.1em] border-t-gray-200 cursor-pointer" routerLink="{{ ticket.id }}">
+            <div class="flex flex-col gap-1">
+              <div class="flex flex-wrap gap-2 items-center">
+                <span class="text-[1.1rem] font-semibold">{{ ticket.title }}</span>
+                <span class="text-[.7rem] text-center font-semibold py-0.5 px-4 rounded-[4em]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ ticket.priority }}</span>
+              </div>
+              <span class="text-[.9rem] font-medium text-gray-500">{{ '#' + ticket.id + ' ' + ticket.createdBy.firstname + ' create on ' +  getDate(ticket.createdAt)}}</span>
+            </div>
+          </div>
+        }
+
+        @if(page['prev'] || page['next']) {
+          <div class="flex gap-4 py-2 px-4 border-t-[.1em] border-t-gray-200 justify-end">
+            <div class="flex gap-2 flex-wrap">
+              <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-4 font-medium disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-auto border-blue-500 text-blue-500 hover:bg-neutral-50 cursor-pointer" [disabled]="!page['prev']" (click)="prev()">Previous</button>
+  
+              @if(page['prev']) {
+                <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-gray-300 text-gray-500">{{ count }}</span>
+              }
+  
+              <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-blue-500 bg-blue-500 text-white">{{ count + 1 }}</span>
+  
+              @if(page['next']) {
+                <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-gray-300 text-gray-500">{{ count + 2 }}</span>
+              }
+  
+              <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-4 font-medium disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-auto border-blue-500 text-blue-500 hover:bg-neutral-50 cursor-pointer" [disabled]="!page['next']" (click)="next()">Next</button>
+            </div>
+          </div>
+        }
+      </div>
     </div>
   }
 

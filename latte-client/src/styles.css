@@ -5,23 +5,23 @@ body {
 }
 
 html {
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 @media screen and (max-width: 700px) {
   html {
-    font-size: 0.8;
+    font-size: .9rem;
   }
 }
 
 @media screen and (max-width: 400px) {
   html {
-    font-size: 0.7;
+    font-size: .8rem;
   }
 }
 
 @media screen and (max-width: 200px) {
   html {
-    font-size: 0.6;
+    font-size: .7rem;
   }
 }

@@ -1,18 +1,4 @@
-fa-icon {
-  font-size: 1rem;
-}
-
-.navbar {
-  display: none;
-}
-
-.nav-toggle:checked + .sidenav {
-  display: flex;
-  left: 0%;
-  transition: all .3s linear;
-}
-
-.gone {
+.hide {
   display: none;
 }
 
@@ -22,19 +8,21 @@ fa-icon {
 }
 
 @media screen and (max-width: 800px) {
-  .wrapper {
-    flex-direction: column;
-  }
-  .gone {
+  .hide {
     display: block;
   }
+
+  
   .sidenav {
-    position: fixed;
+    position: absolute;
     left: -100%;
     transition: all .3s linear;
     height: 100vh;
   }
-  .navbar {
-    display: flex;
+
+  .nav-toggle:checked~.flex>.sidenav{
+    left: 0%;
+    transition: all .3s linear;
+    height: 100%;
   }
 }

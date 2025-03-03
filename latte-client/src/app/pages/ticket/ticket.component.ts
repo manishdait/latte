@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { setTickets } from '../../state/ticket/ticket.action';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
+import { getDate } from '../../shared/utils';
 
 @Component({
   selector: 'app-ticket',
@@ -66,5 +67,9 @@ export class TicketComponent implements OnInit {
         this.store.dispatch(setTickets({tickets: response.content}))
       }
     });
+  }
+
+  getDate(date: any) {
+    return getDate(date);
   }
 }

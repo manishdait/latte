@@ -1,5 +1,5 @@
 <div class="w-full p-4 flex flex-col gap-8">
-  <div class="bg-white p-8 rounded-sm flex flex-col gap-2 shadow-sm">
+  <div class="bg-white p-8 rounded-sm flex flex-col gap-2 border-[.1em] border-gray-200">
     <h1 class="text-3xl font-extrabold ">{{ greet() + ', ' + firstname }}</h1>
 
     <div class="flex items-center gap-2">
@@ -12,12 +12,12 @@
   </div>
 
   <div class="flex gap-8 flex-wrap">
-    <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] shadow-sm">
+    <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] border-[.1em] border-gray-200">
       <span class="text-base">Open Tickets</span>
       <span class="text-4xl font-bold">{{ info?.total_tickets }}</span>
     </div>
 
-    <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] shadow-sm">
+    <div class="bg-white p-8 rounded-sm flex flex-col gap-2 w-[min(100%,400px)] border-[.1em] border-gray-200">
       <span class="text-base">Completed Tickets</span>
       <span class="text-4xl font-bold">{{ info?.completed_tickets }}</span>
     </div>

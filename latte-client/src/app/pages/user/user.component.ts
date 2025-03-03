@@ -31,7 +31,7 @@ export class UserComponent implements OnInit {
   confirmToggle: boolean = false;
 
   count: number = 0;
-  size: number = 10;
+  size: number = 2;
   page: Record<string, boolean> = {
     'prev': false,
     'next': false
