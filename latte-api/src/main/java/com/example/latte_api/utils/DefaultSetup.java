@@ -17,6 +17,7 @@ import com.example.latte_api.user.role.Role;
 import com.example.latte_api.user.role.RoleRepository;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,37 +31,46 @@ public class DefaultSetup {
   private final PasswordEncoder encoder;
 
   @PostConstruct
+  @Transactional
   public void init() {
-    Path dir = Paths.get("../data");
+    long count = userRepository.count();
+
+    if (count != 0) {
+      return;
+    }
+
+    Path dir = Paths.get("data");
     try {
       if(!Files.exists(dir)) {
         Files.createDirectories(dir);
       }
-      File cred = new File("../data/cred");
+      File cred = new File("data/.cred");
 
       if (!cred.exists()) {
         cred.createNewFile();
-        String password = UUID.randomUUID().toString() + LocalTime.now().hashCode();
-  
-        FileWriter fileWriter = new FileWriter(cred);
-        fileWriter.append(password + "\n");
-        fileWriter.close();
-        
-        cred.setReadOnly();
-  
-        Role roleAdmin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
-        User admin = User.builder()
-          .firstname("Admin")
-          .email("admin@admin.com")
-          .password(encoder.encode(password))
-          .role(roleAdmin)
-          .build();
-  
-        userRepository.save(admin);
       }
+
+      String password = UUID.randomUUID().toString() + LocalTime.now().hashCode();
+  
+      FileWriter fileWriter = new FileWriter(cred);
+      fileWriter.append(password + "\n");
+      fileWriter.close();
+        
+      cred.setReadOnly();
+  
+      Role roleAdmin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
+      User admin = User.builder()
+        .firstname("Admin")
+        .email("admin@admin.com")
+        .password(encoder.encode(password))
+        .role(roleAdmin)
+        .build();
+  
+      userRepository.save(admin);
     } catch (Exception e) {
       e.printStackTrace();
       log.error("Exception occurs during initializing default admin user: {}", e.getMessage());
+      throw new RuntimeException("Exception creating admin user");
     }
   }
 }
