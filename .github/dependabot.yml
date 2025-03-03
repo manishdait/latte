@@ -9,7 +9,15 @@ updates:
     directory: "/latte-api" 
     schedule:
       interval: "weekly"
+    target-branch: "dependency-updates"
+    lables:
+      - "dependabot-update"
+      - "maven-package"
   - package-ecosystem: "npm"
     directory: "/latte-client"
     schedule:
       interval: "weekly"
+    target-branch: "dependency-updates"
+    lables:
+      - "dependabot-update"
+      - "npm-package"
