@@ -55,6 +55,9 @@ public class Ticket extends AbstractAuditingEntity {
   @Column(name = "status")
   private Status status;
 
+  @Column(name = "lock")
+  private Boolean lock;
+
   @ManyToOne
   @JoinColumn(name = "created_by")
   private User createdBy;

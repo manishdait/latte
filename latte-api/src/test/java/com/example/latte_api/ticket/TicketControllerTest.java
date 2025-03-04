@@ -88,6 +88,7 @@ public class TicketControllerTest {
       .title("T1")
       .description("description")
       .createdBy(peter)
+      .lock(false)
       .priority(Priority.LOW)
       .status(Status.OPEN)
       .build();
@@ -96,6 +97,7 @@ public class TicketControllerTest {
       .title("T2")
       .description("description")
       .createdBy(jhon)
+      .lock(false)
       .priority(Priority.LOW)
       .status(Status.CLOSE)
       .build();
@@ -570,6 +572,210 @@ public class TicketControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldLockTicket_byTicketId_ifRequestedUserIsAdmin() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/lock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      TicketResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    final TicketResponse result = response.getBody();
+    Assertions.assertThat(result.lock()).isTrue();
+  }
+
+  @Test
+  void shouldGiveForbidden_whenTicketLock_ifRequestedUserIsNotAdmin() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/lock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldGiveForbidden_whenTicketLock_ifRequestMissingAuthorizationHeader() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/lock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldGiveNotFound_whenTicketLock_ifTicketNotExist() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final Long id = 300L;
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/lock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  @Test
+  void shouldUnockTicket_byTicketId_ifRequestedUserIsAdmin() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/unlock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      TicketResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    final TicketResponse result = response.getBody();
+    Assertions.assertThat(result.lock()).isFalse();
+  }
+
+  @Test
+  void shouldGiveForbidden_whenTicketUnlock_ifRequestedUserIsNotAdmin() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/unlock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldGiveForbidden_whenTicketUnlock_ifRequestMissingAuthorizationHeader() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+
+    final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
+      "/latte-api/v1/tickets",
+      HttpMethod.POST,
+      new HttpEntity<>(ticketRequest, headers),
+      TicketResponse.class
+    );
+
+    final Long id = ticket.getBody().id();
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/unlock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldGiveNotFound_whenTicketUnLock_ifTicketNotExist() {
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final Long id = 300L;
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/tickets/unlock/" + id,
+      HttpMethod.PATCH,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test

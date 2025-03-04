@@ -59,6 +59,16 @@ public class TicketController {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.editTicket(id, request, authentication));
   }
 
+  @PatchMapping("/lock/{id}")
+  public ResponseEntity<TicketResponse> lockTicket(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.lockTicket(id));
+  }
+
+  @PatchMapping("/unlock/{id}")
+  public ResponseEntity<TicketResponse> unlockTicket(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.unlockTicket(id));
+  }
+
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable Long id) {
     ticketService.deleteTicket(id);

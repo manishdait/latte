@@ -24,6 +24,7 @@ import com.example.latte_api.ticket.mapper.TicketMapper;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -54,6 +55,7 @@ public class TicketService {
       .description(request.description())
       .priority(request.priority())
       .status(request.status())
+      .lock(false)
       .createdBy(user)
       .build();
 
@@ -155,6 +157,26 @@ public class TicketService {
 
     ticketRepository.save(ticket);
     activityService.saveActivities(activities);
+    return ticketMapper.mapToTicketResponse(ticket);
+  }
+
+  @Transactional
+  public TicketResponse lockTicket(Long id) {
+    Ticket ticket = ticketRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+    ticket.setLock(true);
+    ticketRepository.save(ticket);
+    return ticketMapper.mapToTicketResponse(ticket);
+  }
+
+  @Transactional
+  public TicketResponse unlockTicket(Long id) {
+    Ticket ticket = ticketRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+    ticket.setLock(false);
+    ticketRepository.save(ticket);
     return ticketMapper.mapToTicketResponse(ticket);
   }
 

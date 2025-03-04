@@ -67,7 +67,9 @@ public class SecurityConfig {
 
       request.requestMatchers(
         HttpMethod.PATCH, 
-        "/latte-api/v1/users/*"
+        "/latte-api/v1/users/*",
+        "/latte-api/v1/tickets/lock/*",
+        "/latte-api/v1/tickets/unlock/*"
       ).hasRole("ADMIN");
 
       request.requestMatchers(

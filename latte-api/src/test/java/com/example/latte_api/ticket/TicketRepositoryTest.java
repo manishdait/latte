@@ -42,6 +42,7 @@ public class TicketRepositoryTest {
     .title("Test Ticket")
     .description("Ticket for test")
     .priority(Priority.LOW)
+    .lock(false)
     .status(Status.OPEN)
     .build();
 

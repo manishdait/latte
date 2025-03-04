@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS ticket (
   description TEXT NOT NULL,
   priority VARCHAR(255) CHECK(priority = 'LOW' OR priority = 'MEDIUM' OR priority = 'HIGH') NOT NULL,
   status VARCHAR(255) CHECK(status = 'OPEN' OR status = 'CLOSE' OR status = 'IN_PROGRESS') NOT NULL,
+  lock Boolean NOT NULL DEFAULT FALSE,
   created_by BIGINT REFERENCES _user(id) NOT NULL,
   assigned_to BIGINT REFERENCES _user(id),
   created_at TIMESTAMP,

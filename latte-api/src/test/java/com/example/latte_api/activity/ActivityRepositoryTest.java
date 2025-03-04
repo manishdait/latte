@@ -62,6 +62,7 @@ public class ActivityRepositoryTest {
       .title("Test Ticket")
       .description("Ticket for test")
       .priority(Priority.LOW)
+      .lock(false)
       .status(Status.OPEN)
       .createdBy(user)
       .build();

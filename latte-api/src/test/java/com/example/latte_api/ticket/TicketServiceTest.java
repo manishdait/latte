@@ -39,6 +39,8 @@ import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.role.Role;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @ExtendWith(MockitoExtension.class)
 public class TicketServiceTest {
   private TicketService ticketService;
@@ -595,5 +597,61 @@ public class TicketServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id));
+  }
+
+  @Test
+  void shouldLockTicket_andReturnTicketResponse_forValidId() {
+    final Ticket ticket = Mockito.mock(Ticket.class);
+    final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
+
+    final Long id = 101L;
+
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+
+    final TicketResponse result = ticketService.lockTicket(101L);
+
+    verify(ticketRepository, times(1)).findById(id);
+    verify(ticketMapper, times(1)).mapToTicketResponse(ticket);
+    Assertions.assertThat(result).isNotNull();
+  }
+
+  @Test
+  void shouldThrow_exceptionOnLockTicket_forInvalidId() {
+    final Long id = 101L;
+
+    when(ticketRepository.findById(id)).thenReturn(Optional.empty());
+
+    Assertions.assertThatThrownBy(() -> ticketService.lockTicket(101L))
+      .isInstanceOf(EntityNotFoundException.class)
+      .hasMessage("Ticket not found");
+  }
+
+  @Test
+  void shouldUnlockTicket_andReturnTicketResponse_forValidId() {
+    final Ticket ticket = Mockito.mock(Ticket.class);
+    final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
+
+    final Long id = 101L;
+
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+
+    final TicketResponse result = ticketService.unlockTicket(101L);
+
+    verify(ticketRepository, times(1)).findById(id);
+    verify(ticketMapper, times(1)).mapToTicketResponse(ticket);
+    Assertions.assertThat(result).isNotNull();
+  }
+
+  @Test
+  void shouldThrow_exceptionOnUnlockTicket_forInvalidId() {
+    final Long id = 101L;
+
+    when(ticketRepository.findById(id)).thenReturn(Optional.empty());
+
+    Assertions.assertThatThrownBy(() -> ticketService.unlockTicket(101L))
+      .isInstanceOf(EntityNotFoundException.class)
+      .hasMessage("Ticket not found");
   }
 }

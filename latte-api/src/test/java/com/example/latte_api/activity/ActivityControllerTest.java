@@ -89,6 +89,7 @@ public class ActivityControllerTest {
       .createdBy(jhon)
       .createdAt(Instant.now())
       .priority(Priority.LOW)
+      .lock(false)
       .status(Status.OPEN)
       .build();
     
