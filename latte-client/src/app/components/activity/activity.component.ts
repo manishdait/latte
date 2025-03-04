@@ -4,6 +4,7 @@ import { ActivityResponse, ActivityType } from '../../models/activity.type';
 import { CommentService } from '../../service/comment.service';
 import { CommentRequest } from '../../models/comment.type';
 import { getDate } from '../../shared/utils';
+import { TicketResponse } from '../../models/ticket.type';
 
 @Component({
   selector: 'app-activity',
@@ -13,7 +14,7 @@ import { getDate } from '../../shared/utils';
 })
 export class ActivityComponent implements OnInit {
   @ViewChild('message') message!: ElementRef;
-  @Input('ticketId') ticketId: number | undefined;
+  @Input('ticket') ticket: TicketResponse | undefined;
 
   hasMore: boolean = false;
 
@@ -25,8 +26,8 @@ export class ActivityComponent implements OnInit {
   constructor(private activityService: ActivityService, private commentService: CommentService) {}
 
   ngOnInit(): void {
-    if(this.ticketId) {
-      this.activityService.getActivitiesForTicket(this.ticketId, this.count, this.size).subscribe({
+    if(this.ticket) {
+      this.activityService.getActivitiesForTicket(this.ticket.id, this.count, this.size).subscribe({
         next: (response) => {
           this.activities = response.content;
           this.hasMore = response.next;
@@ -45,9 +46,9 @@ export class ActivityComponent implements OnInit {
 
   comment(message: string) {
     const input = this.message.nativeElement as HTMLInputElement;
-    if (this.ticketId && message !== '') {
+    if (this.ticket && message !== '') {
       const request: CommentRequest = {
-        ticketId: this.ticketId,
+        ticketId: this.ticket.id,
         message: message
       }
       input.value = '';
@@ -60,10 +61,10 @@ export class ActivityComponent implements OnInit {
   }
 
   loadPrevious() {
-    if (this.ticketId) {
+    if (this.ticket) {
       this.count += 1;
     
-      this.activityService.getActivitiesForTicket(this.ticketId, this.count, this.size).subscribe({
+      this.activityService.getActivitiesForTicket(this.ticket.id, this.count, this.size).subscribe({
         next: (response) => {
           this.activities = this.activities.concat(response.content);
           this.hasMore = response.next;

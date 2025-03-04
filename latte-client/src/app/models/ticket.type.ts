@@ -8,6 +8,7 @@ export interface TicketResponse {
   description: string,
   priority: Priority,
   status: Status,
+  lock: boolean,
   createdBy: UserResponse,
   assignedTo: UserResponse,
   createdAt: Date,

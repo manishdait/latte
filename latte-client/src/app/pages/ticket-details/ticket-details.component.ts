@@ -125,6 +125,24 @@ export class TicketDetailsComponent implements OnInit {
     }
   }
 
+  lockTicket() {
+    this.ticketService.lockTicket(this.ticketId).subscribe({
+      next: (response) => {
+        this.ticket = response;
+        this.activity.ngOnInit(); 
+      }
+    }) 
+  }
+
+  unlockTicket() {
+    this.ticketService.unlockTicket(this.ticketId).subscribe({
+      next: (response) => {
+        this.ticket = response;
+        this.activity.ngOnInit(); 
+      }
+    })
+  }
+
   isAdmin() {
     return this.authService.getRoles() === Role.ADMIN;
   }

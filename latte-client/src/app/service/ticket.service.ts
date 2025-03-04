@@ -42,6 +42,14 @@ export class TicketService {
     return this.client.patch<TicketResponse>(`${URL}/${ticketId}`, request);
   }
 
+  lockTicket(ticketId: number) {
+    return this.client.patch<TicketResponse>(`${URL}/lock/${ticketId}`, null);
+  }
+
+  unlockTicket(ticketId: number) {
+    return this.client.patch<TicketResponse>(`${URL}/unlock/${ticketId}`, null);
+  }
+
   deleteTicket(ticketId: number): Observable<Map<string, any>> {
     return this.client.delete<Map<string, any>>(`${URL}/${ticketId}`);
   }
