@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { TicketResponse } from "../../models/ticket.type";
+import { TicketResponse } from "../../model/ticket.type";
 import { 
   addTicket, 
   decrementTicketCloseCount, 

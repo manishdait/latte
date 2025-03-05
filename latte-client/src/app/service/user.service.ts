@@ -2,8 +2,8 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { ResetPasswordRequest, UserResponse } from "../models/user.type";
-import { Page } from "../models/page.type";
+import { ResetPasswordRequest, UserResponse } from "../model/user.type";
+import { Page } from "../model/page.type";
 
 const URL: string = `${environment.API_ENDPOINT}/users`;
 

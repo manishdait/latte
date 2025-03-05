@@ -1,18 +1,17 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Role } from '../../models/role.enum';
-import { CreateTicketComponent } from '../../forms/create-ticket/create-ticket.component';
+import { Role } from '../../model/role.enum';
 import { getColor } from '../../shared/utils';
 import { jwtDecode } from "jwt-decode";
 import { AuthService } from '../../service/auth.service';
 import { environment } from '../../../environments/environment';
-
+import { TicketFormComponent } from '../../components/form/ticket-form/ticket-form.component';
 
 @Component({
   selector: 'app-home',
-  imports: [FontAwesomeModule, RouterOutlet, RouterLink, RouterLinkActive, CreateTicketComponent],
+  imports: [FontAwesomeModule, RouterOutlet, RouterLink, RouterLinkActive, TicketFormComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

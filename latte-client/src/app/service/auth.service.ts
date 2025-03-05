@@ -1,7 +1,7 @@
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { AuthRequest, AuthResponse, RegistrationRequest } from '../models/auth.type';
+import { AuthRequest, AuthResponse, RegistrationRequest } from '../model/auth.type';
 import { catchError, map, Observable, of } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
 

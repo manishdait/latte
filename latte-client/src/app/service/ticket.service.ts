@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { Observable } from "rxjs";
-import { Page } from "../models/page.type";
-import { PatchTicketRequest, TicketRequest, TicketResponse } from "../models/ticket.type";
+import { Page } from "../model/page.type";
+import { PatchTicketRequest, TicketRequest, TicketResponse } from "../model/ticket.type";
 import { HttpClient } from "@angular/common/http";
-import { Status } from "../models/status.enum";
+import { Status } from "../model/status.enum";
 
 const URL: string = `${environment.API_ENDPOINT}/tickets`;
 

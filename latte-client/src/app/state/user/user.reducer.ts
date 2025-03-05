@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { UserResponse } from "../../models/user.type";
+import { UserResponse } from "../../model/user.type";
 import { addUser, decrementUserCount, incrementUserCount, removeUser, setUserCount, setUsers } from "./user.action";
 
 export interface UserState {

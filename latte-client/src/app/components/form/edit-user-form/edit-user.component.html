@@ -1,0 +1,36 @@
+<div class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center translucent-bg p-4">
+  <div class="w-[min(100%,650px)] flex flex-col p-4 gap-4 rounded-sm shadow-sm bg-white">
+    <h1 class="text-2xl text-neutral-800 font-medium">Edit User</h1>
+
+    <form class="w-full" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-neutral-800" for="firstname">Firstname</label>
+        <input class="text-base text-neutral-800 px-2 py-1 border-[.1em] border-gray-200 rounded-sm outline-none focus:border-lime-500" placeholder="Enter firstname of the user..." id="firstname" formControlName="firstname">
+        @if(formErrors && (formControls['firstname'].errors && formControls['firstname'].errors['required'])) {
+          <span class="text-sm text-red-600">*Required firstname</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-neutral-800" for="email">Email</label>
+        <input class="text-base text-neutral-800 px-2 py-1 border-[.1em] border-gray-200 rounded-sm outline-none focus:border-lime-500" placeholder="Enter user email..." id="email" formControlName="email">
+        @if(formErrors && (formControls['email'].errors && formControls['email'].errors['required'])) {
+          <span class="text-sm text-red-600">*Required email address</span>
+        }
+        @if(formErrors && (formControls['email'].errors && formControls['email'].errors['email'])) {
+          <span class="text-sm text-red-600">*Enter valid email address</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-neutral-800" for="role">Password</label>
+        <app-dropdown [id]="'role'" [placeholder]="'Select a role...'" [list]="roles" formControlName="role"/>
+      </div>
+
+      <div class="flex gap-4">
+        <button class="text-base font-medium px-2 py-1 bg-lime-500 border-[.1em] border-lime-500 text-white rounded-sm cursor-pointer hover:bg-lime-600 hover:border-lime-600" type="submit">Edit User</button>
+        <button class="text-base font-medium px-2 py-1 bg-white border-[.1em] border-lime-500 text-lime-500 rounded-sm cursor-pointer hover:bg-gray-100" type="button" (click)="cancel.emit(true)">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

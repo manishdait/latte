@@ -1,7 +1,5 @@
 @if(ticketToggle) {
-  <div class="fixed left-0 w-screen h-screen">
-    <app-create-ticket (toggle)="ticketToggle = false"></app-create-ticket>
-  </div>
+  <app-ticket-form (cancel)="ticketToggle = false"/>
 }
 
 <div class="w-screen h-screen flex flex-col">
@@ -9,16 +7,15 @@
 
   <div class="navbar px-4 py-2 border-b-[.1em] border-b-gray-200">
     <div class="flex items-end">
-      <div class="w-[1.6rem] h-full my-[.1em]">
+      <div class="w-[6.5rem] h-full my-[.1em]">
         <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
       </div>
-      <h1 class="text-[1.8rem] text-lime-600 font-semibold px-2 leading-none">Latte</h1>
       
       <label for="nav-toggle" class="hide">
         @if (!navtoggle.checked) {
-          <fa-icon class="text-base text-lime-600 cursor-pointer" [icon]="'arrow-right-to-bracket'"></fa-icon>
+          <fa-icon class="text-base text-lime-500 cursor-pointer" [icon]="'arrow-right-to-bracket'"></fa-icon>
         } @else {
-          <fa-icon class="text-base text-lime-600 cursor-pointer rotate-180" [icon]="'arrow-right-to-bracket'"></fa-icon>
+          <fa-icon class="text-base text-lime-500 cursor-pointer transform rotate-90" [icon]="'arrow-right-to-bracket'"></fa-icon>
         }
       </label>
     </div>
@@ -28,17 +25,17 @@
     <div class="bg-white h-full flex flex-col w-[min(100%,280px)] border-r-[.1em] border-r-gray-200 p-4 sidenav">
       <div class="flex flex-col gap-2">
         <a class="text-neutral-600 font-medium  p-2 rounded-sm cursor-pointer flex items-center gap-2" (click)="createTicket()">
-          <fa-icon [icon]="'pen'"></fa-icon>
+          <fa-icon class="text-[.9rem]" [icon]="'pen'"></fa-icon>
           <span class="text-base">Create Ticket</span>
         </a>
   
         <a class="text-neutral-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/dashboard" routerLinkActive="active">
-          <fa-icon [icon]="'house'"></fa-icon>
+          <fa-icon class="text-[.9rem]" [icon]="'house'"></fa-icon>
           <span>Dashboard</span>
         </a>
   
         <a class="text-neutral-600 text-base font-medium p-2 rounded-sm cursor-pointer flex items-center gap-2" routerLink="/home/tickets" routerLinkActive="active">
-          <fa-icon [icon]="'ticket'"></fa-icon>
+          <fa-icon class="text-[.9rem]" [icon]="'ticket'"></fa-icon>
           <span>Tickets</span>
         </a>
       </div>
@@ -48,7 +45,7 @@
           <span class="text-neutral-800 text-base font-medium px-2 rounded-sm">ADMIN</span>
           <a class="text-neutral-600 text-base px-2 rounded-sm cursor-pointer" routerLink="/home/users">Users</a>
         }
-        <span class="text-neutral-600 text-base px-2 rounded-sm cursor-pointer">Version - <span class="text-sm text-neutral-800 font-bold bg-lime-100 py-1 px-2 rounded-sm">{{ version }}</span></span>
+        <a class="text-neutral-600 text-base px-2 rounded-sm cursor-pointer" href="https://github.com/manishdait/latte">Version - <span class="text-sm text-neutral-800 font-bold bg-lime-100 py-1 px-2 rounded-sm">{{ version }}</span></a>
 
         <div class="flex gap-2 p-2 items-center mt-4 cursor-pointer" routerLink="/home/profile">
           <div class="w-[2.2rem] h-[2.2rem] rounded-[100%] flex items-center justify-center" [style.background-color]="color(firstname)">

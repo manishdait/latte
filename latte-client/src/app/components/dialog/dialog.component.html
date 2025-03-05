@@ -1,0 +1,13 @@
+<div class="fixed w-screen h-screen left-0 top-0 flex items-center justify-center translucent-bg">
+  <div class="w-[min(100%,400px)] flex flex-col p-4 gap-8 rounded-sm shadow-sm bg-white">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl text-neutral-800 font-medium">Confirm</h1>
+      <span class="text-base text-neutral-800">{{ message }}</span>
+    </div>
+
+    <div class="flex gap-2">
+      <button class="text-base font-medium px-2 py-1 bg-lime-500 border-[.1em] border-lime-500 text-white rounded-sm cursor-pointer hover:bg-lime-600 hover:border-lime-600" type="button" (click)="trigger(true)">Yes</button>
+      <button class="text-base font-medium px-2 py-1 bg-red-500 border-[.1em] border-red-500 text-white rounded-sm cursor-pointer hover:bg-red-600 hover:border-red-600" type="button" (click)="trigger(false)">No</button>
+    </div>
+  </div>
+</div>

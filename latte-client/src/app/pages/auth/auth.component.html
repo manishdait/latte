@@ -1,43 +1,37 @@
 <div class="w-[min(100vw,450px)] h-screen mx-auto flex flex-col items-center justify-center p-4 gap-8">
   <div class="flex items-end gap-2">
-    <div class="w-[3rem] h-full my-[.2em]">
-      <img class="w-full h-full object-contain" src="asset/icon.svg">
+    <div class="w-[10rem] h-full my-[.1em]">
+      <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
     </div>
-    <h1 class="text-5xl text-center text-lime-600 font-bold leading-none">Latte</h1>
   </div>
 
   <div class="w-full">
     <h1 class="text-3xl text-center font-bold">Sign in to your account</h1>
 
-    <form class="bg-white rounded-lg w-full p-4 mt-4 shadow-sm" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form class="w-full bg-white p-4 mt-4 rounded-lg border-[.1em] border-gray-200" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm" for="email">Email Address</label>
-        <input class="text-base border-[.1em] border-gray-200 p-2 rounded-sm outline-none focus:border-lime-500" placeholder="petergriffin@something.com" id="email" type="email" formControlName="email">
-
+        <label class="text-sm text-neutral-800" for="email">Email Address</label>
+        <input class="text-base text-neutral-800 border-[.1em] border-gray-200 px-2 py-1 rounded-sm outline-none focus:border-lime-500" placeholder="petergriffin@something.com" id="email" type="email" formControlName="email">
         @if(formError && (formControls['email'].errors && formControls['email'].errors['required'])) {
-          <span class="text-sm text-red-500">*Required email address</span>
+          <span class="text-sm text-red-600">*Required email address</span>
         }
         @if(formError && (formControls['email'].errors && formControls['email'].errors['email'])) {
-          <span class="text-sm text-red-500">*Enter valid email address</span>
+          <span class="text-sm text-red-600">*Enter valid email address</span>
         }
       </div>
 
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm" for="password">Password</label>
-        <div class="border-[.1em] border-gray-200 p-2 rounded-sm flex items-center gap-1 focus-within:border-lime-500">
-          <input class="grow-1 outline-none" placeholder="your-secret" id="password" [type]="passtype" formControlName="password">
-          <fa-icon [title]="passicon === 'eye'? 'show password' : 'hide password'" class="text-sm" [icon]="passicon" class="text-gray-500 cursor-pointer" (click)="showPassword()"></fa-icon>
-        </div>
-        
+        <label class="text-sm text-neutral-800" for="password">Password</label>
+        <app-password [id]="'password'" formControlName="password"/>
         @if(formError && (formControls['password'].errors && formControls['password'].errors['required'])) {
-          <span class="text-sm text-red-500">*Required password</span>
+          <span class="text-sm text-red-600">*Required password</span>
         }
         @if(formError && (formControls['password'].errors && formControls['password'].errors['minlength'])) {
-          <span class="text-sm text-red-500">*Pasword must have minimum 8 character</span>
+          <span class="text-sm text-red-600">*Pasword must have minimum 8 character</span>
         }
       </div>
 
-      <button class="bg-lime-500 text-1xl text-white font-medium rounded-sm border-[.1em] border-lime-500 w-full my-4 p-2 cursor-pointer hover:bg-lime-600 hover:border-lime-600" type="submit">Sign in</button>
+      <button class="bg-lime-500 text-base text-white font-medium rounded-sm border-[.1em] border-lime-500 w-full my-2 px-2 py-1 cursor-pointer hover:bg-lime-600 hover:border-lime-600" type="submit">Sign in</button>
     </form>
   </div>
 </div>

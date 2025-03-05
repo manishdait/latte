@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-import { homeGuard } from './guard/home.guard';
 import { AuthComponent } from './pages/auth/auth.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { HomeComponent } from './pages/home/home.component';
-import { ProfileComponent } from './pages/profile/profile.component';
-import { TicketDetailsComponent } from './pages/ticket-details/ticket-details.component';
-import { TicketComponent } from './pages/ticket/ticket.component';
-import { UserComponent } from './pages/user/user.component';
+import { TicketDetailsComponent } from './routes/ticket-details/ticket-details.component';
+import { UserComponent } from './routes/user/user.component';
+import { TicketComponent } from './routes/ticket/ticket.component';
+import { ProfileComponent } from './routes/profile/profile.component';
+import { homeGuard } from './guard/home.guard';
+import { DashboardComponent } from './routes/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {path: '', pathMatch: 'full', redirectTo: 'home'},

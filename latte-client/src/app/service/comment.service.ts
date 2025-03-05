@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
-import { CommentRequest } from "../models/comment.type";
+import { CommentRequest } from "../model/comment.type";
 import { Observable } from "rxjs";
-import { ActivityResponse } from "../models/activity.type";
+import { ActivityResponse } from "../model/activity.type";
 import { HttpClient } from "@angular/common/http";
 
 const URL: string = `${environment.API_ENDPOINT}/comments`;

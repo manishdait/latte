@@ -1,9 +1,0 @@
-.translucent-bg {
-  background-color: #5059637c;
-}
-
-.active {
-  background-color: oklch(0.623 0.214 259.815);
-  border-color: oklch(0.623 0.214 259.815);
-  color: #fff;
-}
