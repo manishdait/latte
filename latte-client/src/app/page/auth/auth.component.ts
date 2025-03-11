@@ -37,8 +37,8 @@ export class AuthComponent implements OnInit {
 
     this.formError = false;
     var request: AuthRequest = {
-      email: this.form.get('email')!.value,
-      password: this.form.get('password')!.value
+      email: this.form.get('email')?.value,
+      password: this.form.get('password')?.value
     }
 
     this.authService.authenticateUser(request).subscribe({

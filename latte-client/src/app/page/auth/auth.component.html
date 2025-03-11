@@ -1,0 +1,37 @@
+<div class="w-screen h-screen bg-neutral-50">
+  <div class="w-[min(100vw,450px)] h-screen flex flex-col items-center justify-center gap-8 p-4 mx-auto">
+    <div class="w-[10rem] h-[5rem]">
+      <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
+    </div>
+
+    <div class="w-full">
+      <h1 class="text-[1.8rem] text-neutral-900 text-center font-bold">Sign in to your account</h1>
+  
+      <form class="w-full bg-neutral-50 border-[.1em] border-neutral-200 rounded-sm p-4 mt-2" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-1 my-4">
+          <label class="text-sm text-neutral-900" for="email">Email Address</label>
+          <input class="text-base text-neutral-900 border-[.1em] border-neutral-200 rounded-sm outline-none px-2 py-1 focus:border-green-600" id="email" type="email" placeholder="petergriffin@something.com" formControlName="email">
+          @if(formError && (formControls['email'].errors && formControls['email'].errors['required'])) {
+            <span class="text-sm text-red-600">*Required email address</span>
+          }
+          @if(formError && (formControls['email'].errors && formControls['email'].errors['email'])) {
+            <span class="text-sm text-red-600">*Enter valid email address</span>
+          }
+        </div>
+  
+        <div class="flex flex-col gap-1 my-4">
+          <label class="text-sm text-neutral-900" for="password">Password</label>
+          <app-password [id]="'password'" [placeholder]="'your-secret'" formControlName="password"/>
+          @if(formError && (formControls['password'].errors && formControls['password'].errors['required'])) {
+            <span class="text-sm text-red-600">*Required password</span>
+          }
+          @if(formError && (formControls['password'].errors && formControls['password'].errors['minlength'])) {
+            <span class="text-sm text-red-600">*Pasword must have minimum 8 character</span>
+          }
+        </div>
+  
+        <button class="w-full bg-green-500 text-base text-white font-medium border-[.1em] border-green-500 rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600 px-2 py-1 my-2" type="submit">Sign in</button>
+      </form>
+    </div>
+  </div>
+</div>

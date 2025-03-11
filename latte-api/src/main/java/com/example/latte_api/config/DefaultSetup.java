@@ -1,4 +1,4 @@
-package com.example.latte_api.utils;
+package com.example.latte_api.config;
 
 import java.io.File;
 import java.io.FileWriter;

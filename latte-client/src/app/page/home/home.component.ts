@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
   role: Role;
   firstname: string;
 
-  ticketToggle: boolean = false;
+  formToggle: boolean = false;
 
   constructor(private faLibrary: FaIconLibrary, private authService: AuthService) {
     this.role = authService.getRoles();
@@ -43,6 +43,6 @@ export class HomeComponent implements OnInit {
   }
 
   createTicket() {
-    this.ticketToggle = true;
+    this.formToggle = true;
   }
 }

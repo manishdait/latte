@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './pages/auth/auth.component';
-import { HomeComponent } from './pages/home/home.component';
+import { AuthComponent } from './page/auth/auth.component';
+import { HomeComponent } from './page/home/home.component';
 import { TicketDetailsComponent } from './routes/ticket-details/ticket-details.component';
 import { UserComponent } from './routes/user/user.component';
 import { TicketComponent } from './routes/ticket/ticket.component';
