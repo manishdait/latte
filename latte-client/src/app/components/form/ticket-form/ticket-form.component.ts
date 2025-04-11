@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { priorities, Priority } from '../../../model/priority.enum';
 import { TicketRequest } from '../../../model/ticket.type';
@@ -20,30 +20,34 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
   styleUrl: './ticket-form.component.css'
 })
 export class TicketFormComponent implements OnInit {
-  @Output('cancel') cancel: EventEmitter<boolean> = new EventEmitter();
+  ticketService = inject(TicketService);
+  userService = inject(UserService);
+  alertService = inject(AlertService);
+  faLibrary = inject(FaIconLibrary);
 
-  form: FormGroup;
-  formErrors: boolean = false;
+  cancel = output<boolean>();
+
+  formErrors = signal(false);
+  more = signal(false);
+  engineers = signal<string[]>([]);
+  priorities = signal<string[]>(priorities);
   
-  engineers: string[] = [];
-  hasMore: boolean = false;
-
-  page: number = 0;
-  size: number = 5;
-
-  priorities: string[] = priorities;
-
-  constructor(private faLibrary: FaIconLibrary, private ticketService: TicketService, private userService: UserService, private alertService: AlertService, private store: Store<AppState>) {
-    userService.fetchUserList(this.page, this.size).subscribe((data) => {
-      this.engineers = this.engineers.concat(data.content);
-      this.hasMore = data.next;
+  pageCount = signal(0);
+  size = signal(5);
+  
+  form: FormGroup;
+  
+  constructor(private store: Store<AppState>) {
+    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+      this.engineers.set(data.content);
+      this.more.set(data.next);
     })
 
     this.form = new FormGroup({
       title: new FormControl('', [Validators.required]),
       description: new FormControl(''),
       assignedTo: new FormControl(''),
-      priority: new FormControl('', [Validators.required])
+      priority: new FormControl('', [Validators.required]),
     })
   }
 
@@ -60,11 +64,11 @@ export class TicketFormComponent implements OnInit {
   }
 
   showMore() {
-    this.page += 1;
+    this.pageCount.update(count => count + 1);
 
-    this.userService.fetchUserList(this.page, this.size).subscribe((data) => {
-      this.engineers = this.engineers.concat(data.content);
-      this.hasMore = data.next;
+    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+      this.engineers.update(arr => arr.concat(data.content));
+      this.more.set(data.next);
     })
   }
 
@@ -72,11 +76,12 @@ export class TicketFormComponent implements OnInit {
     console.log(this.form.controls);
     
     if (this.form.invalid) {
-      this.formErrors = true;
+      this.formErrors.set(true);
       return;
     }
     
-    this.formErrors = false;
+    this.formErrors.set(false);
+
     const request: TicketRequest = {
       title: this.form.get('title')!.value,
       description: this.form.get('description')!.value,

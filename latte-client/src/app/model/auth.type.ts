@@ -13,6 +13,7 @@ export interface AuthRequest {
 }
 
 export interface AuthResponse {
+  firstname: string,
   email: string,
   accessToken: string,
   refreshToken: string,

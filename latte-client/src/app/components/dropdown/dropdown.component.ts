@@ -1,7 +1,7 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, forwardRef, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { CustomControlDirective } from '../../shared/directive/custom-control.directive';
+import { CustomControlDirective } from '../../shared/directives/custom-control.directive';
 
 @Component({
   selector: 'app-dropdown',
@@ -17,22 +17,22 @@ import { CustomControlDirective } from '../../shared/directive/custom-control.di
   ],
 })
 export class DropdownComponent extends CustomControlDirective {
-  @Input('id') id: string | undefined;
-  @Input('placeholder') placeholder: string | undefined;
-  @Input('list') list: string[] | undefined;
-  @Input('hasMore') hasMore: boolean | undefined;
-  @Input('hasUnassign') unassign: boolean | undefined;
+  id = input('');
+  placeholder = input('');
+  list = input<string[]>();
+  more = input(false);
+  unassign = input(false);
 
-  @Output('showMore') showMore: EventEmitter<boolean> = new EventEmitter();
+  next = output<boolean>();
 
-  dropdown: boolean = false;
+  dropdown = signal(false);
 
   toggleDropdown() {
-    this.dropdown = !this.dropdown;
+    this.dropdown.update(toggle => !toggle);
   }
 
   select(value: string) {
     this.control!.setValue(value);
-    this.dropdown = false;
+    this.dropdown.set(false);
   }
 }

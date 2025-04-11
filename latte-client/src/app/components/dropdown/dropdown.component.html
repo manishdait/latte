@@ -1,23 +1,26 @@
 @if(control) {
   <div class="relative">
-    <div class="flex items-center gap-1 justify-between px-2 py-1 border-[.1em] border-gray-200 rounded-sm mb-1 cursor-pointer" [class]="{'border-lime-500': dropdown}" (click)="toggleDropdown()">
-      <input class="text-base text-neutral-800 outline-none pointer-events-none cursor-none" [id]="id" type="text" [placeholder]="placeholder" [value]="control.value" [formControl]="control">
-      <fa-icon class="text-[.9rem] text-neutral-500 transform" [class]="{'rotate-180' : dropdown}" [icon]="'angle-down'"></fa-icon>
+    <div class="flex items-center gap-1 justify-between px-2 py-1 border-[.1em] border-gray-200 rounded-sm mb-1 cursor-pointer" [class]="{'border-green-500': dropdown()}" (click)="toggleDropdown()">
+      <input class="text-base text-neutral-800 outline-none pointer-events-none cursor-none" [id]="id()" type="text" [placeholder]="placeholder()" [value]="control.value" [formControl]="control">
+      <fa-icon class="text-[.9rem] text-neutral-500 transform" [class]="{'rotate-180' : dropdown()}" [icon]="'angle-down'"></fa-icon>
     </div>
-  
-    <div class="absolute w-full max-h-40 bg-white border-[.1em] border-gray-200 flex-col overflow-hidden overflow-y-scroll rounded-sm" [class]="{'flex' : dropdown, 'hidden': !dropdown}">
-      @if(unassign && control.value !== '') {
-        <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-20" (click)="select('')">Unassigned</span>
-      }
-  
-      @for(element of list; track element) {
-        @if (control.value !== element) {
-          <span class="text-base text-neutral-800 px-2 py-1 cursor-pointer hover:bg-neutral-100 not-last:border-b-[.1em] not-last:border-b-gray-200" (click)="select(element)">{{ element }}</span>
+
+    @if (dropdown()) {
+      <div class="absolute w-full max-h-40 flex bg-neutral-50 border-[.1em] border-gray-200 flex-col overflow-hidden overflow-y-scroll rounded-sm z-10">
+        @if(unassign() && control.value !== '') {
+          <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-20" (click)="select('')">Unassigned</span>
         }
-      }
-      @if(hasMore) {
-        <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-200" (click)="showMore.emit(true)">Show more</span>
-      }
-    </div>
+  
+        @for(element of list(); track element) {
+          @if (control.value !== element) {
+            <span class="text-base text-neutral-800 px-2 py-1 cursor-pointer hover:bg-neutral-100 not-last:border-b-[.1em] not-last:border-b-gray-200" (click)="select(element)">{{ element }}</span>
+          }
+        }
+        @if(more()) {
+          <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-200" (click)="next.emit(true)">Show more</span>
+        }
+      </div>
+    }
+    
   </div>
 }

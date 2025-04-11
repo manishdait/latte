@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { CustomControlDirective } from '../../shared/directive/custom-control.directive';
+import { CustomControlDirective } from '../../shared/directives/custom-control.directive';
 
 @Component({
   selector: 'app-password',

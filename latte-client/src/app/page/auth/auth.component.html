@@ -11,10 +11,10 @@
         <div class="flex flex-col gap-1 my-4">
           <label class="text-sm text-neutral-900" for="email">Email Address</label>
           <input class="text-base text-neutral-900 border-[.1em] border-neutral-200 rounded-sm outline-none px-2 py-1 focus:border-green-600" id="email" type="email" placeholder="petergriffin@something.com" formControlName="email">
-          @if(formError && (formControls['email'].errors && formControls['email'].errors['required'])) {
+          @if(formError() && (formControls['email'].errors && formControls['email'].errors['required'])) {
             <span class="text-sm text-red-600">*Required email address</span>
           }
-          @if(formError && (formControls['email'].errors && formControls['email'].errors['email'])) {
+          @if(formError() && (formControls['email'].errors && formControls['email'].errors['email'])) {
             <span class="text-sm text-red-600">*Enter valid email address</span>
           }
         </div>
@@ -22,10 +22,10 @@
         <div class="flex flex-col gap-1 my-4">
           <label class="text-sm text-neutral-900" for="password">Password</label>
           <app-password [id]="'password'" [placeholder]="'your-secret'" formControlName="password"/>
-          @if(formError && (formControls['password'].errors && formControls['password'].errors['required'])) {
+          @if(formError() && (formControls['password'].errors && formControls['password'].errors['required'])) {
             <span class="text-sm text-red-600">*Required password</span>
           }
-          @if(formError && (formControls['password'].errors && formControls['password'].errors['minlength'])) {
+          @if(formError() && (formControls['password'].errors && formControls['password'].errors['minlength'])) {
             <span class="text-sm text-red-600">*Pasword must have minimum 8 character</span>
           }
         </div>

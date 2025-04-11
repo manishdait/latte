@@ -10,7 +10,7 @@ export interface TicketResponse {
   status: Status,
   lock: boolean,
   createdBy: UserResponse,
-  assignedTo: UserResponse,
+  assignedTo: UserResponse | null,
   createdAt: Date,
   lastUpdated: Date
 }

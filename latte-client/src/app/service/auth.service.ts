@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { AuthRequest, AuthResponse, RegistrationRequest } from '../model/auth.type';
 import { catchError, map, Observable, of } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
+import { Role } from '../model/role.enum';
 
 const URL: string = `${environment.API_ENDPOINT}/auth`;
 
@@ -40,23 +41,28 @@ export class AuthService {
     )
   }
 
-  logout() {
+  logout(): void {
     this.localStorage.clear();
   }
 
-  private storeCred(response: AuthResponse) {
+  private storeCred(response: AuthResponse): void {
+    this.localStorage.store('firstname', response.firstname);
     this.localStorage.store('username', response.email);
     this.localStorage.store('accessToken', response.accessToken);
     this.localStorage.store('refreshToken', response.refreshToken);
     this.localStorage.store('roles', response.role);
   }
 
-  getAccessToken() {
+  getAccessToken(): string {
     return this.localStorage.retrieve('accessToken');
   }
 
-  getRoles() {
+  getRole(): Role {
     return this.localStorage.retrieve('roles');
+  }
+
+  getFirstname(): string {
+    return this.localStorage.retrieve('firstname');
   }
 
   isAuthenticated(): Observable<boolean> {

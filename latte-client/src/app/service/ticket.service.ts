@@ -14,8 +14,8 @@ const URL: string = `${environment.API_ENDPOINT}/tickets`;
 export class TicketService {
   constructor(private client: HttpClient) {}
 
-  fetchTicktsInfo(): Observable<Map<string, number>> {
-    return this.client.get<Map<string, number>>(`${URL}/info`);
+  fetchTicktsInfo(): Observable<{ [key: string]: number }> {
+    return this.client.get<{ [key: string]: number }>(`${URL}/info`);
   }
 
   fetchPagedTickets(page: number, size: number): Observable<Page<TicketResponse>> {

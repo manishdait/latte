@@ -1,63 +1,62 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, inject, input, Input, OnInit, output, Output, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TicketResponse, PatchTicketRequest } from '../../../../model/ticket.type';
 import { TicketService } from '../../../../service/ticket.service';
 import { UserService } from '../../../../service/user.service';
 import { fontawsomeIcons } from '../../../../shared/fa-icons';
+import { DropdownComponent } from '../../../../components/dropdown/dropdown.component';
 
 @Component({
   selector: 'app-edit-assign',
-  imports: [ReactiveFormsModule, FontAwesomeModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule, DropdownComponent],
   templateUrl: './edit-assign.component.html',
   styleUrl: './edit-assign.component.css'
 })
 export class EditAssignComponent implements OnInit {
-  @Input('ticket') ticket: TicketResponse | undefined;
-  @Output('toggle') toggle: EventEmitter<boolean> = new EventEmitter();
-  @Output('changes') changes: EventEmitter<boolean> = new EventEmitter();
+  userService = inject(UserService);
+  ticketService = inject(TicketService);
+  faLibrary = inject(FaIconLibrary);
 
-  assignedTo: string = '';
+  ticketId = input.required<number>();
+  value = input.required<string>();
+  cancel = output<boolean>();
+  changes = output<boolean>();
 
-  dropdown: boolean = false;
+  dropdown = signal(false);
+  engineers = signal<string[]>([]);
+  next = signal(false);
+  pageCount = signal(0);
+  size = signal(5);
 
-  engineers: string[] = [];
-  hasMore: boolean = false;
+  form: FormGroup;
 
-  page: number = 0;
-  size: number = 5;
+  constructor() {
+    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+      this.engineers.set(data.content);
+      this.next.set(data.next);
+    })
 
-  constructor(private faLibrary: FaIconLibrary, private ticketService: TicketService, private userService: UserService) {
-    userService.fetchUserList(this.page, this.size).subscribe((data) => {
-      this.engineers = this.engineers.concat(data.content);
-      this.hasMore = data.next;
+    this.form = new FormGroup({
+      assignedTo: new FormControl('')
     })
   }
 
   ngOnInit(): void {
-    this.assignedTo = this.ticket!.assignedTo.firstname;
+    this.form.controls['assignedTo'].setValue(this.value())
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
   toggleDropdown() {
-    this.dropdown = !this.dropdown;
-  }
-
-  setAssignedTo(firstname: string) {
-    this.assignedTo = firstname;
-    this.toggleDropdown();
-  }
-  unassigned() {
-    this.assignedTo = '';
-    this.toggleDropdown();
+    this.dropdown.update(toggle => !toggle);
   }
 
   showMore() {
-    this.page += 1;
+    this.pageCount.update(count => count + 1);
 
-    this.userService.fetchUserList(this.page, this.size).subscribe((data) => {
-      this.engineers = this.engineers.concat(data.content);
-      this.hasMore = data.next;
+    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+      this.engineers.update(arr => arr.concat(data.content));
+      this.next.set(data.next);
     })
   }
 
@@ -67,21 +66,22 @@ export class EditAssignComponent implements OnInit {
       description: null,
       priority: null,
       status: null,
-      assignedTo: this.assignedTo
+      assignedTo: this.form.get('assignedTo')?.value
     }
 
-    if(this.ticket) {
-      this.ticketService.updateTicket(this.ticket.id, request).subscribe({
-        next: (response) => {
-          this.changes.emit(true);
-          this.cancel();
-        }
-      })
-    }
+    console.log(request);
+    
+
+    this.ticketService.updateTicket(this.ticketId(), request).subscribe({
+      next: (response) => {
+        this.changes.emit(true);
+        this.toggleCancel();
+      }
+    })
   }
 
-  cancel() {
-    this.toggle.emit(false);
+  toggleCancel() {
+    this.cancel.emit(false);
   }
 }
 

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthComponent } from './page/auth/auth.component';
 import { HomeComponent } from './page/home/home.component';
-import { TicketDetailsComponent } from './routes/ticket-details/ticket-details.component';
+import { TicketDetailsComponent } from './page/ticket-details/ticket-details.component';
 import { UserComponent } from './routes/user/user.component';
 import { TicketComponent } from './routes/ticket/ticket.component';
 import { ProfileComponent } from './routes/profile/profile.component';

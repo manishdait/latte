@@ -1,7 +1,7 @@
-@if(message) {
-  <div class="fixed w-screen flex items-center justify-center p-4">
-    <div class="bg-white p-4 rounded-sm shadow-sm w-[min(100%,500px)]">
-      <span class=" text-base font-semibold text-center block">{{ message }}</span>
+@if(message() !== '') {
+  <div class="fixed w-screen flex items-center justify-center p-4 z-50">
+    <div class="bg-neutral-50 p-4 rounded-sm border-[.1em] border-neutral-200 w-[min(100%,500px)]">
+      <span class=" text-base font-semibold text-center block">{{ message() }}</span>
     </div>
   </div>
 }

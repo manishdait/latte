@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { AuthRequest } from '../../model/auth.type';
 import { AuthService } from '../../service/auth.service';
@@ -13,10 +13,14 @@ import { PasswordComponent } from '../../components/password/password.component'
   styleUrl: './auth.component.css'
 })
 export class AuthComponent implements OnInit {
+  alertService = inject(AlertService);
+  authService = inject(AuthService);
+  router = inject(Router);
+  
+  formError = signal(false);
   form: FormGroup;
-  formError: boolean = false;
-
-  constructor(private alertService: AlertService, private authService: AuthService, private router: Router) {
+  
+  constructor() {
     this.form = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(8)])
@@ -31,11 +35,11 @@ export class AuthComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-      this.formError = true;
+      this.formError.set(true);
       return;
     }
 
-    this.formError = false;
+    this.formError.set(false);
     var request: AuthRequest = {
       email: this.form.get('email')?.value,
       password: this.form.get('password')?.value

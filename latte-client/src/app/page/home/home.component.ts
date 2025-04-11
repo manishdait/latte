@@ -1,48 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { fontawsomeIcons } from '../../shared/fa-icons';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Role } from '../../model/role.enum';
-import { getColor } from '../../shared/utils';
-import { jwtDecode } from "jwt-decode";
-import { AuthService } from '../../service/auth.service';
-import { environment } from '../../../environments/environment';
+import { Component, OnInit, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { TicketFormComponent } from '../../components/form/ticket-form/ticket-form.component';
+import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { SideNavbarComponent } from '../../components/side-navbar/side-navbar.component';
 
 @Component({
   selector: 'app-home',
-  imports: [FontAwesomeModule, RouterOutlet, RouterLink, RouterLinkActive, TicketFormComponent],
+  imports: [RouterOutlet, NavbarComponent, SideNavbarComponent, TicketFormComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  version: string = environment.VERSION;
-  
-  role: Role;
-  firstname: string;
+  createTicket = signal(false);
+  sidenav = signal(false);
 
-  formToggle: boolean = false;
+  ngOnInit(): void {}
 
-  constructor(private faLibrary: FaIconLibrary, private authService: AuthService) {
-    this.role = authService.getRoles();
-    const token:any = jwtDecode(authService.getAccessToken());
-    this.firstname = token.firstname;
+  createTicketToggle() {
+    this.createTicket.update(toggle => !toggle);
   }
 
-  ngOnInit(): void {
-    this.faLibrary.addIcons(...fontawsomeIcons);
-  }
-
-  color(username: any): string {
-    if (!username) {return '#ddd'}
-    return getColor(username);
-  }
-
-  isAdmin(): boolean {
-    return this.role === Role.ADMIN;
-  }
-
-  createTicket() {
-    this.formToggle = true;
+  toggleSidenav() {
+    this.sidenav.update(toggle => !toggle);
   }
 }

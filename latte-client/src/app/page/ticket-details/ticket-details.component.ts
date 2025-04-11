@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { TicketService } from '../../service/ticket.service';
@@ -10,7 +10,10 @@ import { AuthService } from '../../service/auth.service';
 import { Role } from '../../model/role.enum';
 import { EditPriorityComponent } from './components/edit-priority/edit-priority.component';
 import { EditAssignComponent } from './components/edit-assign/edit-assign.component';
-import { ActivityComponent } from './components/activity/activity.component';
+import { ActivityComponent } from '../../components/activity/activity.component';
+import { CommentRequest } from '../../model/comment.type';
+import { CommentService } from '../../service/comment.service';
+import { Priority } from '../../model/priority.enum';
 
 @Component({
   selector: 'app-ticket-details',
@@ -19,28 +22,44 @@ import { ActivityComponent } from './components/activity/activity.component';
   styleUrl: './ticket-details.component.css'
 })
 export class TicketDetailsComponent implements OnInit {
-  @ViewChild('desc') descInput!: ElementRef;
   @ViewChild('activity') activity!: ActivityComponent;
+  @ViewChild('title') titleField!: ElementRef;
 
-  ticket: TicketResponse | undefined;
-  ticketId: number;
-  assignToggle: boolean = false;
+  authService = inject(AuthService);
+  ticketService = inject(TicketService);
+  commentService = inject(CommentService);
+  router = inject(Router)
+  route = inject(ActivatedRoute);
+  faLibrary = inject(FaIconLibrary);
 
-  descriptionChanged:boolean = false;
-  description: string = '';
+  ticket = signal<TicketResponse>({
+    id: 0,
+    title: '',
+    description: '',
+    priority: Priority.LOW,
+    status: Status.OPEN,
+    lock: false,
+    createdBy: {
+      firstname: '',
+      email: '',
+      role: Role.USER
+    },
+    assignedTo: null,
+    createdAt: new Date(),
+    lastUpdated: new Date()
+  });
 
-  deleteToggle: boolean = false;
-  priorityToggle: boolean = false;
-
-  constructor (private faLibrary: FaIconLibrary, private authService: AuthService, private ticketService: TicketService, private router: Router, private route: ActivatedRoute) {
-    this.ticketId = route.snapshot.params['id'];
-  }
+  ticketId = signal(this.route.snapshot.params['id']);
+  
+  editTitle = signal(false);
+  editAssignee = signal(false);
+  editPriority = signal(false);
+  admin = signal(this.authService.getRole() === Role.ADMIN);
 
   ngOnInit(): void {
-    this.ticketService.fetchTicket(this.ticketId).subscribe({
+    this.ticketService.fetchTicket(this.ticketId()).subscribe({
       next: (response) => {
-        this.ticket = response;
-        this.description = response.description;
+        this.ticket.set(response);
       }
     });
 
@@ -56,54 +75,30 @@ export class TicketDetailsComponent implements OnInit {
     return getDate(date);
   }
 
-  detectDescription(value: string) {
-    this.description = value;
-    this.descriptionChanged = this.ticket!.description !== value;
-  }
-
-  editDescription() {
-    const request: PatchTicketRequest = {
-      title: null,
-      description: this.description,
-      priority: null,
-      status: null,
-      assignedTo: null
-    }
-
-    if (this.ticket && this.description) {
-      this.ticketService.updateTicket(this.ticket.id, request).subscribe((response) => {
-        this.ticket = response;
-        this.activity.ngOnInit();
-      });
-    }
-
-    this.descriptionChanged = false;
-  }
-
-  cancleDescrChanges() {
-    this.descriptionChanged = false;
-    const input = this.descInput.nativeElement as HTMLInputElement;
-    input.value = this.ticket!.description;
-  }
-
-  delete() {
-    if (this.ticket) {
-      this.ticketService.deleteTicket(this.ticket.id).subscribe({
-        next: (response) => {
-          console.log(response);
-          this.router.navigate(['home/tickets'], {replaceUrl: true});
-        }
-      })
-    }
-  }
-
-  refreshActivities() {
-    this.ngOnInit();
-    this.activity.ngOnInit();
-  }
-
   getStatus(status: Status) {
     return status.toString();
+  }
+
+  getAssignee() {
+    if(this.ticket().assignedTo && this.ticket().assignedTo !== null) {
+      return this.ticket().assignedTo?.firstname;
+    }
+    return '';
+  }
+
+  getPriority() {
+    if (this.ticket().priority === Priority.LOW) {
+      return 'Low';
+    } else if (this.ticket().priority === Priority.MEDIUM) {
+      return 'Medium';
+    } else {
+      return 'High';
+    }
+  }
+
+  refresh() {
+    this.ngOnInit();
+    this.activity.ngOnInit();
   }
 
   updateStatus() {
@@ -112,13 +107,13 @@ export class TicketDetailsComponent implements OnInit {
         title: null,
         description: null,
         priority: null,
-        status: this.ticket.status === Status.OPEN? Status.CLOSE : Status.OPEN,
+        status: this.ticket().status === Status.OPEN? Status.CLOSE : Status.OPEN,
         assignedTo: null
       }
 
-      this.ticketService.updateTicket(this.ticketId, request).subscribe({
+      this.ticketService.updateTicket(this.ticketId(), request).subscribe({
         next: (response) => {
-          this.ticket = response;
+          this.ticket.set(response);
           this.activity.ngOnInit(); 
         }
       }) 
@@ -126,24 +121,69 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   lockTicket() {
-    this.ticketService.lockTicket(this.ticketId).subscribe({
+    this.ticketService.lockTicket(this.ticketId()).subscribe({
       next: (response) => {
-        this.ticket = response;
+        this.ticket.set(response);
         this.activity.ngOnInit(); 
       }
     }) 
   }
 
   unlockTicket() {
-    this.ticketService.unlockTicket(this.ticketId).subscribe({
+    this.ticketService.unlockTicket(this.ticketId()).subscribe({
       next: (response) => {
-        this.ticket = response;
+        this.ticket.set(response);
         this.activity.ngOnInit(); 
       }
     })
   }
 
-  isAdmin() {
-    return this.authService.getRoles() === Role.ADMIN;
+  updateTitle() {
+    let title = (this.titleField.nativeElement as HTMLInputElement).value;
+
+    if (title === '' || title === this.ticket().title) {return;}
+    const request: PatchTicketRequest = {
+      title: title,
+      description: null,
+      priority: null,
+      status: null,
+      assignedTo: null
+    }
+
+    this.ticketService.updateTicket(this.ticketId(), request).subscribe({
+      next: (response) => {
+        this.toggleEditTitle();
+        this.ticket.set(response);
+        this.activity.ngOnInit();
+      }
+    })
+  }
+
+  toggleEditTitle() {
+    this.editTitle.update(toggle => !toggle);
+  }
+
+  toggleEditAssignee() {
+    this.editAssignee.update(toggle => !toggle);
+  }
+
+  toggleEditPriority() {
+    this.editPriority.update(toggle => !toggle);
+  }
+
+  comment(message: HTMLTextAreaElement) {
+    if (message.value !== '') {
+      const request: CommentRequest = {
+        ticketId: this.ticketId(),
+        message: message.value
+      }
+
+      this.commentService.createComment(request).subscribe({
+        next: () => {
+          message.value = '';
+          this.activity.ngOnInit()
+        }
+      })
+    }
   }
 }

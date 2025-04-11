@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { UserResponse } from '../../../model/user.type';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Role, roles } from '../../../model/role.enum';
@@ -13,16 +13,20 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
   styleUrl: './edit-user.component.css'
 })
 export class EditUserComponent implements OnInit {
-  @Input('user') user: UserResponse | undefined;
-  @Output('cancel') cancel: EventEmitter<boolean> = new EventEmitter();
+  userService = inject(UserService);
+  alertService = inject(AlertService);
 
+  user = input.required<UserResponse>();
+  cancel = output<boolean>();
+
+  formErrors = signal(false);
+  
+  _user = signal('');
+  roles = signal<string[]>(roles);
+  
   form: FormGroup;
-  formErrors: boolean = false;
   
-  _user: string | undefined;
-  roles: string[] = roles;
-  
-  constructor(private userService: UserService, private alertService: AlertService) {
+  constructor() {
     this.form = new FormGroup({
       firstname: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -31,11 +35,11 @@ export class EditUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this._user = this.user?.email;
+    this._user.set(this.user().email);
 
-    this.form.controls['firstname'].setValue(this.user?.firstname);
-    this.form.controls['email'].setValue(this.user?.email);
-    this.form.controls['role'].setValue(this.user?.role === Role.ADMIN? 'Admin' : 'User');
+    this.form.controls['firstname'].setValue(this.user().firstname);
+    this.form.controls['email'].setValue(this.user().email);
+    this.form.controls['role'].setValue(this.user().role === Role.ADMIN? 'Admin' : 'User');
   }
   
   get formControls() {
@@ -44,11 +48,11 @@ export class EditUserComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-      this.formErrors = true;
+      this.formErrors.set(true);
       return;
     }
   
-    this.formErrors = false;
+    this.formErrors.set(false);
 
     const request: UserResponse = {
       firstname: this.form.get('firstname')?.value,
@@ -57,14 +61,14 @@ export class EditUserComponent implements OnInit {
     }
 
     if (this._user) {
-      this.userService.editUser(request, this._user).subscribe({
+      this.userService.editUser(request, this._user()).subscribe({
         next: (response) => {
           this.alertService.alert = 'Updated user info';
           this.cancel.emit(true);
         },
         error: (err) => {
           this.form.reset();
-          this.form.controls['role'].setValue(this.user?.role == Role.ADMIN? 'Admin' : 'User');
+          this.form.controls['role'].setValue(this.user().role == Role.ADMIN? 'Admin' : 'User');
           this.alertService.alert = err.error.error;
         }
       })

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Router } from '@angular/router';
@@ -9,6 +9,8 @@ import { UserService } from '../../service/user.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PasswordComponent } from '../../components/password/password.component';
+import { Role } from '../../model/role.enum';
+
 @Component({
   selector: 'app-profile',
   imports: [ReactiveFormsModule, FontAwesomeModule, DialogComponent, PasswordComponent],
@@ -16,29 +18,44 @@ import { PasswordComponent } from '../../components/password/password.component'
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit {
-  profile: UserResponse | undefined;
-  update: UserResponse | undefined;
+  authService = inject(AuthService);
+  userService = inject(UserService);
+  alertService = inject(AlertService);
+  faLibrary = inject(FaIconLibrary);
+  router = inject(Router);
 
-  updateForm: FormGroup;
-  updateFormErrors: boolean = false;
-  isUpdated: boolean = false;
+  userDetails = signal<UserResponse>({
+    firstname: '',
+    email: '',
+    role: Role.USER
+  });
 
-  resetForm: FormGroup;
-  resetFormErrors: boolean = false;
-
-  resetToggle: boolean = false;
-  confirmToggle: boolean = false;
-
-  message: string | undefined;
-  operation: Operation | undefined;
-
-  constructor(private authService: AuthService, private userService: UserService, private alertService: AlertService, private faLibrary: FaIconLibrary, private router: Router) {
-    this.updateForm = new FormGroup({
+  buffer = signal<UserResponse>({
+    firstname: '',
+    email: '',
+    role: Role.USER
+  });
+  
+  bufferUpdated = signal(false);
+  userDetailsFormError = signal(false);
+  
+  passwordReset = signal(false);
+  passwordResetFormError = signal(false);
+  
+  confirm = signal(false);
+  message = signal('');
+  operation = signal<Operation>(Operation.UPDATE_USER);
+  
+  userDetailsForm: FormGroup;
+  passwordResetForm: FormGroup;
+  
+  constructor() {
+    this.userDetailsForm = new FormGroup({
       firstname: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email])
     });
 
-    this.resetForm = new FormGroup({
+    this.passwordResetForm = new FormGroup({
       updatedPassword: new FormControl('', [Validators.required, Validators.minLength(8)]),
       confirmPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
     })
@@ -47,75 +64,78 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.userService.fetchUserInfo().subscribe({
       next: (response) => {
-        this.profile = response;
+        this.userDetails.set(response);
+        this.buffer.set({...response});
 
-        this.update = {
-          firstname: response.firstname,
-          email: response.email,
-          role: response.role
-        };
-
-        this.updateForm.controls['firstname'].setValue(this.update.firstname);
-        this.updateForm.controls['email'].setValue(this.update.email);
+        this.userDetailsForm.controls['firstname'].setValue(this.userDetails().firstname);
+        this.userDetailsForm.controls['email'].setValue(this.userDetails().email);
       },
       error: (err) => {
         console.error(err);
       }
     });
+
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
-  get updateControls() {
-    return this.updateForm.controls;
+  get userDetailsFormControl() {
+    return this.userDetailsForm.controls;
   }
 
-  get resetControls() {
-    return this.resetForm.controls;
+  get passwordResetControl() {
+    return this.passwordResetForm.controls;
   }
 
   changeFirstname(value: string) {
-    if (this.update) {
-      this.update.firstname = value;
-      this.callUpdate();
-    }
+    this.buffer.update(user => {
+      return {
+        ...user,
+        firstname: value
+      }
+    });
+
+    this.callUpdate();
   }
 
   changeEmail(value: string) {
-    if (this.update) {
-      this.update.email = value;
-      this.callUpdate();
-    }
+    this.buffer.update(user => {
+      return {
+        ...user,
+        email: value
+      }
+    });
+    this.callUpdate();
   }
 
-  onUpdate() {
-    this.message = `You will be logout once your profile is updated`;
-    this.operation = Operation.UPDATE_USER;
-    this.confirm();
+  onUpdateUserDetails() {
+    this.message.set(`You will be logout once your profile is updated`);
+    this.operation.set(Operation.UPDATE_USER);
+    this.toggleConfirm();
   }
 
-  onReset() {
-    this.message = `Do you want to reset your password?`;
-    this.operation = Operation.RESET_PASSWORD;
-    this.confirm();
+  onResetPassword() {
+    this.message.set(`Do you want to reset your password?`);
+    this.operation.set(Operation.RESET_PASSWORD);
+    this.toggleConfirm();
   }
 
-  confirm() {
-    this.confirmToggle = true;
+  toggleConfirm() {
+    this.confirm.update(toggle => !toggle);
   }
 
-  trigger(event: boolean) {
+  confirmTrigger(event: boolean) {
     if (event) {
-      if (this.operation === Operation.UPDATE_USER) {
+      if (this.operation() === Operation.UPDATE_USER) {
         this.updateUser();
-      } else if (this.operation === Operation.RESET_PASSWORD) {
+      } else if (this.operation() === Operation.RESET_PASSWORD) {
         this.resetPassword()
       }
     }
-    this.confirmToggle = false;
+    this.confirm.set(false);
   }
 
-  toggleReset() {
-    this.resetToggle = !this.resetToggle;
+  togglePasswordReset() {
+    this.passwordReset.update(toggle => !toggle);
   }
 
   logout() {
@@ -124,29 +144,25 @@ export class ProfileComponent implements OnInit {
   }
 
   private callUpdate() {
-    if (this.profile && this.update) {
-      if (
-        this.profile.firstname === this.update.firstname 
-        && this.profile.email === this.update.email
-      ) {
-        this.isUpdated = false;
+    if (this.userDetails().firstname === this.buffer().firstname && this.userDetails().email === this.buffer().email) {
+        this.bufferUpdated.set(false);
       } else {
-        this.isUpdated = true;
-      }
+      this.bufferUpdated.set(true);
     }
   }
 
-  private updateUser() {
-    if(this.updateForm.invalid) {
-      this.updateFormErrors = true;
+  updateUser() {
+    if(this.userDetailsForm.invalid) {
+      this.userDetailsFormError.set(true);
       return;
     }
     
-    this.updateFormErrors = false;
+    this.userDetailsFormError.set(false);
+
     const request: UserResponse = {
-      firstname: this.updateForm.get('firstname')?.value,
-      email: this.updateForm.get('email')?.value,
-      role: this.profile!.role
+      firstname: this.userDetailsForm.get('firstname')?.value,
+      email: this.userDetailsForm.get('email')?.value,
+      role: this.userDetails().role
     }
     
     this.userService.updateUser(request).subscribe({
@@ -159,26 +175,26 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private resetPassword() {
-    if(this.resetForm.invalid  || 
-      this.resetForm.get('updatedPassword')?.value != this.resetForm.get('confirmPassword')?.value) {
-      this.resetFormErrors = true;
+  resetPassword() {
+    if(this.passwordResetForm.invalid  || 
+      this.passwordResetForm.get('updatedPassword')?.value != this.passwordResetForm.get('confirmPassword')?.value) {
+      this.passwordResetFormError.set(true);
       return;
     }
     
-    this.resetFormErrors = false;
+    this.passwordResetFormError.set(true);
     const request: ResetPasswordRequest = {
-      updatePassword: this.resetForm.get('updatedPassword')?.value,
-      confirmPassword: this.resetForm.get('confirmPassword')?.value
+      updatePassword: this.passwordResetForm.get('updatedPassword')?.value,
+      confirmPassword: this.passwordResetForm.get('confirmPassword')?.value
     }
 
     this.userService.resetPassword(request).subscribe({
       next: (response) => {
-        this.resetToggle = false;
+        this.passwordReset.set(false);
         this.alertService.alert = 'Password reset succesfully';
       },
       error: (err) => {
-        this.resetForm.reset();
+        this.passwordResetForm.reset();
         this.alertService.alert = 'Error reseting password';
       }
     })

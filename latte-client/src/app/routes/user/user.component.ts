@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { UserService } from '../../service/user.service';
 import { UserResponse } from '../../model/user.type';
 import { EditUserComponent } from '../../components/form/edit-user-form/edit-user.component';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
-import { Observable } from 'rxjs';
+import { count, Observable } from 'rxjs';
 import { userCountSelector, userSelector } from '../../state/user/user.selector';
 import { decrementUserCount, removeUser, setUserCount, setUsers } from '../../state/user/user.action';
 import { CommonModule } from '@angular/common';
@@ -14,31 +14,42 @@ import { fontawsomeIcons } from '../../shared/fa-icons';
 import { UserFormComponent } from '../../components/form/user-from/user-form.component';
 import { PasswordFormComponent } from '../../components/form/password-form/password-form.component';
 import { DialogComponent } from '../../components/dialog/dialog.component';
+import { PaginationComponent } from '../../components/pagination/pagination.component';
+import { Role } from '../../model/role.enum';
 
 @Component({
   selector: 'app-user',
-  imports: [UserFormComponent, EditUserComponent, PasswordFormComponent, CommonModule, DialogComponent, FontAwesomeModule],
+  imports: [PaginationComponent, UserFormComponent, EditUserComponent, PasswordFormComponent, CommonModule, DialogComponent, FontAwesomeModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
 export class UserComponent implements OnInit {
-  user: UserResponse | undefined;
-  users$: Observable<UserResponse[]>;
-
-  editToggle: boolean = false;
-  createToggle: boolean = false;
-  resetToggle: boolean = false;
-  confirmToggle: boolean = false;
-
-  userCount$: Observable<number>;
-
-  count: number = 0;
-  size: number = 10;
-  page: Record<string, boolean> = {
+  userService = inject(UserService);
+  alertService = inject(AlertService);
+  faLibrary = inject(FaIconLibrary);
+  
+  buffer = signal<UserResponse>({
+    firstname: '',
+    email: '',
+    role: Role.USER
+  });
+  
+  editUser = signal(false);
+  createUser = signal(false);
+  resetPassword = signal(false);
+  confirm = signal(false);
+  
+  pageCount = signal(0);
+  size = signal(2);
+  page = signal<Record<string, boolean>> ({
     'prev': false,
     'next': false
-  }
-  constructor(private userService: UserService, private alertService: AlertService, private faLibrary: FaIconLibrary, private store: Store<AppState>) {
+  });
+  
+  users$: Observable<UserResponse[]>;
+  userCount$: Observable<number>;
+  
+  constructor(private store: Store<AppState>) {
     this.users$ = store.select(userSelector);
     this.userCount$ = store.select(userCountSelector);
   }
@@ -51,10 +62,10 @@ export class UserComponent implements OnInit {
       }
     })
 
-    this.userService.fetchPagedUsers(this.count, this.size).subscribe({
+    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
       next: (response) => {
-        this.page['prev'] = response.prev;
-        this.page['next'] = response.next;
+        this.page()['prev'] = response.prev;
+        this.page()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
       }
     });
@@ -62,60 +73,59 @@ export class UserComponent implements OnInit {
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
-  createUser() {
-    this.createToggle = true;
+  toggleCreateUser() {
+    this.createUser.update(toggle => !toggle);
   }
 
-  edit(user: UserResponse) {
-    this.user = user;
-    this.editToggle = true;
+  toggleEditUser(user: UserResponse) {
+    this.buffer.set(user);
+    this.editUser.set(true);
   }
 
-  resetPassword(user: UserResponse) {
-    this.user = user;
-    this.resetToggle = true;
+  toggleResetPassword(user: UserResponse) {
+    this.buffer.set(user);
+    this.resetPassword.set(true);
   }
 
   delete(user: UserResponse) {
-    this.user = user;
-    this.confirm();
+    this.buffer.set(user);
+    this.toggleConfirm();
   }
 
-  confirm() {
-    this.confirmToggle = true;
+  toggleConfirm() {
+    this.confirm.update(toggle => !toggle);
   } 
 
-  trigger(event: boolean) {
-    this.confirmToggle = false;
-    
-    if (event && this.user) {
-      this.userService.deleteUser(this.user.email).subscribe({
+  confirmTrigger(event: boolean) {
+    this.toggleConfirm();
+    if (event) {
+      this.userService.deleteUser(this.buffer().email).subscribe({
         next: (response) => {
-          this.store.dispatch(removeUser({email: this.user!.email}));
+          this.store.dispatch(removeUser({email: this.buffer().email}));
           this.store.dispatch(decrementUserCount());
-          this.alertService.alert = `User with name ${this.user?.firstname} deleted`;
+          this.alertService.alert = `User with name ${this.buffer().firstname} deleted`;
         }
       })
     }
   }
 
   next() {
-    this.count += 1;
-    this.userService.fetchPagedUsers(this.count, this.size).subscribe({
+    this.pageCount.update(count => count + 1);
+    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
       next: (response) => {
-        this.page['prev'] = response.prev;
-        this.page['next'] = response.next;
+        this.page()['prev'] = response.prev;
+        this.page()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
       }
     });
   }
 
   prev() {
-    this.count -= 1;
-    this.userService.fetchPagedUsers(this.count, this.size).subscribe({
+    this.pageCount.update(count => count - 1);
+    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
       next: (response) => {
-        this.page['prev'] = response.prev;
-        this.page['next'] = response.next;
+        this.page()['prev'] = response.prev;
+        this.page()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
       }
     });

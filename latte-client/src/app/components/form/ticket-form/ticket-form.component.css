@@ -1,3 +1,3 @@
-.translucent-bg {
-  background-color: #5059637c;
+.z-high {
+  z-index: 10000;
 }

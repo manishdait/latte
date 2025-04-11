@@ -1,67 +1,19 @@
-@if(formToggle) {
-  <app-ticket-form (cancel)="formToggle = false"/>
+@if(createTicket()) {
+  <app-ticket-form (cancel)="createTicketToggle()"/>
 }
 
-<div class="w-screen h-screen flex flex-col bg-neutral-50">
-  <input type="checkbox" id="nav-toggle" class="fixed hidden nav-toggle" #navtoggle>
-
-  <div class="border-b-[.1em] border-neutral-200 px-4 py-2 navbar">
-    <div class="flex">
-      <div class="w-[6.5rem] h-[2rem]">
-        <img class="w-full h-full object-contain" src="asset/icon.svg" alt="logo">
-      </div>
-      
-      <!-- <label for="nav-toggle" class="hide">
-        @if (!navtoggle.checked) {
-          <fa-icon class="text-base text-lime-500 cursor-pointer" [icon]="'arrow-right-to-bracket'"></fa-icon>
-        } @else {
-          <fa-icon class="text-base text-lime-500 cursor-pointer transform rotate-90" [icon]="'arrow-right-to-bracket'"></fa-icon>
-        }
-      </label> -->
-    </div>
-  </div>
+<div class="w-screen h-screen flex flex-col bg-neutral-50 overflow-hidden">
+  <app-navbar [sidenavToggle]="sidenav()" (sidenav)="toggleSidenav()"/>
 
   <div class="w-full h-full flex">
-    <div class="w-[min(100%,280px)] h-full flex flex-col bg-neutral-50 border-r-[.1em] border-gray-200 p-4 sidenav">
-      <div class="flex flex-col gap-2">
-        <a class="flex items-center gap-1 text-neutral-500 rounded-sm cursor-pointer px-2 py-1" (click)="createTicket()">
-          <fa-icon class="text-[.9rem]" [icon]="'pen'"></fa-icon>
-          <span class="text-base font-medium">Create Ticket</span>
-        </a>
-  
-        <a class="flex items-center gap-2 text-neutral-500 rounded-sm cursor-pointer px-2 py-1" routerLink="/home/dashboard" routerLinkActive="active">
-          <fa-icon class="text-[.9rem]" [icon]="'house'"></fa-icon>
-          <span class="text-base font-medium">Dashboard</span>
-        </a>
-  
-        <a class="flex items-center gap-2 text-neutral-500 rounded-sm cursor-pointer px-2 py-1" routerLink="/home/tickets" routerLinkActive="active">
-          <fa-icon class="text-[.9rem]" [icon]="'ticket-simple'"></fa-icon>
-          <span class="text-base font-medium">Tickets</span>
-        </a>
-      </div>
-
-      <div class="flex flex-col gap-2 mt-auto">
-        @if (isAdmin()) {
-          <span class="text-neutral-900 text-base font-medium px-2">ADMIN</span>
-          <a class="text-neutral-500 text-base cursor-pointer px-2" routerLink="/home/users">Users</a>
-        }
-
-        <a class="text-neutral-500 text-base cursor-pointer px-2" href="https://github.com/manishdait/latte">Version - <span class="bg-green-300/20 text-sm text-neutral-800 font-bold rounded-sm px-2 py-1">{{ version }}</span></a>
-
-        <div class="flex items-center gap-2 cursor-pointer p-2 mt-4" routerLink="/home/profile">
-          <div class="w-[2.2rem] h-[2.2rem] flex items-center justify-center rounded-[100%]" [style.background-color]="color(firstname)">
-            <span class="text-base text-white font-bold">{{ firstname.charAt(0) }}</span>
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <span class="text-sm text-neutral-500">{{ firstname }}</span>
-            <span class="text-sm text-neutral-900 font-medium">View Profile</span>
-          </div>
-        </div>
-      </div>
+    <div class="w-[min(100%,230px)] h-full flex flex-col bg-neutral-50 border-r-[.1em] border-neutral-200 py-4 px-2 sidenav" [class]="sidenav()? 'out' : 'in'">
+      <app-side-navbar (createTicket)="createTicketToggle()"/>
     </div>
 
     <div class="grow overflow-y-scroll">
-      <router-outlet/>
+      <main class="w-[min(1400px,100%)] mx-auto">
+        <router-outlet/>
+      </main>
     </div>
+  </div>
 </div>

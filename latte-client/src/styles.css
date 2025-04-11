@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+* {
+  outline: none;
+}
+
+*::-webkit-scrollbar {
+  width: .3em;
+  height: .3em;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(163, 163, 163);
+  border-radius: .5em;
+}
+*::-webkit-scrollbar-track {
+  background-color: rgb(231, 231, 231);
+}
+
 html {
   font-size: 1rem;
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, output, Output } from '@angular/core';
 
 @Component({
   selector: 'app-dialog',
@@ -7,10 +7,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './dialog.component.css'
 })
 export class DialogComponent {
-  @Input('message') message: string | undefined;
-  @Output('state') state: EventEmitter<boolean> = new EventEmitter();
+  message = input('')
+  trigger = output<boolean>();
 
-  trigger(state: boolean) {
-    this.state.emit(state);
+  toggleTrigger(state: boolean) {
+    this.trigger.emit(state);
   }
 }

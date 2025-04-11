@@ -1,0 +1,31 @@
+<div class="flex flex-col-reverse">
+  @for(activity of activities(); track activity.id) {
+    <div class="flex flex-col items-start">
+      @if(getType(activity.type) === 'EDIT') {
+        <div class="flex items-center gap-1">
+          <div class="w-6 h-6 rounded-full bg-neutral-200"></div>
+          <span class="text-[.9rem] text-neutral-800">{{ activity.message + ' on ' + getDate(activity.createdAt) }}</span>
+        </div>
+      } @else {
+        <div class="border-[.1em] border-neutral-200 w-full overflow-hidden rounded-sm">
+          <div class="flex text-base px-2 py-1 gap-2 border-b-[.1em] border-neutral-200">
+            <span class="text-[.9rem] font-medium text-neutral-800">{{ activity.author }}</span>
+            <span class="text-[.9rem] text-neutral-500">{{ 'commented ' + getDate(activity.createdAt) }}</span>
+          </div>
+            
+          <div class="p-2">
+            <span class="text-base text-neutral-800 text-justify">{{ activity.message }}</span>
+          </div>
+        </div>
+      }
+      <div class="min-h-8 h-fit ml-[.68em] w-[.1em] bg-neutral-200"></div>
+    </div>
+  }
+
+  @if(more()) {
+    <div class="w-full p-2 flex flex-col gap-1">
+      <button class="mx-auto text-base border-[.1em] border-neutral-200 px-2 py-1 cursor-pointer rounded-sm text-neutral-500 hover:bg-neutral-900/5" type="button" (click)="loadPrevious()">Load Previous</button>
+      <div class="mx-auto w-[.05rem] h-[1rem] bg-neutral-200"></div>
+    </div>
+  }
+</div>

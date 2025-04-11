@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, output, Output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistrationRequest } from '../../../model/auth.type';
 import { Role, roles } from '../../../model/role.enum';
@@ -18,12 +18,12 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
   styleUrl: './user-form.component.css'
 })
 export class UserFormComponent implements OnInit {
-  @Output('cancel') cancel: EventEmitter<boolean> = new EventEmitter();
+  cancel = output<boolean>();
 
+  formErrors = signal(false);
+  roles = signal<string[]>(roles);
+  
   form: FormGroup;
-  formErrors: boolean = false;
-
-  roles: string[] = roles;
 
   constructor(private authService: AuthService, private alertService: AlertService, private store: Store<AppState>) {
     this.form = new FormGroup({
@@ -42,11 +42,12 @@ export class UserFormComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-      this.formErrors = true;
+      this.formErrors.set(true);
       return;
     }
 
-    this.formErrors = false;
+    this.formErrors.set(false);
+    
     const request: RegistrationRequest = {
       firstname: this.form.get('firstname')?.value,
       email: this.form.get('email')?.value,

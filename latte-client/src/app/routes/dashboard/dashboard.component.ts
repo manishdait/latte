@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
@@ -17,25 +17,29 @@ import { selectTicketOpenCount, selectTicketCloseCount } from '../../state/ticke
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  firstname: string;
+  authService = inject(AuthService);
+  ticketService = inject(TicketService);
 
-  openCount$: Observable<number>;
-  closeCount$: Observable<number>;
+  username = signal(this.authService.getFirstname());
 
-  constructor (private authService: AuthService, private ticketServie: TicketService, private store: Store<AppState>) {
-    const token:any = jwtDecode(authService.getAccessToken());
-    this.firstname = token.firstname;
+  openTickets$: Observable<number>;
+  closedTickets$: Observable<number>;
+  totalTickets = signal(0);
 
-    this.openCount$ = store.select(selectTicketOpenCount);
-    this.closeCount$ = store.select(selectTicketCloseCount);
+  constructor (private store: Store<AppState>) {
+    this.openTickets$ = store.select(selectTicketOpenCount);
+    this.closedTickets$ = store.select(selectTicketCloseCount);
   }
 
   ngOnInit(): void {
-    this.ticketServie.fetchTicktsInfo().subscribe({
+    this.ticketService.fetchTicktsInfo().subscribe({
       next: (response) => {
-        const info =  response as any;
-        this.store.dispatch(setTicketOpenCount({ticketCount: info.open_tickets}))
-        this.store.dispatch(setTicketCloseCount({ticketCount: info.completed_tickets}))
+        let open = response['open_tickets'] ?? 0;
+        let close = response['closed_tickets'] ?? 0;
+
+        this.store.dispatch(setTicketOpenCount({ticketCount: open}));
+        this.store.dispatch(setTicketCloseCount({ticketCount: close}));
+        this.totalTickets.set(open + close);
       },
       error: (err) => {
         console.error(err.error);

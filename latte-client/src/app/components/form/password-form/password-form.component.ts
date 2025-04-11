@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, OnInit, output, Output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ResetPasswordRequest, UserResponse } from '../../../model/user.type';
 import { UserService } from '../../../service/user.service';
@@ -12,13 +12,17 @@ import { PasswordComponent } from '../../password/password.component';
   styleUrl: './password-form.component.css'
 })
 export class PasswordFormComponent implements OnInit {
-  @Input('user') user: UserResponse | undefined;
-  @Output('cancel') cancel: EventEmitter<boolean> = new EventEmitter();
+  userService = inject(UserService);
+  alertService = inject(AlertService);
 
+  user = input.required<UserResponse>();
+  cancel = output<boolean>();
+  
+  formErrors = signal(false);
+  
   form: FormGroup;
-  formErrors: boolean = false;
 
-  constructor(private userService: UserService, private alertService: AlertService) {
+  constructor() {
     this.form = new FormGroup({
       updatedPassword: new FormControl('', [Validators.required, Validators.minLength(8)]),
       confirmPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
@@ -33,27 +37,25 @@ export class PasswordFormComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid || this.form.get('updatedPassword')?.value != this.form.get('confirmPassword')?.value) {
-      this.formErrors = true;
+      this.formErrors.set(true);
       return;
     }
 
-    this.formErrors = false;
+    this.formErrors.set(false);
     const request: ResetPasswordRequest = {
       updatePassword: this.form.get('updatedPassword')?.value,
       confirmPassword: this.form.get('confirmPassword')?.value
     }
 
-    if(this.user) {
-      this.userService.resetPasswordForUser(request, this.user.email).subscribe({
-        next: () => {
-          this.alertService.alert = 'Updated user information';
-          this.cancel.emit(true);
-        },
-        error: (err) => {
-          this.alertService.alert = err.error.error;
-          this.form.reset();
-        }
-      });
-    }
+    this.userService.resetPasswordForUser(request, this.user().email).subscribe({
+      next: () => {
+        this.alertService.alert = 'Updated user information';
+        this.cancel.emit(true);
+      },
+      error: (err) => {
+        this.alertService.alert = err.error.error;
+        this.form.reset();
+      }
+    });
   }
 }

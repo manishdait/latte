@@ -1,25 +1,34 @@
-<div class="w-full flex flex-col gap-8 p-4">
-  <div class="bg-neutral-50 flex flex-col gap-4 border-[.1em] border-neutral-200 rounded-sm p-4">
-    <h1 class="text-3xl text-neutral-900 font-bold">{{ greet() + ', ' + firstname }}</h1>
+<div class="flex flex-col gap-8 p-4 mx-auto">
+  <div class="bg-neutral-50 flex flex-col gap-6 border-[.1em] border-neutral-200 rounded-sm p-4">
+    <h1 class="text-3xl text-neutral-900 font-semibold">{{ greet() + ', ' + username() }}</h1>
 
     <div class="flex items-center gap-2">
-      <div class="w-[2.5rem] h-[2.5rem] flex items-center justify-center rounded-[100%]" [style.background-color]="color(firstname)">
-        <span class="text-base font-bold text-white">{{ firstname.charAt(0) }}</span>
+      <div class="w-[2.5rem] h-[2.5rem] flex items-center justify-center rounded-[100%]" [style.background-color]="color(username())">
+        <span class="text-base font-bold text-white">{{ username().charAt(0) }}</span>
       </div>
 
-      <span class="text-base text-neutral-900">{{ firstname }}</span>
+      <span class="text-base text-neutral-900">{{ username() }}</span>
     </div>
   </div>
 
   <div class="flex flex-wrap gap-8">
-    <div class="w-[min(100%,400px)] flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
-      <span class="text-base">Open Tickets</span>
-      <span class="text-4xl font-bold">{{ (openCount$ | async) }}</span>
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
+      <span class="text-base">Total Tickets</span>
+      <span class="text-4xl font-semibold">{{ totalTickets() }}</span>
     </div>
 
-    <div class="w-[min(100%,400px)] flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
-      <span class="text-base">Completed Tickets</span>
-      <span class="text-4xl font-bold">{{ (closeCount$ | async) }}</span>
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">  
+      <span class="text-base">Open Tickets</span>
+      <span class="text-4xl font-semibold">{{ (openTickets$ | async) }}</span>
     </div>
+
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
+      <span class="text-base">Closed Tickets</span>
+      <span class="text-4xl font-semibold">{{ (closedTickets$ | async) }}</span>
+    </div>
+  </div>
+
+  <div>
+    <!-- <h1 class="text-2xl font-semibold">Recent Tickets</h1> -->
   </div>
 </div>

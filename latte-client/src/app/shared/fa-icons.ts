@@ -12,23 +12,27 @@ import {
   faEyeSlash,  
   faHouse,  
   faLock, 
-  faPen,
+  faPlus,
   faTicketSimple, 
+  faGear,
   faUnlock, 
-  IconDefinition 
+  IconDefinition, 
+  faBars
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
   faHouse, 
   faClose, 
-  faPen, 
+  faPlus,
   faTicketSimple, 
   faAngleRight, 
   faAngleLeft, 
   faUnlock, 
   faLock, 
   faCalendar, 
-  faCheck, 
+  faCheck,
+  faGear,
+  faBars,
   faEye, 
   faEyeSlash, 
   faAngleDown, 
