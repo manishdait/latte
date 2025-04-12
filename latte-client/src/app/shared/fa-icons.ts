@@ -15,9 +15,9 @@ import {
   faPlus,
   faTicketSimple, 
   faGear,
-  faUnlock, 
   IconDefinition, 
-  faBars
+  faBars,
+  faLockOpen
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
@@ -27,7 +27,7 @@ export const fontawsomeIcons: IconDefinition[] = [
   faTicketSimple, 
   faAngleRight, 
   faAngleLeft, 
-  faUnlock, 
+  faLockOpen, 
   faLock, 
   faCalendar, 
   faCheck,

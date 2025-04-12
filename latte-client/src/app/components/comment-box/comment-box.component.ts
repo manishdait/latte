@@ -52,9 +52,15 @@ export class CommentBoxComponent implements OnInit {
   }
 
   updateComment() {
+    const message = (this.message.nativeElement as HTMLTextAreaElement).value;
+    if (message === this.activity().message) {
+      this.edit.set(false);
+      return;
+    }
+
     const request: CommentRequest = {
       ticketId: 0,
-      message: (this.message.nativeElement as HTMLTextAreaElement).value
+      message: message
     }
 
     this.commentService.updateCommnet(this.activity().id, request).subscribe({

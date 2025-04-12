@@ -3,9 +3,29 @@
     <div class="grow flex flex-col gap-4">
       @if(!editTitle()) {
         <h1 class="text-[2rem] text-neutral-800 font-semibold leading-none">{{ ticket().title }}</h1>
-        <span class="w-fit text-[.9rem] text-white font-medium px-5 py-1 rounded-[5em]" [class]="getStatus(ticket().status) === 'OPEN'? 'bg-green-600' : 'bg-purple-600'">
-          {{ ticket().status }}
-        </span>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="w-fit text-[.9rem] text-white font-medium px-5 py-1 rounded-[5em]" [class]="getStatus(ticket().status) === 'OPEN'? 'bg-green-600' : 'bg-purple-600'">
+            {{ ticket().status }}
+          </span>
+          @if(admin()) {
+            @if (!ticket().lock) {
+              <button class="text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[5em] hover:bg-neutral-900/5 cursor-pointer" (click)="lockTicket()">
+                <fa-icon class="text-neutral-500" [icon]="'lock-open'"/>
+                <span class="text-neutral-800 font-medium">Lock</span>
+              </button>
+            } @else {
+              <button class="text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[5em] hover:bg-neutral-900/5 cursor-pointer" (click)="unlockTicket()">
+                <fa-icon class="text-neutral-500" [icon]="'lock'"/>
+                <span class="text-neutral-800 font-medium">Unlock</span>
+              </button>
+            }
+          } @else {
+            <div class="w-[2rem] h-[2rem] text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[100%]">
+              <fa-icon class="text-neutral-500" [icon]="'lock-open'"/>
+            </div>
+          }
+        </div>
       } @else {
         <input class="text-[1rem] text-neutral-800 border-[.1em] border-neutral-200 outline-none px-2 py-1 focus-within:border-green-600" type="text" placeholder="Edit title" #title>
       }
@@ -23,20 +43,7 @@
 
   <div class="flex flex-wrap gap-8">
     <div class="w-[min(820px,100%)] flex flex-col py-2">
-      <div class="border-[.1em] border-neutral-200 rounded-sm">
-        <div class="flex gap-2 text-base px-2 py-1 border-b-[.1em] border-neutral-200">
-          <span class="text-[.9rem] text-neutral-800 font-medium">{{ ticket().createdBy.firstname }}</span>
-          <span class="text-[.9rem] text-neutral-500">opened on {{ getDate(ticket().createdAt) }}</span>
-        </div>
-
-        <div class="p-2">
-          @if (ticket().description) {
-            <span class="text-base text-neutral-800">{{ ticket().description }}</span>
-          } @else {
-            <span class="text-base text-neutral-500">Ticket has no description...</span>
-          }
-        </div>
-      </div>
+      <app-description-box [ticket]="ticket()" [owner]="owner()" (refresh)="refresh()"/>
       <div class="min-h-8 h-fit ml-[.68em] w-[.1em] bg-neutral-200"></div>
 
       <app-activity [ticketId]="ticketId()" #activity/>
@@ -46,11 +53,11 @@
         
         <div class="flex flex-wrap gap-2">
           @if(ticket().status == 'OPEN') {
-            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-purple-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm" type="button" (click)="updateStatus()">Close Ticket</button>
+            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-purple-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm disabled:hover:bg-neutral-50 disabled:text-neutral-500 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
           } @else {
-            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-green-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm" type="button" (click)="updateStatus()">Reopen Ticket</button>
+            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-green-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm disabled:text-neutral-500 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
           }
-          <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="comment(message)">Comment</button>
+          <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm disabled:bg-neutral-300 disabled:border-neutral-300 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="comment(message)">Comment</button>
         </div>
       </div>
     </div>

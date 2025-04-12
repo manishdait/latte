@@ -14,10 +14,11 @@ import { ActivityComponent } from '../../components/activity/activity.component'
 import { CommentRequest } from '../../model/comment.type';
 import { CommentService } from '../../service/comment.service';
 import { Priority } from '../../model/priority.enum';
+import { DescriptionBoxComponent } from '../../components/description-box/description-box.component';
 
 @Component({
   selector: 'app-ticket-details',
-  imports: [FontAwesomeModule, ActivityComponent, EditAssignComponent, EditPriorityComponent],
+  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent],
   templateUrl: './ticket-details.component.html',
   styleUrl: './ticket-details.component.css'
 })
@@ -31,6 +32,8 @@ export class TicketDetailsComponent implements OnInit {
   router = inject(Router)
   route = inject(ActivatedRoute);
   faLibrary = inject(FaIconLibrary);
+
+  owner = signal(false);
 
   ticket = signal<TicketResponse>({
     id: 0,
@@ -60,6 +63,7 @@ export class TicketDetailsComponent implements OnInit {
     this.ticketService.fetchTicket(this.ticketId()).subscribe({
       next: (response) => {
         this.ticket.set(response);
+        this.owner.set(this.ticket().createdBy.firstname === this.authService.getFirstname());
       }
     });
 
@@ -168,6 +172,7 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleEditPriority() {
+    if (this.ticket().lock) {return;}
     this.editPriority.update(toggle => !toggle);
   }
 
