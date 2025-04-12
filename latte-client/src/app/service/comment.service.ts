@@ -16,4 +16,12 @@ export class CommentService {
   createComment(request: CommentRequest): Observable<ActivityResponse> {
     return this.client.post<ActivityResponse>(`${URL}`, request);
   }
+
+  updateCommnet(id: number, request: CommentRequest): Observable<ActivityResponse> {
+    return this.client.patch<ActivityResponse>(`${URL}/${id}`, request);
+  }
+
+  deleteComment(id: number): Observable<{ [key: string]: boolean }> {
+    return this.client.delete<{ [key: string]: boolean }>(`${URL}/${id}`);
+  }
 }

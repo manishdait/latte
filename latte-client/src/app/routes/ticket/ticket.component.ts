@@ -8,15 +8,15 @@ import { Status } from '../../model/status.enum';
 import { TicketResponse } from '../../model/ticket.type';
 import { TicketService } from '../../service/ticket.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
-import { getDate } from '../../shared/utils';
 import { AppState } from '../../state/app.state';
 import { setTicketOpenCount, setTicketCloseCount, setTickets } from '../../state/ticket/ticket.action';
 import { selectTickets, selectTicketOpenCount, selectTicketCloseCount } from '../../state/ticket/ticket.selector';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
+import { ListItemComponent } from '../../components/list-item/list-item.component';
 
 @Component({
   selector: 'app-ticket',
-  imports: [PaginationComponent, RouterLink, CommonModule, FontAwesomeModule],
+  imports: [PaginationComponent, ListItemComponent, RouterLink, CommonModule, FontAwesomeModule],
   templateUrl: './ticket.component.html',
   styleUrl: './ticket.component.css'
 })
@@ -89,10 +89,6 @@ export class TicketComponent implements OnInit {
         this.store.dispatch(setTickets({tickets: response.content}))
       }
     });
-  }
-
-  getDate(date: any) {
-    return getDate(date);
   }
 
   getStatus() {

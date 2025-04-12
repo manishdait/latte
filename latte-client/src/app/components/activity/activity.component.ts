@@ -5,10 +5,11 @@ import { CommentRequest } from '../../model/comment.type';
 import { ActivityService } from '../../service/activity.service';
 import { CommentService } from '../../service/comment.service';
 import { getDate } from '../../shared/utils';
+import { CommentBoxComponent } from '../comment-box/comment-box.component';
 
 @Component({
   selector: 'app-activity',
-  imports: [],
+  imports: [CommentBoxComponent],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.css'
 })
@@ -41,7 +42,6 @@ export class ActivityComponent implements OnInit {
     return getDate(date);
   }
 
-
   loadPrevious() {
     this.count.update(count => count + 1);
     
@@ -51,5 +51,9 @@ export class ActivityComponent implements OnInit {
         this.more.set(response.next);
       }
     });
+  }
+
+  refresh() {
+    this.ngOnInit();
   }
 }

@@ -7,16 +7,7 @@
           <span class="text-[.9rem] text-neutral-800">{{ activity.message + ' on ' + getDate(activity.createdAt) }}</span>
         </div>
       } @else {
-        <div class="border-[.1em] border-neutral-200 w-full overflow-hidden rounded-sm">
-          <div class="flex text-base px-2 py-1 gap-2 border-b-[.1em] border-neutral-200">
-            <span class="text-[.9rem] font-medium text-neutral-800">{{ activity.author }}</span>
-            <span class="text-[.9rem] text-neutral-500">{{ 'commented ' + getDate(activity.createdAt) }}</span>
-          </div>
-            
-          <div class="p-2">
-            <span class="text-base text-neutral-800 text-justify">{{ activity.message }}</span>
-          </div>
-        </div>
+        <app-comment-box class="w-full" [activity]="activity" (refresh)="refresh()"/>
       }
       <div class="min-h-8 h-fit ml-[.68em] w-[.1em] bg-neutral-200"></div>
     </div>
