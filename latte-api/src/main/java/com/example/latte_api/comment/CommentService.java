@@ -35,4 +35,25 @@ public class CommentService {
       
     return activityService.createActivity(comment);
   }
+
+  public void deleteComment(Long id, Authentication authentication) {
+    User user = (User) authentication.getPrincipal();
+    Activity activity = activityService.getActivity(id);
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
+      return;
+    }
+    activityService.deleteActivity(activity);
+  }
+
+  public ActivityDto updateComment(Long id, CommentRequest request, Authentication authentication) {
+    User user = (User) authentication.getPrincipal();
+    Activity activity = activityService.getActivity(id);
+    
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
+      throw new IllegalArgumentException("Opretion not permited");
+    }
+
+    activity.setMessage(request.message());
+    return activityService.updateActivity(activity);
+  }
 }
