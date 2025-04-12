@@ -8,6 +8,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.latte_api.errors.TicketLockException;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,8 +29,8 @@ public class GlobalExceptionHandler {
     );
   }
   
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e, HttpServletRequest request) {
+  @ExceptionHandler({IllegalArgumentException.class, TicketLockException.class})
+  public ResponseEntity<ErrorResponse> handleIllegalArgument(Exception e, HttpServletRequest request) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
       new ErrorResponse(
         Instant.now(), 

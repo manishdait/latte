@@ -8,10 +8,12 @@ import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.enums.ActivityType;
 import com.example.latte_api.comment.dto.CommentRequest;
+import com.example.latte_api.errors.TicketLockException;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.User;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,7 +26,13 @@ public class CommentService {
   public ActivityDto createComment(CommentRequest request, Authentication authentication){
     User user = (User) authentication.getPrincipal();
 
-    Ticket ticket = ticketRepository.findById(request.ticketId()).orElseThrow();
+    Ticket ticket = ticketRepository.findById(request.ticketId()).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+
+    if (ticket.getLock()) {
+      throw new TicketLockException();
+    }
 
     Activity comment = Activity.builder()
       .type(ActivityType.COMMENT)
@@ -39,6 +47,11 @@ public class CommentService {
   public void deleteComment(Long id, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     Activity activity = activityService.getActivity(id);
+    
+    if(activity.getTicket().getLock()) {
+      throw new TicketLockException();
+    }
+
     if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
       return;
     }
@@ -48,6 +61,10 @@ public class CommentService {
   public ActivityDto updateComment(Long id, CommentRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     Activity activity = activityService.getActivity(id);
+
+    if(activity.getTicket().getLock()) {
+      throw new TicketLockException();
+    }
     
     if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
       throw new IllegalArgumentException("Opretion not permited");

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
+import com.example.latte_api.errors.TicketLockException;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -117,7 +118,14 @@ public class TicketService {
   public TicketResponse editTicket(Long id, TicketPatchRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
 
-    Ticket ticket = ticketRepository.findById(id).orElseThrow();
+    Ticket ticket = ticketRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+
+    if (ticket.getLock()) {
+      throw new TicketLockException();
+    }
+
     List<Activity> activities = new ArrayList<>();
     
     if (request.title() != null && !request.title().equals(ticket.getTitle())) {
