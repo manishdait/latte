@@ -59,12 +59,11 @@ public class AuthService {
     );
 
     User user = (User) authentication.getPrincipal();
-    String role = user.getRole().getRole();
 
-    String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of("roles", role, "firstname", user.getFirstname()));
-    String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of("roles", role, "firstname", user.getFirstname()),  604800);
+    String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
+    String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
 
-    return new AuthResponse(user.getEmail(), accessToken, refreshToken, user.getRole().getRole());
+    return new AuthResponse(user.getFirstname(), user.getEmail(), accessToken, refreshToken, user.getRole().getRole());
   }
 
   public AuthResponse refreshToken(HttpServletRequest request) {
@@ -87,7 +86,7 @@ public class AuthService {
     }
 
     String role = userDetails.getRole().getRole();
-    String accessToken = jwtProvider.generateToken(username, Map.of("roles", role, "firstname", userDetails.getFirstname()));
-    return new AuthResponse(userDetails.getUsername(), accessToken, token, role);
+    String accessToken = jwtProvider.generateToken(username, Map.of());
+    return new AuthResponse(userDetails.getFirstname(), userDetails.getUsername(), accessToken, token, role);
   }
 }
