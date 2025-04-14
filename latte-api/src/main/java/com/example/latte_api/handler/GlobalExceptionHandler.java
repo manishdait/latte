@@ -8,8 +8,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.latte_api.errors.TicketLockException;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,23 +16,36 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
-  public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException e, HttpServletRequest request) {
+  public ResponseEntity<ErrorResponse> handleBadCredential(BadCredentialsException e, HttpServletRequest request) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
       new ErrorResponse(
         Instant.now(), 
         HttpStatus.FORBIDDEN.value(),
-        "Invalid username or password",
+        e.getMessage(),
         request.getRequestURI()
       )
     );
   }
   
-  @ExceptionHandler({IllegalArgumentException.class, TicketLockException.class})
-  public ResponseEntity<ErrorResponse> handleIllegalArgument(Exception e, HttpServletRequest request) {
+  @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+  public ResponseEntity<ErrorResponse> handleIllegalArgState(Exception e, HttpServletRequest request) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
       new ErrorResponse(
         Instant.now(), 
         HttpStatus.BAD_REQUEST.value(),
+        e.getMessage(),
+        request.getRequestURI()
+      )
+    );
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class) 
+  public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException e, HttpServletRequest request) {
+    e.printStackTrace();
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+      new ErrorResponse(
+        Instant.now(), 
+        HttpStatus.NOT_FOUND.value(),
         e.getMessage(),
         request.getRequestURI()
       )
@@ -48,19 +59,6 @@ public class GlobalExceptionHandler {
         Instant.now(), 
         HttpStatus.UNAUTHORIZED.value(),
         "Jwt Exception",
-        request.getRequestURI()
-      )
-    );
-  }
-
-  @ExceptionHandler(EntityNotFoundException.class) 
-  public ResponseEntity<ErrorResponse> handleException(EntityNotFoundException e, HttpServletRequest request) {
-    e.printStackTrace();
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-      new ErrorResponse(
-        Instant.now(), 
-        HttpStatus.NOT_FOUND.value(),
-        e.getMessage(),
         request.getRequestURI()
       )
     );

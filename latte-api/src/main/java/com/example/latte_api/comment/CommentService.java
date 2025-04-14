@@ -8,7 +8,6 @@ import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.enums.ActivityType;
 import com.example.latte_api.comment.dto.CommentRequest;
-import com.example.latte_api.errors.TicketLockException;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.User;
@@ -31,7 +30,7 @@ public class CommentService {
     );
 
     if (ticket.getLock()) {
-      throw new TicketLockException();
+      throw new IllegalStateException("Ticket is locked");
     }
 
     Activity comment = Activity.builder()
@@ -48,8 +47,8 @@ public class CommentService {
     User user = (User) authentication.getPrincipal();
     Activity activity = activityService.getActivity(id);
     
-    if(activity.getTicket().getLock()) {
-      throw new TicketLockException();
+    if (activity.getTicket().getLock()) {
+      throw new IllegalStateException("Ticket is locked");
     }
 
     if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
@@ -62,8 +61,8 @@ public class CommentService {
     User user = (User) authentication.getPrincipal();
     Activity activity = activityService.getActivity(id);
 
-    if(activity.getTicket().getLock()) {
-      throw new TicketLockException();
+    if (activity.getTicket().getLock()) {
+      throw new IllegalStateException("Ticket is locked");
     }
     
     if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
