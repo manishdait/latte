@@ -54,6 +54,12 @@ public class User extends AbstractAuditingEntity implements UserDetails, Princip
   @JoinColumn(name = "role_id")
   private Role role;
 
+  @Column(name = "deletable")
+  private boolean deletable;
+
+  @Column(name = "editable")
+  private boolean editable;
+
   @Override
   public String getName() {
     return this.email;

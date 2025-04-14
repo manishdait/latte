@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
-import com.example.latte_api.errors.TicketLockException;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -47,7 +46,7 @@ public class TicketService {
 
     if (!request.assignedTo().isEmpty()) {
       assignTo = userRepository.findByFirstname(request.assignedTo()).orElseThrow(
-        () -> new IllegalArgumentException("Assinged user not found")
+        () -> new EntityNotFoundException("Assinged user not found")
       );
     }
 
@@ -123,7 +122,7 @@ public class TicketService {
     );
 
     if (ticket.getLock()) {
-      throw new TicketLockException();
+      throw new IllegalStateException("Ticket is locked");
     }
 
     List<Activity> activities = new ArrayList<>();
@@ -190,6 +189,11 @@ public class TicketService {
 
   public void deleteTicket(Long id) {
     Ticket ticket = ticketRepository.findById(id).orElseThrow();
+    
+    if (ticket.getLock()) {
+      throw new IllegalStateException("Ticket is locked");
+    }
+    
     if(ticket.getAssignedTo() != null) {
       ticket.setAssignedTo(null);
       ticketRepository.save(ticket);

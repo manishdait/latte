@@ -15,8 +15,10 @@ public interface TicketMapper {
   @Mapping(target = "createdBy.firstname", source = "createdBy.firstname")
   @Mapping(target = "createdBy.email", source = "createdBy.email")
   @Mapping(target = "createdBy.role", source = "createdBy.role.role")
+  @Mapping(target = "createdBy.editable", source = "createdBy.editable")
   @Mapping(target = "assignedTo.firstname", source = "assignedTo.firstname")
   @Mapping(target = "assignedTo.email", source = "assignedTo.email")
   @Mapping(target = "assignedTo.role", source = "assignedTo.role.role")
+  @Mapping(target = "assignedTo.deletable", source = "assignedTo.deletable")
   TicketResponse mapToTicketResponse(Ticket ticket);
 }

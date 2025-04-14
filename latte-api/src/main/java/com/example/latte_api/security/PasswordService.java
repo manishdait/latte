@@ -21,6 +21,11 @@ public class PasswordService {
 
   public UserDto resetPassword(ResetPasswordRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
+
+    if (!user.isEditable()) {
+      throw new IllegalStateException("User can not be edited");
+    }
+
     if (!request.updatePassword().equals(request.confirmPassword())) {
       throw new IllegalArgumentException("Update password and Confirm password not match");
     }
@@ -32,6 +37,10 @@ public class PasswordService {
 
   public UserDto resetPassword(ResetPasswordRequest request, String _user) {
     User user = userRepository.findByEmail(_user).orElseThrow();
+
+    if (!user.isEditable()) {
+      throw new IllegalStateException("User can not be edited");
+    }
     
     if (!request.updatePassword().equals(request.confirmPassword())) {
       throw new IllegalArgumentException("Update password and Confirm password not match");

@@ -19,6 +19,7 @@ import com.example.latte_api.user.mapper.UserMapper;
 import com.example.latte_api.user.role.Role;
 import com.example.latte_api.user.role.RoleRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,11 @@ public class UserService implements UserDetailsService {
     return userRepository.findByEmail(username).orElseThrow(
       () -> new UsernameNotFoundException(String.format("User with username:`%s` not found", username))
     );
+  }
+
+  public Map<String, Long> getUserCount() {
+    long count = userRepository.count();
+    return Map.of("user_count", count);
   }
 
   public PagedEntity<UserDto> getUsers(int number, int size) {
@@ -72,6 +78,11 @@ public class UserService implements UserDetailsService {
   @Transactional
   public UserDto updateUser(UserDto request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
+
+    if (!user.isEditable()) {
+      throw new IllegalStateException("User cannot be edited");
+    }
+
     user.setEmail(request.email());
     user.setFirstname(request.firstname());
     userRepository.save(user);
@@ -83,11 +94,17 @@ public class UserService implements UserDetailsService {
   public UserDto updateUser(UserDto request, String _user) {
     User user = userRepository.findByEmail(_user).orElseThrow();
 
+    if (!user.isEditable()) {
+      throw new IllegalStateException("User cannot be edited");
+    }
+
     user.setEmail(request.email());
     user.setFirstname(request.firstname());
 
     if (!request.role().equals(user.getRole().getRole())) {
-      Role role = roleRepository.findByRole(request.role()).orElseThrow();
+      Role role = roleRepository.findByRole(request.role()).orElseThrow(
+        () -> new EntityNotFoundException("Role not found")
+      );
       user.setRole(role);
     }
     
@@ -96,12 +113,12 @@ public class UserService implements UserDetailsService {
   }
 
   public void deleteUser(String _user) {
-    User user = userRepository.findByEmail(_user).orElseThrow();
+    User user = userRepository.findByEmail(_user).orElseThrow(
+      () -> new EntityNotFoundException("User not found")
+    );
+    if (!user.isDeletable()) {
+      throw new IllegalStateException("User cannot be deleted");
+    }
     userRepository.delete(user);
-  }
-
-  public Map<String, Long> getUserCount() {
-    long count = userRepository.count();
-    return Map.of("user_count", count);
   }
 }

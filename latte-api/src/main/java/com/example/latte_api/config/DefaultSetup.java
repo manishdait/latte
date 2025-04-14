@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!test")
+@Profile({"!test"})
 public class DefaultSetup {
   private final RoleRepository roleRepository; 
   private final UserRepository userRepository;
@@ -66,6 +66,8 @@ public class DefaultSetup {
         .email("admin@admin.com")
         .password(encoder.encode(password))
         .role(roleAdmin)
+        .editable(true)
+        .deletable(false)
         .build();
   
       userRepository.save(admin);

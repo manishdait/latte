@@ -48,6 +48,8 @@ public class AuthService {
       .email(request.email())
       .password(passwordEncoder.encode(request.password()))
       .role(role)
+      .editable(true)
+      .deletable(true)
       .build();
 
     userRepository.save(user);  
