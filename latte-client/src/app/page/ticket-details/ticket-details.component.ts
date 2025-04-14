@@ -45,7 +45,9 @@ export class TicketDetailsComponent implements OnInit {
     createdBy: {
       firstname: '',
       email: '',
-      role: Role.USER
+      role: Role.USER,
+      editable: false,
+      deletable: false
     },
     assignedTo: null,
     createdAt: new Date(),
@@ -58,6 +60,7 @@ export class TicketDetailsComponent implements OnInit {
   editAssignee = signal(false);
   editPriority = signal(false);
   admin = signal(this.authService.getRole() === Role.ADMIN);
+  util = signal(false);
 
   ngOnInit(): void {
     this.ticketService.fetchTicket(this.ticketId()).subscribe({
@@ -174,6 +177,16 @@ export class TicketDetailsComponent implements OnInit {
   toggleEditPriority() {
     if (this.ticket().lock) {return;}
     this.editPriority.update(toggle => !toggle);
+  }
+
+  toggleUtil() {
+    this.util.update(toggle => !toggle);
+  }
+
+  delete() {
+    this.ticketService.deleteTicket(this.ticketId()).subscribe({
+      next: (res) => {this.router.navigate(['home/tickets'], {replaceUrl: true})}
+    })
   }
 
   comment(message: HTMLTextAreaElement) {

@@ -4,7 +4,7 @@ import { UserResponse } from '../../model/user.type';
 import { EditUserComponent } from '../../components/form/edit-user-form/edit-user.component';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
-import { count, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { userCountSelector, userSelector } from '../../state/user/user.selector';
 import { decrementUserCount, removeUser, setUserCount, setUsers } from '../../state/user/user.action';
 import { CommonModule } from '@angular/common';
@@ -31,7 +31,9 @@ export class UserComponent implements OnInit {
   buffer = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER
+    role: Role.USER,
+    editable: false,
+    deletable: false
   });
   
   editUser = signal(false);

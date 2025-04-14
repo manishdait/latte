@@ -1,43 +1,56 @@
 <div class="w-[min(1400px,100%)] flex flex-col flex-wrap gap-8 p-4 mx-auto">
   <div class="border-b-[.1em] border-gray-200 flex flex-wrap gap-4 py-4">
     <div class="grow flex flex-col gap-4">
-      @if(!editTitle()) {
-        <h1 class="text-[2rem] text-neutral-800 font-semibold leading-none">{{ ticket().title }}</h1>
+      <div class="flex items-center gap-2">
+        <div class="w-full">
+          @if(!editTitle()) {
+            <h1 class="text-[2rem] text-neutral-800 font-semibold leading-none">{{ ticket().title }}</h1>
+          } @else {
+            <input class="w-full text-[1rem] text-neutral-800 border-[.1em] border-neutral-200 outline-none px-2 py-1 focus-within:border-green-600" type="text" placeholder="Edit title" #title>
+          }
+        </div>
 
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex gap-4">
+          @if (!editTitle()) {
+            <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
+          } @else {
+            <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
+            <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
+          }
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
           <span class="w-fit text-[.9rem] text-white font-medium px-5 py-1 rounded-[5em]" [class]="getStatus(ticket().status) === 'OPEN'? 'bg-green-600' : 'bg-purple-600'">
             {{ ticket().status }}
           </span>
-          @if(admin()) {
-            @if (!ticket().lock) {
-              <button class="text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[5em] hover:bg-neutral-900/5 cursor-pointer" (click)="lockTicket()">
-                <fa-icon class="text-neutral-500" [icon]="'lock-open'"/>
-                <span class="text-neutral-800 font-medium">Lock</span>
-              </button>
-            } @else {
-              <button class="text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[5em] hover:bg-neutral-900/5 cursor-pointer" (click)="unlockTicket()">
-                <fa-icon class="text-neutral-500" [icon]="'lock'"/>
-                <span class="text-neutral-800 font-medium">Unlock</span>
-              </button>
-            }
-          } @else {
-            <div class="w-[2rem] h-[2rem] text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[100%]">
-              <fa-icon class="text-neutral-500" [icon]="'lock-open'"/>
-            </div>
-          }
+          <div class="w-[2rem] h-[2rem] text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[100%]">
+            <fa-icon class="text-neutral-500" [icon]="ticket().lock? 'lock' : 'lock-open'"/>
+          </div>
         </div>
-      } @else {
-        <input class="text-[1rem] text-neutral-800 border-[.1em] border-neutral-200 outline-none px-2 py-1 focus-within:border-green-600" type="text" placeholder="Edit title" #title>
-      }
-    </div>
 
-    <div class="flex gap-4">
-      @if (!editTitle()) {
-        <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
-      } @else {
-        <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
-        <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
-      }
+        @if (admin()) {
+          <div class="relative">
+            <div class="flex items-center justify-center hover:bg-neutral-200 w-[1rem] h-[1rem] rounded-[100%] p-4 cursor-pointer" (click)="toggleUtil()">
+              <fa-icon class="text-neutral-800" [icon]="util()? 'close' : 'ellipsis'"/>
+            </div>
+
+            @if (util()) {
+              <div class="absolute right-8 bg-neutral-50 border-[.1em] border-neutral-200 rounded-sm">
+                <ul>
+                  <li class="text-[.9rem] px-2 py-1 text-red-600 hover:bg-neutral-200 cursor-pointer border-b-[.1em] border-neutral-200" (click)="delete()" (click)="toggleUtil()">Delete</li>
+                  @if (ticket().lock) {
+                    <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="unlockTicket()" (click)="toggleUtil()">Unlock</li>
+                  } @else {
+                    <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="lockTicket()" (click)="toggleUtil()">Lock</li> 
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        }
+      </div>
     </div>
   </div>
 

@@ -60,7 +60,9 @@ export class UserFormComponent implements OnInit {
         const user: UserResponse = {
           firstname: request.firstname,
           email: request.email,
-          role: request.role
+          role: request.role,
+          editable: false,
+          deletable: false
         }
         this.store.dispatch(addUser({user: user}));
         this.store.dispatch(incrementUserCount());

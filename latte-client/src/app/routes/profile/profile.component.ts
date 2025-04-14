@@ -27,13 +27,17 @@ export class ProfileComponent implements OnInit {
   userDetails = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER
+    role: Role.USER,
+    editable: false,
+    deletable: false
   });
 
   buffer = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER
+    role: Role.USER,
+    editable: false,
+    deletable: false
   });
   
   bufferUpdated = signal(false);
@@ -162,7 +166,9 @@ export class ProfileComponent implements OnInit {
     const request: UserResponse = {
       firstname: this.userDetailsForm.get('firstname')?.value,
       email: this.userDetailsForm.get('email')?.value,
-      role: this.userDetails().role
+      role: this.userDetails().role,
+      editable: false,
+      deletable: false
     }
     
     this.userService.updateUser(request).subscribe({

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { priorities, Priority } from '../../../model/priority.enum';
+import { Priority } from '../../../model/priority.enum';
 import { TicketRequest } from '../../../model/ticket.type';
 import { Status } from '../../../model/status.enum';
 import { TicketService } from '../../../service/ticket.service';
@@ -30,11 +30,13 @@ export class TicketFormComponent implements OnInit {
   formErrors = signal(false);
   more = signal(false);
   engineers = signal<string[]>([]);
-  priorities = signal<string[]>(priorities);
   
   pageCount = signal(0);
   size = signal(5);
   
+  list: string[] = ['Low', 'Medium', 'High'];
+  priorities: Record<string, Priority> = {'Low': Priority.LOW, 'Medium': Priority.MEDIUM, 'High': Priority.HIGH};
+
   form: FormGroup;
   
   constructor(private store: Store<AppState>) {
@@ -85,7 +87,7 @@ export class TicketFormComponent implements OnInit {
     const request: TicketRequest = {
       title: this.form.get('title')!.value,
       description: this.form.get('description')!.value,
-      priority: Priority[this.form.get('priority')!.value as keyof typeof Priority],
+      priority: this.priorities[this.form.get('priority')?.value],
       status: Status.OPEN,
       assignedTo: this.form.get('assignedTo')!.value
     }

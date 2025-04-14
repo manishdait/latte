@@ -57,7 +57,9 @@ export class EditUserComponent implements OnInit {
     const request: UserResponse = {
       firstname: this.form.get('firstname')?.value,
       email: this.form.get('email')?.value,
-      role: this.form.get('role')?.value === 'Admin'? Role.ADMIN : Role.USER
+      role: this.form.get('role')?.value === 'Admin' ? Role.ADMIN : Role.USER,
+      editable: false,
+      deletable: false
     }
 
     if (this._user) {
