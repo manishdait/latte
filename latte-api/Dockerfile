@@ -18,5 +18,7 @@ COPY --from=jre target/jre jre
 ENV DATASOURCE_USERNAME=postgres
 ENV DATASOURCE_PASSWORD=password
 ENV DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/latte_db
+ENV JWT_SECRETKEY=
+ENV JWT_EXPIRATION=
 EXPOSE 8080
-ENTRYPOINT [ "jre/bin/java", "-jar", "app.jar", "--spring.profiles.active=dev" ]
+ENTRYPOINT [ "jre/bin/java", "-jar", "app.jar", "--spring.profiles.active=local" ]

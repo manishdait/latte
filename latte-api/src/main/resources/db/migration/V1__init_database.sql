@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS _user (
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   role_id BIGINT REFERENCES role(id) NOT NULL,
+  deletable BOOLEAN NOT NULL DEFAULT true,
+  editable BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP,
   last_modified_at TIMESTAMP
 );

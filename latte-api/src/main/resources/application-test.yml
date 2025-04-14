@@ -7,3 +7,8 @@ spring:
   flyway:
     user: postgres
     password: password
+
+security:
+  jwt:
+    secret-key: 815F1298534CA2989B84C1C2F48D4609E7A05811E0700653661466A6
+    expiration: 43200

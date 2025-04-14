@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  flyway:
+    user: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRETKEY}
+    expiration: ${JWT_EXPIRATION}
+    
