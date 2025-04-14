@@ -61,6 +61,8 @@ public class PasswordServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
+      .editable(true)
+      .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";
@@ -90,7 +92,32 @@ public class PasswordServiceTest {
   }
 
   @Test
-  void shouldThrow_exception_forPasswordUpdate_ifUpdatePassword_adnConfirmPassword_diff() {
+  void shouldThrow_exception_forPasswordUpdate_ifUserisNotEditable() {
+    // mock
+    final User user = User.builder()
+      .id(101L)
+      .firstname("Peter")
+      .email("peter@test.in")
+      .password("Peter@01")
+      .editable(false)
+      .deletable(true)
+      .role(Role.builder().role("USER").build())
+      .build();
+
+    // given
+    final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
+    final Authentication authentication = Mockito.mock(Authentication.class);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+
+    Assertions.assertThatThrownBy(() -> passwordService.resetPassword(request, authentication))
+      .isInstanceOf(IllegalStateException.class);
+
+  }
+
+  @Test
+  void shouldThrow_exception_forPasswordUpdate_ifUpdatePassword_andConfirmPassword_diff() {
     // mock
     final User user = Mockito.mock(User.class);
 
@@ -113,6 +140,8 @@ public class PasswordServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
+      .editable(true)
+      .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";

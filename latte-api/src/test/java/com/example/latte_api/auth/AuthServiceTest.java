@@ -151,9 +151,9 @@ public class AuthServiceTest {
     // when
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(user);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname()))))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of())))
       .thenReturn(accessToken);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())), eq(604800)))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800)))
       .thenReturn(refreshToken);
 
     final AuthResponse result = authService.authenticateUser(request);
@@ -163,9 +163,9 @@ public class AuthServiceTest {
       .authenticate(any(UsernamePasswordAuthenticationToken.class));
     verify(authentication, times(1)).getPrincipal();
     verify(jwtProvider, times(1))
-      .generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())));
+      .generateToken(eq(user.getEmail()), eq(Map.of()));
     verify(jwtProvider, times(1))
-      .generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())), eq(604800));
+      .generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800));
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(request.email());
@@ -207,7 +207,7 @@ public class AuthServiceTest {
     when(jwtProvider.getUsername(refershToken)).thenReturn(username);
     when(userRepository.findByEmail(username)).thenReturn(Optional.of(user));
     when(jwtProvider.validToken(user, refershToken)).thenReturn(true);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname()))))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of())))
       .thenReturn(accessToken);
 
     final AuthResponse result = authService.refreshToken(request);
@@ -217,7 +217,7 @@ public class AuthServiceTest {
     verify(jwtProvider, times(1)).getUsername(refershToken);
     verify(userRepository, times(1)).findByEmail(username);
     verify(jwtProvider, times(1)).validToken(user, refershToken);
-    verify(jwtProvider, times(1)).generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())));
+    verify(jwtProvider, times(1)).generateToken(eq(user.getEmail()), eq(Map.of()));
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(username);

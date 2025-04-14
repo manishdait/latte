@@ -183,7 +183,7 @@ public class TicketServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> ticketService.createTicket(request, authentication))
-      .isInstanceOf(IllegalArgumentException.class)
+      .isInstanceOf(EntityNotFoundException.class)
       .hasMessage("Assinged user not found");
   }
 
@@ -296,7 +296,7 @@ public class TicketServiceTest {
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.get("open_tickets")).isEqualTo(1);
-    Assertions.assertThat(result.get("completed_tickets")).isEqualTo(1);
+    Assertions.assertThat(result.get("closed_tickets")).isEqualTo(1);
   }
 
   @Test
@@ -306,6 +306,7 @@ public class TicketServiceTest {
     final Ticket ticket = Ticket.builder()
       .title("Title")
       .description("description")
+      .lock(false)
       .priority(Priority.LOW)
       .status(Status.OPEN)
       .build();
@@ -348,6 +349,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -389,6 +391,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -430,6 +433,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
 
@@ -457,6 +461,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -497,6 +502,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -526,6 +532,30 @@ public class TicketServiceTest {
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(updated.getStatus()).isEqualTo(request.status());
+  }
+
+   @Test
+  void shouldThrows_exception_whenTicketUpdated_IfTicketIsLocked() {
+    // mock
+    final User user = Mockito.mock(User.class);
+    final Ticket ticket = Ticket.builder()
+      .title("Title")
+      .description("description")
+      .priority(Priority.LOW)
+      .status(Status.OPEN)
+      .lock(true)
+      .build();
+    // given
+    final Authentication authentication = Mockito.mock(Authentication.class);
+    final Long id = 101L;
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+
+    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication))
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -597,6 +627,21 @@ public class TicketServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id));
+  }
+
+  @Test
+  void shouldThrow_exception_forLockedTicket() {
+    final Ticket ticket = Mockito.mock(Ticket.class);
+    // given
+    final Long id = 101L;
+
+    // when
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(ticket.getLock()).thenReturn(true);
+
+    // then
+    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id))
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test

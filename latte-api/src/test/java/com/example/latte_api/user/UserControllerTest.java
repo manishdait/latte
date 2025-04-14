@@ -59,21 +59,34 @@ public class UserControllerTest {
     Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
     Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
 
+    User superAdmin = User.builder()
+      .firstname("SuperAdmin")
+      .email("superadmin@test.in")
+      .password(passwordEncoder.encode("Admin@01"))
+      .editable(false)
+      .deletable(false)
+      .role(admin)
+      .build();
+
     User jhon = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
       .password(passwordEncoder.encode("Admin@01"))
+      .editable(true)
+      .deletable(true)
       .role(admin)
       .build();
 
     User peter = User.builder()
       .firstname("Peter")
       .email("peter@test.in")
+      .editable(true)
+      .deletable(true)
       .password(passwordEncoder.encode("Peter@01"))
       .role(user)
       .build();
 
-    userRepository.saveAll(List.of(jhon, peter));
+    userRepository.saveAll(List.of(jhon, superAdmin, peter));
   }
 
   @AfterEach
@@ -102,7 +115,7 @@ public class UserControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody().getContent()).hasSize(2);
+    Assertions.assertThat(response.getBody().getContent()).hasSize(3);
   }
 
   @Test
@@ -150,12 +163,12 @@ public class UserControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody().getContent()).hasSize(2);
+    Assertions.assertThat(response.getBody().getContent()).hasSize(3);
   }
 
   @Test
   void shouldReturnUserDto_ofAuthenticatedUser() {
-    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER");
+    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -186,7 +199,7 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnUserDto_byEmail_whenAdminRequestsUserInfo() {
-    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER");
+    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -240,13 +253,13 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withNewDetails() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
@@ -261,13 +274,13 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withoutChangingRole() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
@@ -282,7 +295,7 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserRequest_missingAuthorizationHeader() {
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
@@ -295,14 +308,33 @@ public class UserControllerTest {
   }
 
   @Test
+  void shouldReturnBadRequest_whenUpdateUserRequest_ifUserIsNotEditable() {
+    final AuthResponse cred = superadminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
+
+    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+      "/latte-api/v1/users",
+      HttpMethod.PUT,
+      new HttpEntity<>(request, headers),
+      UserDto.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
   void shouldUpdateUserByEmail_whenAdminRequestsUpdate() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
     final String user = "peter@test.in";
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
@@ -318,13 +350,13 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateUserByEmail_andChangeRole_whenAdminRequestsUpdate() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
     final String user = "peter@test.in";
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
@@ -345,7 +377,7 @@ public class UserControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
     final String user = "peter@test.in";
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
@@ -360,7 +392,7 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserByEmail_missingAuthorizationHeader() {
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
     final String user = "peter@test.in";
 
     final ResponseEntity<UserDto> response = testRestTemplate.exchange(
@@ -556,6 +588,25 @@ public class UserControllerTest {
   }
 
   @Test
+  void shouldGiveBadRequest_whenUserDeletedByEmail_whenUserIsNotDeletable() {
+    final AuthResponse cred = superadminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final String user = "superadmin@test.in";
+
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      "/latte-api/v1/users/" + user,
+      HttpMethod.DELETE,
+      new HttpEntity<>(null, headers),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
   void shouldReturn_userCount_whenRequesteUserIsAdmin() {
     final AuthResponse cred = adminCred();
 
@@ -570,7 +621,7 @@ public class UserControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(Map.of("user_count", 2L));
+    Assertions.assertThat(response.getBody()).isEqualTo(Map.of("user_count", 3L));
   }
 
   @Test
@@ -600,6 +651,11 @@ public class UserControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  private AuthResponse superadminCred() {
+    final AuthRequest request = new AuthRequest("superadmin@test.in", "Admin@01");
+    return authenticate(request);
   }
 
   private AuthResponse adminCred() {

@@ -127,7 +127,7 @@ public class CommentControllerTest {
   }
 
   @Test
-  void shouldGiveInternalServerError_onCreateNewComment_ifTicketNotExists() {
+  void shouldGiveNotFound_onCreateNewComment_ifTicketNotExists() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -142,7 +142,7 @@ public class CommentControllerTest {
       ErrorResponse.class
     );
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test

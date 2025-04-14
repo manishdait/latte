@@ -71,6 +71,8 @@ public class TicketControllerTest {
     User jhon = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
+      .editable(true)
+      .deletable(true)
       .password(passwordEncoder.encode("Admin@01"))
       .role(admin)
       .build();
@@ -78,6 +80,8 @@ public class TicketControllerTest {
     User peter = User.builder()
       .firstname("Peter")
       .email("peter@test.in")
+      .editable(true)
+      .deletable(true)
       .password(passwordEncoder.encode("Peter@01"))
       .role(user)
       .build();
@@ -139,7 +143,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -165,8 +169,8 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
-    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN", true, true));
   }
 
   @Test
@@ -185,8 +189,7 @@ public class TicketControllerTest {
       ErrorResponse.class
     );
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Assinged user not found");
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test
@@ -265,7 +268,7 @@ public class TicketControllerTest {
 
   @Test
   void shouldGetInfo_ofTicketsOnSystem() {
-    final Map<String, Integer> expected = Map.of("open_tickets", 1, "completed_tickets", 1);
+    final Map<String, Integer> expected = Map.of("open_tickets", 1, "closed_tickets", 1);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -326,7 +329,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -393,7 +396,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -429,7 +432,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -465,8 +468,8 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
-    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN", true, true));
   }
 
   @Test
@@ -501,7 +504,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -537,12 +540,12 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER"));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
   @Test
-  void shouldGiveInternalServerError_onUpdateTicket_byInvalidTicketId() {
+  void shouldGiveNotFound_onUpdateTicket_byInvalidTicketId() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -557,11 +560,11 @@ public class TicketControllerTest {
       ErrorResponse.class
     );
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test
-  void shouldGiveForbidden_onUpdateTicket_whenREquestMissingAuthorizationHeader() {
+  void shouldGiveForbidden_onUpdateTicket_whenRequestMissingAuthorizationHeader() {
     final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
     final Long id = 300L;
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(

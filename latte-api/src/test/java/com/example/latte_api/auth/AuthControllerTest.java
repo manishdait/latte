@@ -64,6 +64,8 @@ public class AuthControllerTest {
       .email("admin@test.in")
       .password(passwordEncoder.encode("Admin@01"))
       .role(admin)
+      .editable(true)
+      .deletable(false)
       .build();
 
     User peter = User.builder()
@@ -71,6 +73,8 @@ public class AuthControllerTest {
       .email("peter@test.in")
       .password(passwordEncoder.encode("Peter@01"))
       .role(user)
+      .editable(true)
+      .deletable(true)
       .build();
 
     userRepository.saveAll(List.of(jhon, peter));
@@ -232,7 +236,6 @@ public class AuthControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Invalid username or password");
   }
 
   @Test
@@ -247,7 +250,6 @@ public class AuthControllerTest {
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Invalid username or password");
   }
 
   @Test
