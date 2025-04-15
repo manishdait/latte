@@ -1,3 +1,28 @@
+CREATE SEQUENCE IF NOT EXISTS authority_seq
+START WITH 101
+INCREMENT BY 1
+MINVALUE 101
+MAXVALUE 10000
+NO CYCLE;
+
+CREATE TABLE IF NOT EXISTS authority (
+  id BIGINT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('authority_seq'),
+  authority VARCHAR(255) UNIQUE NOT NULL
+);
+
+INSERT INTO authority (authority) VALUES ('user::create');
+INSERT INTO authority (authority) VALUES ('user::edit');
+INSERT INTO authority (authority) VALUES ('user::delete');
+INSERT INTO authority (authority) VALUES ('user::reset-password');
+INSERT INTO authority (authority) VALUES ('ticket::create');
+INSERT INTO authority (authority) VALUES ('ticket::edit');
+INSERT INTO authority (authority) VALUES ('ticket::delete');
+INSERT INTO authority (authority) VALUES ('ticket::lock');
+INSERT INTO authority (authority) VALUES ('ticket::assign');
+INSERT INTO authority (authority) VALUES ('role::create');
+INSERT INTO authority (authority) VALUES ('role::edit');
+INSERT INTO authority (authority) VALUES ('role::delete');
+
 CREATE SEQUENCE IF NOT EXISTS role_seq
 START WITH 101
 INCREMENT BY 1
@@ -10,8 +35,29 @@ CREATE TABLE IF NOT EXISTS role (
   role VARCHAR(255) UNIQUE NOT NULL
 );
 
-INSERT INTO role (role) VALUES ('ROLE_ADMIN');
-INSERT INTO role (role) VALUES ('ROLE_USER');
+INSERT INTO role (role) VALUES ('ROLE_Admin');
+INSERT INTO role (role) VALUES ('ROLE_User');
+
+CREATE TABLE IF NOT EXISTS role_authority (
+  role_id BIGINT REFERENCES role(id),
+  authority_id BIGINT REFERENCES authority(id)
+);
+
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 101);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 102);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 103);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 104);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 105);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 106);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 107);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 108);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 109);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 110);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 111);
+INSERT INTO role_authority (role_id, authority_id) VALUES (101, 112);
+
+INSERT INTO role_authority (role_id, authority_id) VALUES (102, 105);
+INSERT INTO role_authority (role_id, authority_id) VALUES (102, 106);
 
 CREATE SEQUENCE IF NOT EXISTS user_seq
 START WITH 101

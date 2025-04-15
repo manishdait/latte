@@ -18,13 +18,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import com.example.latte_api.activity.enums.ActivityType;
+import com.example.latte_api.role.Role;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
 
 @Testcontainers
 @DataJpaTest

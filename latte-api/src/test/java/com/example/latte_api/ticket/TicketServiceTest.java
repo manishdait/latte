@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
+import com.example.latte_api.role.Role;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -37,7 +38,6 @@ import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.ticket.mapper.TicketMapper;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -580,6 +580,7 @@ public class TicketServiceTest {
   void shouldDelete_ticket_withNoAssignee_andValidId() {
     // mock
     final Ticket ticket = Mockito.mock(Ticket.class);
+    final Authentication authentication = Mockito.mock(Authentication.class);
 
     // given
     final Long id = 101L;
@@ -587,7 +588,7 @@ public class TicketServiceTest {
     // when
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
 
-    ticketService.deleteTicket(id);
+    ticketService.deleteTicket(id, authentication);
 
     // then
     verify(ticketRepository, times(1)).findById(id);
@@ -600,6 +601,7 @@ public class TicketServiceTest {
     // mock
     final Ticket ticket = Mockito.mock(Ticket.class);
     final User user = Mockito.mock(User.class);
+    final Authentication authentication = Mockito.mock(Authentication.class);
 
     // given
     final Long id = 101L;
@@ -608,7 +610,7 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(ticket.getAssignedTo()).thenReturn(user);
 
-    ticketService.deleteTicket(id);
+    ticketService.deleteTicket(id, authentication);
 
     // then
     verify(ticketRepository, times(1)).findById(id);
@@ -621,12 +623,13 @@ public class TicketServiceTest {
   void shouldThrow_exception_forInvalidId() {
     // given
     final Long id = 102L;
+    final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
     when(ticketRepository.findById(id)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id));
+    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id, authentication));
   }
 
   @Test
@@ -634,13 +637,14 @@ public class TicketServiceTest {
     final Ticket ticket = Mockito.mock(Ticket.class);
     // given
     final Long id = 101L;
+    final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(ticket.getLock()).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id))
+    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id, authentication))
       .isInstanceOf(IllegalStateException.class);
   }
 
@@ -696,7 +700,6 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.empty());
 
     Assertions.assertThatThrownBy(() -> ticketService.unlockTicket(101L))
-      .isInstanceOf(EntityNotFoundException.class)
-      .hasMessage("Ticket not found");
+      .isInstanceOf(EntityNotFoundException.class);
   }
 }

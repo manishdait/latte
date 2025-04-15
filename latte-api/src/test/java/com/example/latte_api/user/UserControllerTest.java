@@ -28,11 +28,13 @@ import org.testcontainers.utility.DockerImageName;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.handler.ErrorResponse;
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.role.dto.RoleResponse;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
-import com.example.latte_api.user.dto.UserDto;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
+import com.example.latte_api.user.dto.UserRequest;
+import com.example.latte_api.user.dto.UserResponse;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -107,11 +109,11 @@ public class UserControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<PagedEntity<UserDto>> response = testRestTemplate.exchange(
+    final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<PagedEntity<UserDto>>() {}
+      new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -125,11 +127,11 @@ public class UserControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<PagedEntity<UserDto>> response = testRestTemplate.exchange(
+    final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<PagedEntity<UserDto>>() {}
+      new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -138,11 +140,11 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUserListRequestMissingAuthorizationHeader() {
-    final ResponseEntity<PagedEntity<UserDto>> response = testRestTemplate.exchange(
+    final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.GET,
       new HttpEntity<>(null),
-      new ParameterizedTypeReference<PagedEntity<UserDto>>() {}
+      new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -168,17 +170,17 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnUserDto_ofAuthenticatedUser() {
-    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true);
+    final UserResponse expected = new UserResponse("Peter", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/info",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -187,11 +189,11 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUserInfoRequestMissingAuthorizationHeader() {
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/info",
       HttpMethod.GET,
       new HttpEntity<>(null),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -199,7 +201,7 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnUserDto_byEmail_whenAdminRequestsUserInfo() {
-    final UserDto expected = new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true);
+    final UserResponse expected = new UserResponse("Peter", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -207,11 +209,11 @@ public class UserControllerTest {
 
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/info/" + user,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -227,11 +229,11 @@ public class UserControllerTest {
 
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/info/" + user,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -241,11 +243,11 @@ public class UserControllerTest {
   void shouldReturnForbidden_whenUserInfoByEmailRequest_missingAuthorizationHeader() {
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/info/" + user,
       HttpMethod.GET,
       new HttpEntity<>(null),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -253,19 +255,19 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withNewDetails() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
+    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -274,19 +276,19 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withoutChangingRole() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
+    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -295,13 +297,13 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserRequest_missingAuthorizationHeader() {
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.PUT,
       new HttpEntity<>(request, null),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -314,13 +316,13 @@ public class UserControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -328,20 +330,20 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateUserByEmail_whenAdminRequestsUpdate() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_USER", true, true);
+    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -350,20 +352,20 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateUserByEmail_andChangeRole_whenAdminRequestsUpdate() {
-    final UserDto expected = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", true, true);
+    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -377,14 +379,14 @@ public class UserControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -392,14 +394,14 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserByEmail_missingAuthorizationHeader() {
-    final UserDto request = new UserDto("Stewie", "peter@test.in", "ROLE_ADMIN", false, false);
+    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.PUT,
       new HttpEntity<>(request),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -414,11 +416,11 @@ public class UserControllerTest {
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -467,11 +469,11 @@ public class UserControllerTest {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
     final String user = "peter@test.in";
 
-    final ResponseEntity<UserDto> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/users/" + user,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
-      UserDto.class
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -1,6 +1,7 @@
 package com.example.latte_api.user;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,8 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.example.latte_api.role.Role;
 import com.example.latte_api.shared.AbstractAuditingEntity;
-import com.example.latte_api.user.role.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,6 +73,8 @@ public class User extends AbstractAuditingEntity implements UserDetails, Princip
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(role.getRole()));
+    List<SimpleGrantedAuthority> authorities = new ArrayList<>(this.role.getAuthorities());
+    authorities.add(new SimpleGrantedAuthority(this.role.getRole()));
+    return authorities;
   }
 }

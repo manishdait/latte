@@ -28,6 +28,8 @@ import org.testcontainers.utility.DockerImageName;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.handler.ErrorResponse;
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -37,8 +39,6 @@ import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.dto.UserDto;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -143,7 +143,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -169,8 +169,8 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
-    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
+    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in"));
   }
 
   @Test
@@ -329,7 +329,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -396,7 +396,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -432,7 +432,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(request.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -468,8 +468,8 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
-    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in", "ROLE_ADMIN", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
+    Assertions.assertThat(result.assignedTo()).isEqualTo(new UserDto("Admin", "admin@test.in"));
   }
 
   @Test
@@ -504,7 +504,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(ticketRequest.status());
     Assertions.assertThat(result.priority()).isEqualTo(request.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 
@@ -540,7 +540,7 @@ public class TicketControllerTest {
     Assertions.assertThat(result.description()).isEqualTo(ticketRequest.description());
     Assertions.assertThat(result.status()).isEqualTo(request.status());
     Assertions.assertThat(result.priority()).isEqualTo(ticketRequest.priority());
-    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in", "ROLE_USER", true, true));
+    Assertions.assertThat(result.createdBy()).isEqualTo(new UserDto("Peter", "peter@test.in"));
     Assertions.assertThat(result.assignedTo()).isNull();
   }
 

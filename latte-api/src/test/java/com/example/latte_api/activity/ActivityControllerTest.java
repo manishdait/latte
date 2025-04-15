@@ -29,6 +29,8 @@ import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.enums.ActivityType;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
@@ -36,8 +38,6 @@ import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

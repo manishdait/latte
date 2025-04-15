@@ -24,11 +24,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.shared.PagedEntity;
-import com.example.latte_api.user.dto.UserDto;
+import com.example.latte_api.user.dto.UserRequest;
+import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -102,7 +103,7 @@ public class UserServiceTest {
     // when
     when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
 
-    final PagedEntity<UserDto> result = userService.getUsers(page, size);
+    final PagedEntity<UserResponse> result = userService.getUsers(page, size);
 
     // then
     verify(userRepository, times(1)).findAll(any(Pageable.class));
@@ -142,13 +143,13 @@ public class UserServiceTest {
     // mock
     final Authentication authentication = Mockito.mock(Authentication.class);
     final User user = Mockito.mock(User.class);
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
     
     // when
     when(authentication.getPrincipal()).thenReturn(user);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = userService.getUser(authentication);
+    final UserResponse result = userService.getUser(authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -161,7 +162,7 @@ public class UserServiceTest {
   void shouldReturn_userDto_forEmail() {
     // mock
     final User user = Mockito.mock(User.class);
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final String email = "peter@test.in";
@@ -170,7 +171,7 @@ public class UserServiceTest {
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = userService.getUser(email);
+    final UserResponse result = userService.getUser(email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -192,16 +193,16 @@ public class UserServiceTest {
       .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", null, false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = userService.updateUser(request, authentication);
+    final UserResponse result = userService.updateUser(request, authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -227,17 +228,17 @@ public class UserServiceTest {
       .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final String email = "peter@test.in";
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", "USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = userService.updateUser(request, email);
+    final UserResponse result = userService.updateUser(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -255,7 +256,7 @@ public class UserServiceTest {
   void shouldThrow_exceptionOnUpdate_forInvalidEmail() {
     // given
     final String email = "louis@gmail.com";
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", "USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "USER");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -278,7 +279,7 @@ public class UserServiceTest {
 
     // given
     final String email = "peter@test.com";
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", "USER", false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
@@ -301,19 +302,19 @@ public class UserServiceTest {
       .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
     final Role role = Role.builder().id(101L).role("ADMIN").build();
 
     // given
     final String email = "peter@test.in";
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", "ADMIN", false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "ADMIN");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(roleRepository.findByRole(request.role())).thenReturn(Optional.of(role));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = userService.updateUser(request, email);
+    final UserResponse result = userService.updateUser(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -344,7 +345,7 @@ public class UserServiceTest {
 
     // given
     final String email = "peter@test.in";
-    final UserDto request = new UserDto("Stewie", "stewie@test.in", "TEST", false, false);
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "TEST");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));

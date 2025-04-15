@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.auth.dto.RegistrationRequest;
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.role.dto.RoleResponse;
 import com.example.latte_api.security.JwtProvider;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -65,7 +66,14 @@ public class AuthService {
     String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
     String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
 
-    return new AuthResponse(user.getFirstname(), user.getEmail(), accessToken, refreshToken, user.getRole().getRole());
+    Role role = user.getRole();
+    return new AuthResponse(
+      user.getFirstname(), 
+      user.getEmail(), 
+      accessToken, 
+      refreshToken, 
+      new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList())
+    );
   }
 
   public AuthResponse refreshToken(HttpServletRequest request) {
@@ -87,8 +95,8 @@ public class AuthService {
       throw new RuntimeException("Forbidden access");
     }
 
-    String role = userDetails.getRole().getRole();
+    Role role = userDetails.getRole();
     String accessToken = jwtProvider.generateToken(username, Map.of());
-    return new AuthResponse(userDetails.getFirstname(), userDetails.getUsername(), accessToken, token, role);
+    return new AuthResponse(userDetails.getFirstname(), userDetails.getUsername(), accessToken, token, new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
   }
 }

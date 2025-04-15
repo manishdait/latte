@@ -70,8 +70,8 @@ public class TicketController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable Long id) {
-    ticketService.deleteTicket(id);
+  public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable Long id, Authentication authentication) {
+    ticketService.deleteTicket(id, authentication);
     return ResponseEntity.status(HttpStatus.OK).body(Map.of("key", id, "deleted", true));
   }
 }

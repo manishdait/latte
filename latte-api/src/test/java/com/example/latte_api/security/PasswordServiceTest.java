@@ -20,12 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.latte_api.role.Role;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
-import com.example.latte_api.user.dto.UserDto;
+import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
-import com.example.latte_api.user.role.Role;
 
 @ExtendWith(MockitoExtension.class)
 public class PasswordServiceTest {
@@ -66,7 +66,7 @@ public class PasswordServiceTest {
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
@@ -77,7 +77,7 @@ public class PasswordServiceTest {
     when(passwordEncoder.encode(eq(request.updatePassword()))).thenReturn(encodedPass);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = passwordService.resetPassword(request, authentication);
+    final UserResponse result = passwordService.resetPassword(request, authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -145,7 +145,7 @@ public class PasswordServiceTest {
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final String email = "peter@test.in";
@@ -156,7 +156,7 @@ public class PasswordServiceTest {
     when(passwordEncoder.encode(eq(request.updatePassword()))).thenReturn(encodedPass);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = passwordService.resetPassword(request, email);
+    final UserResponse result = passwordService.resetPassword(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);

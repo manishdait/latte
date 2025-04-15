@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.latte_api.security.PasswordService;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
-import com.example.latte_api.user.dto.UserDto;
+import com.example.latte_api.user.dto.UserRequest;
+import com.example.latte_api.user.dto.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +31,7 @@ public class UserController {
   private final PasswordService passwordService;
 
   @GetMapping()
-  public ResponseEntity<PagedEntity<UserDto>> getUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+  public ResponseEntity<PagedEntity<UserResponse>> getUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers(page, size));
   }
 
@@ -45,32 +46,32 @@ public class UserController {
   }
 
   @GetMapping("/info")
-  public ResponseEntity<UserDto> getInfo(Authentication authentication) {
+  public ResponseEntity<UserResponse> getInfo(Authentication authentication) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(authentication));
   }
 
   @GetMapping("/info/{email}")
-  public ResponseEntity<UserDto> getInfoForUser(@PathVariable String email) {
+  public ResponseEntity<UserResponse> getInfoForUser(@PathVariable String email) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(email));
   }
 
   @PutMapping()
-  public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, Authentication authentication) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userDto, authentication));
+  public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest request, Authentication authentication) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(request, authentication));
   }
 
   @PutMapping("/{email}")
-  public ResponseEntity<UserDto> updateUserByEmail(@RequestBody UserDto userDto, @PathVariable String email) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userDto, email));
+  public ResponseEntity<UserResponse> updateUserByEmail(@RequestBody UserRequest request, @PathVariable String email) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(request, email));
   }
 
   @PatchMapping()
-  public ResponseEntity<UserDto> resetUserPassword(@RequestBody ResetPasswordRequest request, Authentication authentication) {
+  public ResponseEntity<UserResponse> resetUserPassword(@RequestBody ResetPasswordRequest request, Authentication authentication) {
     return ResponseEntity.status(HttpStatus.OK).body(passwordService.resetPassword(request, authentication));
   }
 
   @PatchMapping("/{email}")
-  public ResponseEntity<UserDto> resetUserPassword(@RequestBody ResetPasswordRequest request, @PathVariable String email) {
+  public ResponseEntity<UserResponse> resetUserPassword(@RequestBody ResetPasswordRequest request, @PathVariable String email) {
     return ResponseEntity.status(HttpStatus.OK).body(passwordService.resetPassword(request, email));
   }
 

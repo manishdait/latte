@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -60,7 +60,7 @@ public class DefaultSetup {
         
       cred.setReadOnly();
   
-      Role roleAdmin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
+      Role roleAdmin = roleRepository.findByRole("ROLE_Admin").orElseThrow();
       User admin = User.builder()
         .firstname("Admin")
         .email("admin@admin.com")

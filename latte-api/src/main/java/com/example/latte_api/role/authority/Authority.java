@@ -1,8 +1,8 @@
-package com.example.latte_api.user.role;
+package com.example.latte_api.role.authority;
 
 import java.util.List;
 
-import com.example.latte_api.user.User;
+import com.example.latte_api.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -10,7 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,24 +19,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Builder
 @Entity
-@Table(name = "role")
-public class Role {
+@Table(name = "authority")
+public class Authority { 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq_generator")
-  @SequenceGenerator(name = "role_seq_generator", sequenceName = "role_seq", initialValue = 101, allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_seq_generator")
+  @SequenceGenerator(name = "authority_seq_generator", sequenceName = "authority_seq", allocationSize = 1, initialValue = 101)
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "role", unique = true)
-  private String role;
+  @Column(name = "authority", unique = true)
+  private String authority;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "role")
-  private List<User> users;
+  @ManyToMany(mappedBy = "authorities")
+  private List<Role> roles;
 }

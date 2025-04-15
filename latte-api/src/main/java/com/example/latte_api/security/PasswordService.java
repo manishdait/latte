@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
-import com.example.latte_api.user.dto.UserDto;
+import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class PasswordService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
 
-  public UserDto resetPassword(ResetPasswordRequest request, Authentication authentication) {
+  public UserResponse resetPassword(ResetPasswordRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
 
     if (!user.isEditable()) {
@@ -35,7 +35,7 @@ public class PasswordService {
     return userMapper.mapToUserDto(user);
   } 
 
-  public UserDto resetPassword(ResetPasswordRequest request, String _user) {
+  public UserResponse resetPassword(ResetPasswordRequest request, String _user) {
     User user = userRepository.findByEmail(_user).orElseThrow();
 
     if (!user.isEditable()) {

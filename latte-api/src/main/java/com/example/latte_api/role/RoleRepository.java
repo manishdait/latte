@@ -1,4 +1,4 @@
-package com.example.latte_api.user.role;
+package com.example.latte_api.role;
 
 import java.util.Optional;
 
