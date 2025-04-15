@@ -7,6 +7,7 @@ import { TicketComponent } from './routes/ticket/ticket.component';
 import { ProfileComponent } from './routes/profile/profile.component';
 import { homeGuard } from './guard/home.guard';
 import { DashboardComponent } from './routes/dashboard/dashboard.component';
+import { RoleComponent } from './routes/role/role.component';
 
 export const routes: Routes = [
   {path: '', pathMatch: 'full', redirectTo: 'home'},
@@ -19,6 +20,7 @@ export const routes: Routes = [
       {path: 'tickets', component: TicketComponent},
       {path: 'tickets/:id', component: TicketDetailsComponent},
       {path: 'users', component: UserComponent},
+      {path: 'roles', component: RoleComponent},
       {path: 'profile', component: ProfileComponent},
       {path: '', pathMatch: 'full', redirectTo: 'dashboard'}
     ],

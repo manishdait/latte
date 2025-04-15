@@ -2,7 +2,6 @@ import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from '../../service/auth.service';
-import { Role } from '../../model/role.enum';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -18,7 +17,6 @@ export class SideNavbarComponent implements OnInit {
   authService = inject(AuthService);
 
   adminDropDownToggle = signal(false);
-  admin = signal(this.authService.getRole() === Role.ADMIN);
 
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);
@@ -30,5 +28,21 @@ export class SideNavbarComponent implements OnInit {
 
   toggleCreateTopic() {
     this.createTicket.emit(true);
+  }
+
+  createTicketOps() {
+    return this.authService.createTicket();
+  }
+
+  admin() {
+    return  this.userOps() || this.roleOps(); 
+  }
+
+  userOps() {
+    return this.authService.createUser() || this.authService.deleteUser() || this.authService.editUser() || this.authService.resetUserPassword();
+  }
+
+  roleOps() {
+    return this.authService.createRole() || this.authService.editRole() || this.authService.deleteRole();
   }
 }

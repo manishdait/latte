@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { getColor, getDate } from '../../shared/utils';
 import { Status } from '../../model/status.enum';
 import { AuthService } from '../../service/auth.service';
-import { Role } from '../../model/role.enum';
 import { EditPriorityComponent } from './components/edit-priority/edit-priority.component';
 import { EditAssignComponent } from './components/edit-assign/edit-assign.component';
 import { ActivityComponent } from '../../components/activity/activity.component';
@@ -44,10 +43,7 @@ export class TicketDetailsComponent implements OnInit {
     lock: false,
     createdBy: {
       firstname: '',
-      email: '',
-      role: Role.USER,
-      editable: false,
-      deletable: false
+      email: ''
     },
     assignedTo: null,
     createdAt: new Date(),
@@ -59,7 +55,6 @@ export class TicketDetailsComponent implements OnInit {
   editTitle = signal(false);
   editAssignee = signal(false);
   editPriority = signal(false);
-  admin = signal(this.authService.getRole() === Role.ADMIN);
   util = signal(false);
 
   ngOnInit(): void {
@@ -175,7 +170,7 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleEditPriority() {
-    if (this.ticket().lock) {return;}
+    if (this.ticket().lock || !this.editTicketOps()) {return;}
     this.editPriority.update(toggle => !toggle);
   }
 
@@ -203,5 +198,21 @@ export class TicketDetailsComponent implements OnInit {
         }
       })
     }
+  }
+
+  deleteTicketOps() {
+    return this.authService.getFirstname() === this.ticket().createdBy.firstname || this.authService.deleteTicket();
+  }
+
+  assignTicketOps() {
+    return this.authService.assignTicket();
+  }
+
+  lockTicketOps() {
+    return this.authService.lockTicket();
+  }
+
+  editTicketOps() {
+    return this.authService.getFirstname() === this.ticket().createdBy.firstname || this.authService.editTicket();
   }
 }

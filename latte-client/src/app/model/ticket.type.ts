@@ -1,6 +1,6 @@
 import { Priority } from "./priority.enum";
 import { Status } from "./status.enum";
-import { UserResponse } from "./user.type";
+import { UserDto } from "./user.type";
 
 export interface TicketResponse {
   id: number,
@@ -9,8 +9,8 @@ export interface TicketResponse {
   priority: Priority,
   status: Status,
   lock: boolean,
-  createdBy: UserResponse,
-  assignedTo: UserResponse | null,
+  createdBy: UserDto,
+  assignedTo: UserDto | null,
   createdAt: Date,
   lastUpdated: Date
 }

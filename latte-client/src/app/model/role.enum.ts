@@ -1,6 +1,12 @@
-export enum Role {
-  USER = 'ROLE_USER',
-  ADMIN = 'ROLE_ADMIN'
-};
+import { authority } from "./authority.type";
 
-export const roles: string[] = ['User', 'Admin'];
+export interface Role {
+  readonly id: number,
+  role: string,
+  authorities: authority[]
+}
+
+export interface RoleRequest {
+  role: string,
+  authorities: authority[]
+}
