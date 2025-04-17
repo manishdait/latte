@@ -3,8 +3,7 @@ server:
   
 spring:
   profiles:
-    active:
-    - dev
+    active: ${PROFILE:dev}
   application:
     name: latte-api
   jpa:
