@@ -72,7 +72,9 @@ public class UserService implements UserDetailsService {
   }
 
   public UserResponse getUser(String email) {
-    User user = userRepository.findByEmail(email).orElseThrow();
+    User user = userRepository.findByEmail(email).orElseThrow(
+      () -> new EntityNotFoundException("User not found")
+    );
     return userMapper.mapToUserDto(user);
   }
 
@@ -93,7 +95,9 @@ public class UserService implements UserDetailsService {
 
   @Transactional
   public UserResponse updateUser(UserRequest request, String _user) {
-    User user = userRepository.findByEmail(_user).orElseThrow();
+    User user = userRepository.findByEmail(_user).orElseThrow(
+      () -> new EntityNotFoundException("User not found")
+    );
 
     if (!user.isEditable()) {
       throw new IllegalStateException("User cannot be edited");

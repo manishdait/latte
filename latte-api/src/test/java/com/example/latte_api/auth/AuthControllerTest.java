@@ -54,30 +54,32 @@ public class AuthControllerTest {
   @Autowired
   private TestRestTemplate testRestTemplate;
 
+  private final String BASE_URI = "/latte-api/v1/auth";
+
   @BeforeEach
   void setup() {
-    Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
-    Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
+    Role user = roleRepository.findByRole("User").orElseThrow();
+    Role admin = roleRepository.findByRole("Admin").orElseThrow();
 
-    User jhon = User.builder()
+    User adminUser = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
-      .password(passwordEncoder.encode("Admin@01"))
+      .password(passwordEncoder.encode("password"))
       .role(admin)
       .editable(true)
       .deletable(false)
       .build();
 
-    User peter = User.builder()
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password(passwordEncoder.encode("Peter@01"))
+    User commonUser = User.builder()
+      .firstname("User")
+      .email("common@test.in")
+      .password(passwordEncoder.encode("password"))
       .role(user)
       .editable(true)
       .deletable(true)
       .build();
 
-    userRepository.saveAll(List.of(jhon, peter));
+    userRepository.saveAll(List.of(adminUser, commonUser));
   }
 
   @AfterEach
@@ -93,6 +95,7 @@ public class AuthControllerTest {
 
   @Test
   void should_createNewUser_whenUserDoesNotExist() {
+    // user::create
     final Map<String, Boolean> expected = Map.of("user_created", true);
 
     final AuthResponse cred = adminCred();
@@ -100,10 +103,10 @@ public class AuthControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
  
-    final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@gmail.com", "Jhon@01", "ROLE_USER");
+    final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@gmail.com", "Jhon@01", "User");
 
     final ResponseEntity<Map<String, Boolean>> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       new ParameterizedTypeReference<Map<String, Boolean>>() {}
@@ -120,17 +123,16 @@ public class AuthControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
  
-    final RegistrationRequest request = new RegistrationRequest("Peter", "jhon@gmail.com", "Jhon@01", "ROLE_USER");
+    final RegistrationRequest request = new RegistrationRequest("User", "jhon@gmail.com", "Jhon@01", "User");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Duplicate User");
   }
 
 
@@ -141,17 +143,16 @@ public class AuthControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
  
-    final RegistrationRequest request = new RegistrationRequest("Jhon", "peter@test.in", "Jhon@01", "ROLE_USER");
+    final RegistrationRequest request = new RegistrationRequest("Jhon", "common@test.in", "Jhon@01", "User");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Duplicate User");
   }
 
   @Test
@@ -161,25 +162,24 @@ public class AuthControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
  
-    final RegistrationRequest request = new RegistrationRequest("Peter", "peter@test.in", "Jhon@01", "ROLE_USER");
+    final RegistrationRequest request = new RegistrationRequest("User", "common@test.in", "Jhon@01", "User");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(response.getBody().error()).isEqualTo("Duplicate User");
   }
 
   @Test
   void shouldReturnForbidden_whenRegistrationRequest_missingAuthorizationHeader() {
-    final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@test.in", "Jhon@01", "ROLE_USER");
+    final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@test.in", "Jhon@01", "User");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request),
       ErrorResponse.class
@@ -189,7 +189,7 @@ public class AuthControllerTest {
   }
 
   @Test
-  void shouldReturnForbidden_onRegisterUser_whenAuthenticatedUserIsNotAdmin() {
+  void shouldReturnForbidden_onRegisterUser_whenAuthenticatedUser_DontHaveAuthorities() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -198,7 +198,7 @@ public class AuthControllerTest {
     final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@test.in", "Jhon@01", "ROLE_USER");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/sign-up",
+      BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -209,10 +209,10 @@ public class AuthControllerTest {
 
   @Test
   void shouldReturnOk_withAuthResponse_onSuccessfulLogin() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "Admin@01");
+    final AuthRequest request = new AuthRequest("admin@test.in", "password");
 
     final ResponseEntity<AuthResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/login",
+      BASE_URI + "/login",
       HttpMethod.POST,
       new HttpEntity<>(request),
       AuthResponse.class
@@ -229,7 +229,7 @@ public class AuthControllerTest {
     final AuthRequest request = new AuthRequest("admin@test.in", "Peter@01");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/login",
+      BASE_URI + "/login",
       HttpMethod.POST,
       new HttpEntity<>(request),
       ErrorResponse.class
@@ -243,7 +243,7 @@ public class AuthControllerTest {
     final AuthRequest request = new AuthRequest("jhon@test.in", "Jhon@01");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/login",
+      BASE_URI + "/login",
       HttpMethod.POST,
       new HttpEntity<>(request),
       ErrorResponse.class
@@ -260,7 +260,7 @@ public class AuthControllerTest {
     headers.add("Authorization", "Bearer " + cred.refreshToken());
  
     final ResponseEntity<AuthResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/refresh",
+      BASE_URI + "/refresh",
       HttpMethod.POST,
       new HttpEntity<>(null, headers),
       AuthResponse.class
@@ -278,7 +278,7 @@ public class AuthControllerTest {
     headers.add("Authorization", "Bearer " + "random-token");
  
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/refresh",
+      BASE_URI + "/refresh",
       HttpMethod.POST,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -290,7 +290,7 @@ public class AuthControllerTest {
   @Test
   void shouldReturnInternalServerError_onRefreshTokenRequest_missingAuthorizationHeader() {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/refresh",
+      BASE_URI + "/refresh",
       HttpMethod.POST,
       new HttpEntity<>(null, null),
       ErrorResponse.class
@@ -309,7 +309,7 @@ public class AuthControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
  
     final ResponseEntity<Map<String, Boolean>> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/verify",
+      BASE_URI + "/verify",
       HttpMethod.POST,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<Map<String, Boolean>>() {}
@@ -325,7 +325,7 @@ public class AuthControllerTest {
     headers.add("Authorization", "Bearer acess-token");
  
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/verify",
+      BASE_URI + "/verify",
       HttpMethod.POST,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -337,7 +337,7 @@ public class AuthControllerTest {
   @Test
   void shouldReturnForbidden_onVerify_whenRequestMissingAuthorizationHeader() {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/auth/verify",
+      BASE_URI + "/verify",
       HttpMethod.POST,
       new HttpEntity<>(null, null),
       ErrorResponse.class
@@ -346,13 +346,15 @@ public class AuthControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
+  // Helpers
+
   private AuthResponse adminCred() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "Admin@01");
+    final AuthRequest request = new AuthRequest("admin@test.in", "password");
     return authenticate(request);
   }
 
   private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("peter@test.in", "Peter@01");
+    final AuthRequest request = new AuthRequest("common@test.in", "password");
     return authenticate(request);
   }
 

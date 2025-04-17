@@ -66,26 +66,28 @@ public class CommentControllerTest {
   @Autowired
   private TestRestTemplate testRestTemplate;
 
+  private final String BASE_URI = "/latte-api/v1/comments";
+
   @BeforeEach
   void setup() {
-    Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
-    Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
+    Role user = roleRepository.findByRole("User").orElseThrow();
+    Role admin = roleRepository.findByRole("Admin").orElseThrow();
 
-    User jhon = User.builder()
+    User adminUser = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
-      .password(passwordEncoder.encode("Admin@01"))
+      .password(passwordEncoder.encode("password"))
       .role(admin)
       .build();
 
-    User peter = User.builder()
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password(passwordEncoder.encode("Peter@01"))
+    User commonUser = User.builder()
+      .firstname("User")
+      .email("common@test.in")
+      .password(passwordEncoder.encode("password"))
       .role(user)
       .build();
 
-    userRepository.saveAll(List.of(jhon, peter));
+    userRepository.saveAll(List.of(adminUser, commonUser));
   }
 
   @AfterEach
@@ -112,16 +114,16 @@ public class CommentControllerTest {
     final CommentRequest request = new CommentRequest("Test", ticket.id());
 
     final ResponseEntity<ActivityDto> response = testRestTemplate.exchange(
-      "/latte-api/v1/comments",
+      BASE_URI,
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ActivityDto.class
     );
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     
     final ActivityDto result = response.getBody();
-    Assertions.assertThat(result.author()).isEqualTo("Peter");
+    Assertions.assertThat(result.author()).isEqualTo("User");
     Assertions.assertThat(result.message()).isEqualTo(request.message());
     Assertions.assertThat(result.type()).isEqualTo(ActivityType.COMMENT);
   }
@@ -136,7 +138,7 @@ public class CommentControllerTest {
     final CommentRequest request = new CommentRequest("Test", 300L);
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/comments",
+      BASE_URI,
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -151,7 +153,7 @@ public class CommentControllerTest {
     final CommentRequest request = new CommentRequest("Test", ticket.id());
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/comments",
+      BASE_URI,
       HttpMethod.POST,
       new HttpEntity<>(request, null),
       ErrorResponse.class
@@ -160,13 +162,177 @@ public class CommentControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
+  @Test
+  void shouldUpdateComment_forTicket() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketResponse ticket = getTicket();
+    final CommentRequest request = new CommentRequest("Test", ticket.id());
+
+    final ActivityDto activity= testRestTemplate.exchange(
+            BASE_URI,
+            HttpMethod.POST,
+            new HttpEntity<>(request, headers),
+            ActivityDto.class
+    ).getBody();
+
+    final CommentRequest updateReq = new CommentRequest("New", ticket.id());
+
+    final ResponseEntity<ActivityDto> response = testRestTemplate.exchange(
+            BASE_URI + "/" + activity.id(),
+            HttpMethod.PATCH,
+            new HttpEntity<>(updateReq, headers),
+            ActivityDto.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    final ActivityDto result = response.getBody();
+    Assertions.assertThat(result.message()).isEqualTo(updateReq.message());
+  }
+
+  @Test
+  void shouldGiveBadRequest_IfUserNotOwner() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketResponse ticket = getTicket();
+    final CommentRequest request = new CommentRequest("Test", ticket.id());
+
+    final ActivityDto activity= testRestTemplate.exchange(
+            BASE_URI,
+            HttpMethod.POST,
+            new HttpEntity<>(request, headers),
+            ActivityDto.class
+    ).getBody();
+
+    final CommentRequest updateReq = new CommentRequest("New", ticket.id());
+    final AuthResponse _cred = adminCred();
+
+    final HttpHeaders _headers = new HttpHeaders();
+   _headers.add("Authorization", "Bearer " + _cred.accessToken());
+
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+            BASE_URI + "/" + activity.id(),
+            HttpMethod.PATCH,
+            new HttpEntity<>(updateReq, _headers),
+            ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+    void shouldGiveNotFound_forInvalidId() {
+    final AuthResponse cred = userCred();
+      final CommentRequest updateReq = new CommentRequest("New", 101L);
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final long id = 200;
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+            BASE_URI + "/" + id,
+            HttpMethod.PATCH,
+            new HttpEntity<>(updateReq, headers),
+            ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  @Test
+  void shouldDeleteComment_forTicket() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketResponse ticket = getTicket();
+    final CommentRequest request = new CommentRequest("Test", ticket.id());
+
+    final ActivityDto activity= testRestTemplate.exchange(
+            BASE_URI,
+            HttpMethod.POST,
+            new HttpEntity<>(request, headers),
+            ActivityDto.class
+    ).getBody();
+
+    final ResponseEntity<ActivityDto> response = testRestTemplate.exchange(
+            BASE_URI + "/" + activity.id(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(null, headers),
+            ActivityDto.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Test
+  void shouldGiveBadRequest_forTicket_ifNotOwner() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final TicketResponse ticket = getTicket();
+    final CommentRequest request = new CommentRequest("Test", ticket.id());
+
+    final ActivityDto activity= testRestTemplate.exchange(
+            BASE_URI,
+            HttpMethod.POST,
+            new HttpEntity<>(request, headers),
+            ActivityDto.class
+    ).getBody();
+
+    final AuthResponse _cred = adminCred();
+
+    final HttpHeaders _headers = new HttpHeaders();
+    _headers.add("Authorization", "Bearer " + _cred.accessToken());
+
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+            BASE_URI + "/" + activity.id(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(null, _headers),
+            ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void shouldGiveNotFound_forTicket_ifInvalidId() {
+    final AuthResponse cred = userCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    long id = 200L;
+
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+            BASE_URI + "/" + id,
+            HttpMethod.DELETE,
+            new HttpEntity<>(null, headers),
+            ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  // Helpers
+
   private TicketResponse getTicket() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin");
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
 
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/tickets",
@@ -178,7 +344,12 @@ public class CommentControllerTest {
   }
   
   private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("peter@test.in", "Peter@01");
+    final AuthRequest request = new AuthRequest("common@test.in", "password");
+    return authenticate(request);
+  }
+
+  private AuthResponse adminCred() {
+    final AuthRequest request = new AuthRequest("admin@test.in", "password");
     return authenticate(request);
   }
 

@@ -51,8 +51,8 @@ public class CommentService {
       throw new IllegalStateException("Ticket is locked");
     }
 
-    if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
-      return;
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) || !activity.getType().equals(ActivityType.COMMENT)) {
+      throw new IllegalArgumentException("Operation not permitted");
     }
     activityService.deleteActivity(activity);
   }
@@ -65,8 +65,8 @@ public class CommentService {
       throw new IllegalStateException("Ticket is locked");
     }
     
-    if (!activity.getAuthor().getEmail().equals(user.getEmail()) && !activity.getType().equals(ActivityType.COMMENT)) {
-      throw new IllegalArgumentException("Opretion not permited");
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) || !activity.getType().equals(ActivityType.COMMENT)) {
+      throw new IllegalArgumentException("Operation not permitted");
     }
 
     activity.setMessage(request.message());

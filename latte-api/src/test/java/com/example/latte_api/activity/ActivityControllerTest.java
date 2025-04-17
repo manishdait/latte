@@ -67,26 +67,25 @@ public class ActivityControllerTest {
 
   private Ticket ticket;
 
+  private final String BASE_URI = "/latte-api/v1/activities";
+
   @BeforeEach
   void setup() {
-    // remove default user
-    userRepository.deleteAll();
+    Role admin = roleRepository.findByRole("Admin").orElseThrow();
 
-    Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
-
-    User jhon = User.builder()
+    User adminUser = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
-      .password(passwordEncoder.encode("Admin@01"))
+      .password(passwordEncoder.encode("password"))
       .role(admin)
       .build();
 
-    userRepository.save(jhon);
+    userRepository.save(adminUser);
 
     ticket = Ticket.builder()
       .title("T1")
       .description("description")
-      .createdBy(jhon)
+      .createdBy(adminUser)
       .createdAt(Instant.now())
       .priority(Priority.LOW)
       .lock(false)
@@ -97,7 +96,7 @@ public class ActivityControllerTest {
 
     Activity activity = Activity.builder()
       .message("message")
-      .author(jhon)
+      .author(adminUser)
       .ticket(ticket)
       .type(ActivityType.EDIT)
       .build();
@@ -127,7 +126,7 @@ public class ActivityControllerTest {
 
     final Long id = ticket.getId();
     final ResponseEntity<PagedEntity<ActivityDto>> response = testRestTemplate.exchange(
-      "/latte-api/v1/activities/ticket/" + id,
+      BASE_URI + "/ticket/" + id,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<PagedEntity<ActivityDto>>(){}
@@ -139,28 +138,28 @@ public class ActivityControllerTest {
 
   @Test
   @Disabled
-  void shouldGiveInternalServerError_onGettingActivitiesForTicket_forInvalidId() {
+  void shouldGiveNotFound_onGettingActivitiesForTicket_forInvalidId() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final Long id = 300L;
+    final long id = 300L;
     final ResponseEntity<PagedEntity<ActivityDto>> response = testRestTemplate.exchange(
-      "/latte-api/v1/activities/ticket/" + id,
+      BASE_URI + "/ticket/" + id,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<PagedEntity<ActivityDto>>(){}
     );
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test
   void shouldGiveForbidden_onGettingActivitiesForTicket_withRequestMissingAuthorizationHeader() {
     final Long id = ticket.getId();
     final ResponseEntity<PagedEntity<ActivityDto>> response = testRestTemplate.exchange(
-      "/latte-api/v1/activities/ticket/" + id,
+      BASE_URI + "/ticket/" + id,
       HttpMethod.GET,
       new HttpEntity<>(null),
       new ParameterizedTypeReference<PagedEntity<ActivityDto>>(){}
@@ -169,8 +168,10 @@ public class ActivityControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
+  // Helpers
+
   private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "Admin@01");
+    final AuthRequest request = new AuthRequest("admin@test.in", "password");
     return authenticate(request);
   }
 

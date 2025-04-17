@@ -30,7 +30,6 @@ import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.handler.ErrorResponse;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
-import com.example.latte_api.role.dto.RoleResponse;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
 import com.example.latte_api.user.dto.UserRequest;
@@ -56,39 +55,41 @@ public class UserControllerTest {
   @Autowired
   private TestRestTemplate testRestTemplate;
 
+  private final String BASE_URI = "/latte-api/v1/users";
+
   @BeforeEach
   void setup() {
-    Role user = roleRepository.findByRole("ROLE_USER").orElseThrow();
-    Role admin = roleRepository.findByRole("ROLE_ADMIN").orElseThrow();
+    Role user = roleRepository.findByRole("User").orElseThrow();
+    Role admin = roleRepository.findByRole("Admin").orElseThrow();
 
-    User superAdmin = User.builder()
-      .firstname("SuperAdmin")
-      .email("superadmin@test.in")
-      .password(passwordEncoder.encode("Admin@01"))
+    User superUser = User.builder()
+      .firstname("SuperUser")
+      .email("superuser@test.in")
+      .password(passwordEncoder.encode("password"))
       .editable(false)
       .deletable(false)
       .role(admin)
       .build();
 
-    User jhon = User.builder()
+    User adminUser = User.builder()
       .firstname("Admin")
       .email("admin@test.in")
-      .password(passwordEncoder.encode("Admin@01"))
+      .password(passwordEncoder.encode("password"))
       .editable(true)
       .deletable(true)
       .role(admin)
       .build();
 
-    User peter = User.builder()
-      .firstname("Peter")
-      .email("peter@test.in")
+    User commonUser = User.builder()
+      .firstname("User")
+      .email("common@test.in")
       .editable(true)
       .deletable(true)
-      .password(passwordEncoder.encode("Peter@01"))
+      .password(passwordEncoder.encode("password"))
       .role(user)
       .build();
 
-    userRepository.saveAll(List.of(jhon, superAdmin, peter));
+    userRepository.saveAll(List.of(superUser, adminUser, commonUser));
   }
 
   @AfterEach
@@ -103,14 +104,15 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturnPagedUserDto_whenAdminRequestsUserList() {
+  void shouldReturnPagedUserResponse_whenRequestsUserList_byUserHavingProperAuthority() { 
+    // user::create || user::edit || user::delete || user::reset-password
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
@@ -121,44 +123,43 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturnForbidden_whenUserRequestsUserList() {
+  void shouldReturnForbidden_whenRequestsUserList_donotHaveProperAuhtority() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
-
 
   @Test
   void shouldReturnForbidden_whenUserListRequestMissingAuthorizationHeader() {
-    final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI,
       HttpMethod.GET,
       new HttpEntity<>(null),
-      new ParameterizedTypeReference<PagedEntity<UserResponse>>() {}
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
   @Test
-  void shouldReturnPagedString_whenUserRequestsUserStringList() {
+  void shouldReturnPagedUser_asStringList() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResponseEntity<PagedEntity<String>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/list",
+      BASE_URI + "/list",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<PagedEntity<String>>() {}
@@ -169,71 +170,92 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturnUserDto_ofAuthenticatedUser() {
-    final UserResponse expected = new UserResponse("Peter", "peter@test.in", new RoleResponse(null, null, null), true, true);
-    final AuthResponse cred = userCred();
-
-    final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
-
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/info",
-      HttpMethod.GET,
-      new HttpEntity<>(null, headers),
-      UserResponse.class
-    );
-
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
-  }
-
-  @Test
-  void shouldReturnForbidden_whenUserInfoRequestMissingAuthorizationHeader() {
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/info",
+  void shouldReturnForbidden_whenPagedUser_asStringList_requestMissingAuthHeaders() {
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI + "/list",
       HttpMethod.GET,
       new HttpEntity<>(null),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
   @Test
-  void shouldReturnUserDto_byEmail_whenAdminRequestsUserInfo() {
-    final UserResponse expected = new UserResponse("Peter", "peter@test.in", new RoleResponse(null, null, null), true, true);
-    final AuthResponse cred = adminCred();
+  void shouldReturnUserResponse_ofAuthenticatedUser() {
+    final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final String user = "peter@test.in";
-
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/info/" + user,
+      BASE_URI + "/info",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
+
+    final UserResponse user = response.getBody();
+    Assertions.assertThat(user.firstname()).isEqualTo("User");
+    Assertions.assertThat(user.email()).isEqualTo("common@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("User");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
   }
 
   @Test
-  void shouldReturnForbidden_whenUserInfoByEmailRequest_byNonAdminUser() {
+  void shouldReturnForbidden_whenUserInfo_requestMissingAuthorizationHeader() {
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+     BASE_URI + "/info",
+      HttpMethod.GET,
+      new HttpEntity<>(null),
+      ErrorResponse.class
+    );
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+  }
+
+  @Test
+  void shouldReturnUserResponse_byEmail_whenRequestsUserInfo_byUserHavingProperAuthorities() {
+    // user::create || user::edit || user::delete || user::reset-password
+    final AuthResponse cred = adminCred();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + cred.accessToken());
+
+    final String _user = "common@test.in";
+
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
+      BASE_URI + "/info/" + _user,
+      HttpMethod.GET,
+      new HttpEntity<>(null, headers),
+      UserResponse.class
+    );
+
+    final UserResponse user = response.getBody();
+    Assertions.assertThat(user.firstname()).isEqualTo("User");
+    Assertions.assertThat(user.email()).isEqualTo("common@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("User");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
+  }
+
+  @Test
+  void shouldReturnForbidden_whenUserInfoByEmailRequest_byUserNotHavingAuthorities() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/info/" + user,
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI + "/info/" + _user,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -241,13 +263,13 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUserInfoByEmailRequest_missingAuthorizationHeader() {
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/info/" + user,
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI + "/info/" + _user,
       HttpMethod.GET,
       new HttpEntity<>(null),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -255,55 +277,65 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withNewDetails() {
-    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
+
+    final UserResponse user = response.getBody();
+    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
+    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("User");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
   }
 
   @Test
-  void shouldUpdateAuthenticatedUser_withoutChangingRole() {
-    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
+  void shouldUpdateAuthenticatedUser_verifyThat_itNotChangeRole() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
+
+    final UserResponse user = response.getBody();
+    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
+    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("User");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
   }
 
   @Test
   void shouldReturnForbidden_whenUpdateUserRequest_missingAuthorizationHeader() {
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
 
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI,
       HttpMethod.PUT,
       new HttpEntity<>(request, null),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -311,82 +343,94 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnBadRequest_whenUpdateUserRequest_ifUserIsNotEditable() {
-    final AuthResponse cred = superadminCred();
+    final AuthResponse cred = superCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
 
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
   }
 
   @Test
-  void shouldUpdateUserByEmail_whenAdminRequestsUpdate() {
-    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
+  void shouldUpdateUserByEmail_whenRequestsUpdate_byUserHavingAuthorities() {
+    // user::edit
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_USER");
-    final String user = "peter@test.in";
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
+    final String _user = "common@test.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
+    final UserResponse user = response.getBody();
+
+    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
+    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("User");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
   }
 
   @Test
-  void shouldUpdateUserByEmail_andChangeRole_whenAdminRequestsUpdate() {
-    final UserResponse expected = new UserResponse("Stewie", "peter@test.in", new RoleResponse(null, null, null), true, true);
+  void shouldUpdateUserByEmail_andChangeRole_whenRequestsUpdate_byUserHavingAuthorities() {
+    // user::edit
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
-    final String user = "peter@test.in";
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
+    final String _user = "common@test.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
+
+    final UserResponse user = response.getBody();
+    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
+    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.role().role()).isEqualTo("Admin");
+    Assertions.assertThat(user.editable()).isEqualTo(true);
+    Assertions.assertThat(user.deletable()).isEqualTo(true);
   }
 
   @Test
-  void shouldReturnForbidden_whenUpdateUserByEmail_byNonAdminUser() {
+  void shouldReturnForbidden_whenUpdateUserByEmail_forUserNotHavingAuthorities() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
-    final String user = "peter@test.in";
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
+    final String _user = "common@test.in";
 
-    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
+      BASE_URI + "/" + _user,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
-      UserResponse.class
+      ErrorResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -394,11 +438,11 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserByEmail_missingAuthorizationHeader() {
-    final UserRequest request = new UserRequest("Stewie", "peter@test.in", "ROLE_ADMIN");
-    final String user = "peter@test.in";
+    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
+    final String _user = "common@test.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PUT,
       new HttpEntity<>(request),
       UserResponse.class
@@ -417,7 +461,7 @@ public class UserControllerTest {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -436,7 +480,7 @@ public class UserControllerTest {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "UpdatePass");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -450,7 +494,7 @@ public class UserControllerTest {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users",
+      BASE_URI,
       HttpMethod.PATCH,
       new HttpEntity<>(request, null),
       ErrorResponse.class
@@ -460,17 +504,18 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldResetPassword_byEmail_whenAdminRequestChanges() {
+  void shouldResetPassword_byEmail_whenuserRequestChanges_forUserHavingAuthorities() {
+    // user::reset-password
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -480,17 +525,18 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldGiveBadRequest_whenResetPassword_byEmail_whenAdminRequestChanges_andUpdatedPasswordNotMatchConfirmPassword() {
+  void shouldGiveBadRequest_whenResetPassword_byEmail_whenRequestChanges_andUpdatedPasswordNotMatchConfirmPassword_forValidAuthorityUser() {
+    // user::reset-password
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "UpdatePass");
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -500,17 +546,17 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldGiveForbidden_whenResetPassword_byEmail_byNonAdmin() {
+  void shouldGiveForbidden_whenResetPassword_byEmail_forUserNotHavingAuthorities() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -522,10 +568,10 @@ public class UserControllerTest {
   @Test
   void shouldGiveForbidden_whenResetPassword_byEmail_missingAuthorizationHeader() {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String user = "peter@test.in";
+    final String user = "common@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + user,
       HttpMethod.PATCH,
       new HttpEntity<>(request, null),
       ErrorResponse.class
@@ -535,18 +581,19 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldDeleteUser_byEmail_whenRequestedByAdmin() {
-    final Map<String, Object> expected = Map.of("key", "peter@test.in", "deleted", true);
+  void shouldDeleteUser_byEmail_whenRequested_byUserHavingAuthority() {
+    // user::delete
+    final Map<String, Object> expected = Map.of("key", "common@test.in", "deleted", true);
 
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<Map<String, Object>>() {}
@@ -557,16 +604,16 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldGiveForbidden_whenUserDeletedByEmail_whenRequestedByNonAdmin() {
+  void shouldGiveForbidden_whenUserDeletedByEmail_whenRequested_byUserNotHavingAuthority() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -577,10 +624,10 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveForbidden_whenUserDeletedByEmail_whenRequesteMissingAuthorizationHeader() {
-    final String user = "peter@test.in";
+    final String _user = "common@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.DELETE,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -591,15 +638,15 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveBadRequest_whenUserDeletedByEmail_whenUserIsNotDeletable() {
-    final AuthResponse cred = superadminCred();
+    final AuthResponse cred = superCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final String user = "superadmin@test.in";
+    final String _user = "superuser@test.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/" + user,
+      BASE_URI + "/" + _user,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -609,14 +656,15 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturn_userCount_whenRequesteUserIsAdmin() {
+  void shouldReturn_userCount_whenRequest_byUserHavingAuthority() {
+    // user::create || user::edit || user::delete || user::reset-password
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResponseEntity<Map<String, Long>> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/count",
+      BASE_URI + "/count",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<Map<String, Long>>() {}
@@ -627,14 +675,14 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldGiveForbidden_whenGettingUserCount_whenRequesteUserIsNotAdmin() {
+  void shouldGiveForbidden_whenGettingUserCount_whenRequested_byUserNotHavingAuhtorities() {
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/count",
+      BASE_URI + "/count",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -644,9 +692,9 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldGiveForbidden_whenGettingUserCount_whenRequesteMissingAuthorizationHeader() {
+  void shouldGiveForbidden_whenGettingUserCount_whenRequestMissingAuthorizationHeader() {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      "/latte-api/v1/users/count",
+      BASE_URI + "/count",
       HttpMethod.GET,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -655,18 +703,20 @@ public class UserControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
-  private AuthResponse superadminCred() {
-    final AuthRequest request = new AuthRequest("superadmin@test.in", "Admin@01");
+  // Helpers
+
+  private AuthResponse superCred() {
+    final AuthRequest request = new AuthRequest("superuser@test.in", "password");
     return authenticate(request);
   }
 
   private AuthResponse adminCred() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "Admin@01");
+    final AuthRequest request = new AuthRequest("admin@test.in", "password");
     return authenticate(request);
   }
 
   private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("peter@test.in", "Peter@01");
+    final AuthRequest request = new AuthRequest("common@test.in", "password");
     return authenticate(request);
   }
 

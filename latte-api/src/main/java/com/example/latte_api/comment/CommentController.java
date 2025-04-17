@@ -27,7 +27,7 @@ public class CommentController {
 
   @PostMapping()
   public ResponseEntity<ActivityDto> createComment(@RequestBody CommentRequest request, Authentication authentication) {
-    return ResponseEntity.status(HttpStatus.OK).body(commentService.createComment(request, authentication));
+    return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(request, authentication));
   }
 
   @PatchMapping("/{id}")

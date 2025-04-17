@@ -46,11 +46,9 @@ public class ActivityService {
   }
 
   public Activity getActivity(Long id) {
-    Activity activity = activityRepository.findById(id).orElseThrow(
+    return activityRepository.findById(id).orElseThrow(
       () -> new EntityNotFoundException("Activity not found")
     );
-
-    return activity;
   }
   
   public ActivityDto updateActivity(Activity activity) {

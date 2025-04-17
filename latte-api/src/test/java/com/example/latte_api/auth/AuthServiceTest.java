@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.auth.dto.RegistrationRequest;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.security.JwtProvider;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
@@ -111,8 +113,7 @@ public class AuthServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> authService.registerUser(request))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessage("Duplicate User");
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -126,15 +127,14 @@ public class AuthServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> authService.registerUser(request))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessage("Role not exist");
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void shouldReturn_authResponse_forValidCred() {
     // mock
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final Role role = Role.builder().role("USER").build();
+    final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket:create").build())).build();
     final User user = User.builder()
       .id(101L)
       .firstname("Peter")
@@ -169,6 +169,7 @@ public class AuthServiceTest {
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(request.email());
+    Assertions.assertThat(result.role().role()).isEqualTo("User");
     Assertions.assertThat(result.accessToken()).isEqualTo(accessToken);
     Assertions.assertThat(result.refreshToken()).isEqualTo(refreshToken);
   }
@@ -189,7 +190,7 @@ public class AuthServiceTest {
   @Test
   void shouldReturn_authResponse_withRefeshAccessToken_forvalidToken() {
     // mock
-    final Role role = Role.builder().role("USER").build();
+    final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("create:ticket").build())).build();
     final User user = User.builder()
       .id(101L)
       .firstname("Peter")

@@ -27,6 +27,8 @@ import com.example.latte_api.user.dto.ResetPasswordRequest;
 import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @ExtendWith(MockitoExtension.class)
 public class PasswordServiceTest {
   private PasswordService passwordService;
@@ -127,9 +129,11 @@ public class PasswordServiceTest {
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
+    when(user.isEditable()).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, authentication));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, authentication))
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -171,6 +175,31 @@ public class PasswordServiceTest {
   }
 
   @Test
+  void shouldThrow_exception_forPasswordUpdate_forEmail_userIsNotEditable() {
+    // mock
+    final User user = User.builder()
+      .id(101L)
+      .firstname("Peter")
+      .email("peter@test.in")
+      .password("Peter@01")
+      .editable(false)
+      .deletable(true)
+      .role(Role.builder().role("USER").build())
+      .build();
+
+    // given
+    final String email = "peter@test.in";
+    final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
+
+    // when
+    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+    Assertions.assertThatThrownBy(() -> passwordService.resetPassword(request, email))
+      .isInstanceOf(IllegalStateException.class);
+  }
+
+
+  @Test
   void shouldThrow_exception_forPasswordUpdate_forUser_ifUpdatePassword_adnConfirmPassword_diff() {
     // mock
     final User user = Mockito.mock(User.class);
@@ -181,9 +210,11 @@ public class PasswordServiceTest {
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    when(user.isEditable()).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email))
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -196,6 +227,7 @@ public class PasswordServiceTest {
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email))
+      .isInstanceOf(EntityNotFoundException.class);
   }
 }

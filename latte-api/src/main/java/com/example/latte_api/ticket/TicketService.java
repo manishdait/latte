@@ -4,19 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
-import com.example.latte_api.role.authority.Authorities;
+import com.example.latte_api.error.OperationNotPermittedException;
+import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -30,6 +31,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketService {
@@ -46,9 +48,13 @@ public class TicketService {
     User user = (User) authentication.getPrincipal();
     User assignTo = null;
 
-    if (user.getRole().hasAuthority(Authorities.ASSIGN_TICKET) && !request.assignedTo().isEmpty()) {
+    if (request.assignedTo() != null && !request.assignedTo().isEmpty()) {
+      if(!user.hasAuthority(IAuthority.ASSIGN_TICKET)) {
+        throw new OperationNotPermittedException();
+      }
+
       assignTo = userRepository.findByFirstname(request.assignedTo()).orElseThrow(
-        () -> new EntityNotFoundException("Assinged user not found")
+        () -> new EntityNotFoundException("Assignee user not found")
       );
     }
 
@@ -111,7 +117,9 @@ public class TicketService {
   }
 
   public TicketResponse getTicket(Long id) {
-    Ticket ticket = ticketRepository.findById(id).orElseThrow();
+    Ticket ticket = ticketRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
     return ticketMapper.mapToTicketResponse(ticket);
   }
 
@@ -130,36 +138,38 @@ public class TicketService {
     List<Activity> activities = new ArrayList<>();
 
     if (request.title() != null && !request.title().equals(ticket.getTitle())) {
-      if (!canEditTicket(user, ticket)) {throw new BadCredentialsException("Action is forbidded");}
+      if (!canEditTicket(user, ticket)) {throw new OperationNotPermittedException();}
       activities.add(activityGenerator.titleChanged(user, ticket, ticket.getTitle(), request.title()));
       ticket.setTitle(request.title());
     }
 
     if (request.description() != null && !request.description().equals(ticket.getDescription())) {
-      if (!canEditTicket(user, ticket)) {throw new BadCredentialsException("Action is forbidded");}
+      if (!canEditTicket(user, ticket)) {throw new OperationNotPermittedException();}
       activities.add(activityGenerator.descriptionChanged(user, ticket));
       ticket.setDescription(request.description());
     }
 
     if (request.priority() != null && !request.priority().equals(ticket.getPriority())) {
-      if (!canEditTicket(user, ticket)) {throw new BadCredentialsException("Action is forbidded");}
+      if (!canEditTicket(user, ticket)) {throw new OperationNotPermittedException();}
       activities.add(activityGenerator.priorityChanged(user, ticket, ticket.getPriority(), request.priority()));
       ticket.setPriority(request.priority());
     }
 
     if (request.status() != null && !request.status().equals(ticket.getStatus())) {
-      if (!canEditTicket(user, ticket)) {throw new BadCredentialsException("Action is forbidded");}
+      if (!canEditTicket(user, ticket)) {throw new OperationNotPermittedException();}
       activities.add(activityGenerator.statusChanged(user, ticket, ticket.getStatus(), request.status()));
       ticket.setStatus(request.status());
     }
 
     if (request.assignedTo() != null) {
-      if (!user.getRole().hasAuthority(Authorities.ASSIGN_TICKET)) {throw new BadCredentialsException("Action is forbidded");}
+      if (!user.hasAuthority(IAuthority.ASSIGN_TICKET)) {throw new OperationNotPermittedException();}
       assignTicket(ticket, request, user, activities);
     }
 
     ticketRepository.save(ticket);
-    activityService.saveActivities(activities);
+    if (!activities.isEmpty()) {
+      activityService.saveActivities(activities);
+    }
     return ticketMapper.mapToTicketResponse(ticket);
   }
 
@@ -172,14 +182,16 @@ public class TicketService {
 
       User assignedTo = null;
       if (!request.assignedTo().isEmpty()) {
-        assignedTo = userRepository.findByFirstname(request.assignedTo()).orElseThrow();
+        assignedTo = userRepository.findByFirstname(request.assignedTo()).orElseThrow(
+          () -> new EntityNotFoundException("User not found")
+        );
       }
       ticket.setAssignedTo(assignedTo);
     }
   }
 
   private boolean canEditTicket(User user, Ticket ticket) {
-    return isOwner(ticket, user) || user.getRole().hasAuthority(Authorities.EDIT_TICKET);
+    return isOwner(ticket, user) || user.hasAuthority(IAuthority.EDIT_TICKET);
   }
 
   @Transactional
@@ -204,16 +216,19 @@ public class TicketService {
 
   public void deleteTicket(Long id, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    Ticket ticket = ticketRepository.findById(id).orElseThrow();
-    
-    if (!isOwner(ticket, user) || !user.getRole().hasAuthority(Authorities.DELETE_TICKET)) {
-      throw new BadCredentialsException("Operation is forbidded");
-    }
-    
+    Ticket ticket = ticketRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+
     if (ticket.getLock()) {
       throw new IllegalStateException("Ticket is locked");
     }
-    
+
+    if (!isOwner(ticket, user) && !user.hasAuthority(IAuthority.DELETE_TICKET)) {
+      System.out.println("No permit");
+      throw new OperationNotPermittedException();
+    }
+     
     if(ticket.getAssignedTo() != null) {
       ticket.setAssignedTo(null);
       ticketRepository.save(ticket);

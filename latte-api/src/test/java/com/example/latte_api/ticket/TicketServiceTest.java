@@ -28,7 +28,10 @@ import org.springframework.security.core.Authentication;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
+import com.example.latte_api.error.OperationNotPermittedException;
 import com.example.latte_api.role.Role;
+import com.example.latte_api.role.authority.Authority;
+import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -81,7 +84,7 @@ public class TicketServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
-      .role(Role.builder().role("USER").build())
+      .role(Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket::create").build())).build())
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -121,7 +124,9 @@ public class TicketServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
-      .role(Role.builder().role("USER").build())
+      .role(Role.builder().role("User").authorities(
+        List.of(Authority.builder().authority("ticket::create").build(), Authority.builder().authority("ticket::assign").build())
+      ).build())
       .build();
 
     final User assignee = User.builder()
@@ -129,7 +134,7 @@ public class TicketServiceTest {
       .firstname("Louis")
       .email("louis@test.in")
       .password("Louis@01")
-      .role(Role.builder().role("USER").build())
+      .role(Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket::create").build())).build())
       .build();
     final Activity activity = Mockito.mock(Activity.class);
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
@@ -170,7 +175,9 @@ public class TicketServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
-      .role(Role.builder().role("USER").build())
+      .role(Role.builder().role("User").authorities(
+        List.of(Authority.builder().authority("ticket::create").build(), Authority.builder().authority("ticket::assign").build())
+      ).build())
       .build();
   
     // given
@@ -183,8 +190,32 @@ public class TicketServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> ticketService.createTicket(request, authentication))
-      .isInstanceOf(EntityNotFoundException.class)
-      .hasMessage("Assinged user not found");
+      .isInstanceOf(EntityNotFoundException.class);
+  }
+
+   @Test
+  void shouldThrow_exception_onCreateTicket_whileAssigning_IfUserNotHaveAuthority() {
+    // ticket::assign
+
+    // mock
+    final User user = User.builder()
+      .id(101L)
+      .firstname("Peter")
+      .email("peter@test.in")
+      .password("Peter@01")
+      .role(Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket::create").build())).build())
+      .build();
+  
+    // given
+    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis");
+    final Authentication authentication = Mockito.mock(Authentication.class);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+
+    // then
+    Assertions.assertThatThrownBy(() -> ticketService.createTicket(request, authentication))
+      .isInstanceOf(OperationNotPermittedException.class);
   }
 
   @Test
@@ -307,6 +338,7 @@ public class TicketServiceTest {
       .title("Title")
       .description("description")
       .lock(false)
+      .createdBy(user)
       .priority(Priority.LOW)
       .status(Status.OPEN)
       .build();
@@ -322,6 +354,9 @@ public class TicketServiceTest {
     when(authentication.getPrincipal()).thenReturn(user);
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.titleChanged(eq(user), eq(ticket), eq("Title"), eq("New Title"))).thenReturn(activity);
+
+    when(user.getEmail()).thenReturn("user@test.in");
+
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
@@ -349,6 +384,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .createdBy(user)
       .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
@@ -364,6 +400,7 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.descriptionChanged(user, ticket)).thenReturn(activity);
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(user.getEmail()).thenReturn("user@test.in");
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
 
@@ -382,7 +419,8 @@ public class TicketServiceTest {
   }
 
   @Test
-  void shouldReturn_ticketResponse_whenAssigneeToUpdated() {
+  void shouldReturn_ticketResponse_whenAssigneeToUpdated_hasPermission() {
+    // ticket::assign
     // mock
     final User user = Mockito.mock(User.class);
     final User assignedTo = Mockito.mock(User.class);
@@ -390,6 +428,7 @@ public class TicketServiceTest {
       .title("Title")
       .description("description")
       .priority(Priority.LOW)
+      .createdBy(user)
       .status(Status.OPEN)
       .lock(false)
       .build();
@@ -407,6 +446,7 @@ public class TicketServiceTest {
     when(activityGenerator.assignedToChanged(eq(user), eq(ticket), eq(""), eq(request.assignedTo()))).thenReturn(activity);
     when(userRepository.findByFirstname(request.assignedTo())).thenReturn(Optional.of(assignedTo));
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(user.hasAuthority(IAuthority.ASSIGN_TICKET)).thenReturn(true);
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
 
@@ -425,7 +465,35 @@ public class TicketServiceTest {
   }
 
   @Test
+  void shouldThrow_exception_whenAssigneeToUpdated_hasNoPermission() {
+    // mock
+    final User user = Mockito.mock(User.class);
+    final Ticket ticket = Ticket.builder()
+      .title("Title")
+      .description("description")
+      .priority(Priority.LOW)
+      .createdBy(user)
+      .status(Status.OPEN)
+      .lock(false)
+      .build();
+
+    // given
+    final Authentication authentication = Mockito.mock(Authentication.class);
+    final Long id = 101L;
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(user.hasAuthority(IAuthority.ASSIGN_TICKET)).thenReturn(false);
+
+    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication))
+      .isInstanceOf(OperationNotPermittedException.class);
+  }
+
+  @Test
   void shouldThrow_exception_whenAssigneeToUpdated_andAssigneeNotPresent() {
+    // ticket::assign
     // mock
     final User user = Mockito.mock(User.class);
     final Ticket ticket = Ticket.builder()
@@ -433,6 +501,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .createdBy(user)
       .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
@@ -447,9 +516,11 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.assignedToChanged(eq(user), eq(ticket), eq(""), eq(request.assignedTo()))).thenReturn(activity);
     when(userRepository.findByFirstname(request.assignedTo())).thenReturn(Optional.empty());
+    when(user.hasAuthority(IAuthority.ASSIGN_TICKET)).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication));
+    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication))
+      .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
@@ -461,6 +532,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .createdBy(user)
       .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
@@ -476,6 +548,7 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.priorityChanged(user, ticket, ticket.getPriority(), request.priority())).thenReturn(activity);
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(user.getEmail()).thenReturn("user@test.in");
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
 
@@ -502,6 +575,7 @@ public class TicketServiceTest {
       .description("description")
       .priority(Priority.LOW)
       .status(Status.OPEN)
+      .createdBy(user)
       .lock(false)
       .build();
     final Activity activity = Mockito.mock(Activity.class);
@@ -517,6 +591,7 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.statusChanged(user, ticket, ticket.getStatus(), request.status())).thenReturn(activity);
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(user.getEmail()).thenReturn("user@test.in");
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
 
@@ -532,6 +607,80 @@ public class TicketServiceTest {
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(updated.getStatus()).isEqualTo(request.status());
+  }
+
+  @Test
+  void shouldReturn_ticketResponse_whenUpdated_hasProperAuthority() {
+    // ticket::edit
+    // mock
+    final User user = Mockito.mock(User.class);
+    final Ticket ticket = Ticket.builder()
+      .title("Title")
+      .description("description")
+      .priority(Priority.LOW)
+      .status(Status.OPEN)
+      .createdBy(User.builder().email("notowner@test.in").build())
+      .lock(false)
+      .build();
+
+    final Activity activity = Mockito.mock(Activity.class);
+    final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
+
+    // given
+    final Authentication authentication = Mockito.mock(Authentication.class);
+    final Long id = 101L;
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(activityGenerator.statusChanged(user, ticket, ticket.getStatus(), request.status())).thenReturn(activity);
+    when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(user.getEmail()).thenReturn("user@test.in");
+    when(user.hasAuthority(IAuthority.EDIT_TICKET)).thenReturn(true);
+
+    final TicketResponse result = ticketService.editTicket(id, request, authentication);
+
+    // then
+    verify(authentication, times(1)).getPrincipal();
+    verify(ticketRepository, times(1)).findById(id);
+    verify(activityGenerator, times(1)).statusChanged(user, ticket, Status.OPEN, Status.CLOSE);
+    verify(ticketRepository, times(1)).save(ticketCaptor.capture());
+    verify(activityService, times(1)).saveActivities(anyList());
+    verify(ticketMapper, times(1)).mapToTicketResponse(ticket);
+
+    final Ticket updated = ticketCaptor.getValue();
+
+    Assertions.assertThat(result).isNotNull();
+    Assertions.assertThat(updated.getStatus()).isEqualTo(request.status());
+  }
+
+  @Test
+  void shouldThrow_exception_whenUpdated_hasNoAuthority() {
+    // mock
+    final User user = Mockito.mock(User.class);
+    final Ticket ticket = Ticket.builder()
+      .title("Title")
+      .description("description")
+      .priority(Priority.LOW)
+      .status(Status.OPEN)
+      .createdBy(User.builder().email("notowner@test.in").build())
+      .lock(false)
+      .build();
+
+    // given
+    final Authentication authentication = Mockito.mock(Authentication.class);
+    final Long id = 101L;
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(user.getEmail()).thenReturn("user@test.in");
+    when(user.hasAuthority(IAuthority.EDIT_TICKET)).thenReturn(false);
+
+    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication))
+      .isInstanceOf(OperationNotPermittedException.class);
   }
 
    @Test
@@ -573,13 +722,15 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication));
+    Assertions.assertThatThrownBy(() -> ticketService.editTicket(id, request, authentication))
+      .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
   void shouldDelete_ticket_withNoAssignee_andValidId() {
     // mock
     final Ticket ticket = Mockito.mock(Ticket.class);
+    final User user = Mockito.mock(User.class);
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // given
@@ -587,6 +738,9 @@ public class TicketServiceTest {
 
     // when
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticket.getCreatedBy()).thenReturn(user);
+    when(user.getEmail()).thenReturn("user@test.in");
 
     ticketService.deleteTicket(id, authentication);
 
@@ -594,6 +748,53 @@ public class TicketServiceTest {
     verify(ticketRepository, times(1)).findById(id);
     verify(ticket, times(1)).getAssignedTo();
     verify(ticketRepository, times(1)).delete(ticket);
+  }
+
+  @Test
+  void shouldDelete_ticket_withNoAssignee_andValidId_andProperAuthority() {
+    // ticket::delete
+    // mock
+    final Ticket ticket = Mockito.mock(Ticket.class);
+    final User user = Mockito.mock(User.class);
+    final Authentication authentication = Mockito.mock(Authentication.class);
+
+    // given
+    final Long id = 101L;
+
+    // when
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticket.getCreatedBy()).thenReturn(User.builder().email("noowner@test.in").build());
+    when(user.getEmail()).thenReturn("user@test.in");
+    when(user.hasAuthority(IAuthority.DELETE_TICKET)).thenReturn(true);
+
+    ticketService.deleteTicket(id, authentication);
+
+    // then
+    verify(ticketRepository, times(1)).findById(id);
+    verify(ticket, times(1)).getAssignedTo();
+    verify(ticketRepository, times(1)).delete(ticket);
+  }
+
+  @Test
+  void shouldDelete_ticket_withNoAssignee_andValidId_andNoProperAuthority_orNotAOwner() {
+    // mock
+    final Ticket ticket = Mockito.mock(Ticket.class);
+    final User user = Mockito.mock(User.class);
+    final Authentication authentication = Mockito.mock(Authentication.class);
+
+    // given
+    final Long id = 101L;
+
+    // when
+    when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticket.getCreatedBy()).thenReturn(User.builder().email("noowner@test.in").build());
+    when(user.getEmail()).thenReturn("user@test.in");
+    when(user.hasAuthority(IAuthority.DELETE_TICKET)).thenReturn(false);
+
+    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id, authentication))
+      .isInstanceOf(OperationNotPermittedException.class);
   }
 
   @Test
@@ -608,7 +809,10 @@ public class TicketServiceTest {
 
     // when
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
+    when(authentication.getPrincipal()).thenReturn(user);
+    when(ticket.getCreatedBy()).thenReturn(user);
     when(ticket.getAssignedTo()).thenReturn(user);
+    when(user.getEmail()).thenReturn("user@test.in");
 
     ticketService.deleteTicket(id, authentication);
 
@@ -629,7 +833,8 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id, authentication));
+    Assertions.assertThatThrownBy(() -> ticketService.deleteTicket(id, authentication))
+      .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test

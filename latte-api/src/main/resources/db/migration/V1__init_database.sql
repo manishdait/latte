@@ -17,7 +17,7 @@ INSERT INTO authority (authority) VALUES ('user::reset-password');
 INSERT INTO authority (authority) VALUES ('ticket::create');
 INSERT INTO authority (authority) VALUES ('ticket::edit');
 INSERT INTO authority (authority) VALUES ('ticket::delete');
-INSERT INTO authority (authority) VALUES ('ticket::lock');
+INSERT INTO authority (authority) VALUES ('ticket::lock-unlock');
 INSERT INTO authority (authority) VALUES ('ticket::assign');
 INSERT INTO authority (authority) VALUES ('role::create');
 INSERT INTO authority (authority) VALUES ('role::edit');
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS role (
   role VARCHAR(255) UNIQUE NOT NULL
 );
 
-INSERT INTO role (role) VALUES ('ROLE_Admin');
-INSERT INTO role (role) VALUES ('ROLE_User');
+INSERT INTO role (role) VALUES ('Admin');
+INSERT INTO role (role) VALUES ('User');
 
 CREATE TABLE IF NOT EXISTS role_authority (
   role_id BIGINT REFERENCES role(id),

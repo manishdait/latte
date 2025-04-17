@@ -10,6 +10,7 @@ import com.example.latte_api.user.dto.ResetPasswordRequest;
 import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,7 +37,9 @@ public class PasswordService {
   } 
 
   public UserResponse resetPassword(ResetPasswordRequest request, String _user) {
-    User user = userRepository.findByEmail(_user).orElseThrow();
+    User user = userRepository.findByEmail(_user).orElseThrow(
+      () -> new EntityNotFoundException("User not found")
+    );
 
     if (!user.isEditable()) {
       throw new IllegalStateException("User can not be edited");
