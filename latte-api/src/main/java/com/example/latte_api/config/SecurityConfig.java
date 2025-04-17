@@ -22,7 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.latte_api.role.authority.Authorities;
+import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.security.JwtFilter;
 import com.example.latte_api.user.UserService;
 
@@ -51,7 +51,7 @@ public class SecurityConfig {
       request.requestMatchers(
         HttpMethod.POST, 
         "/latte-api/v1/auth/sign-up"
-      ).hasAuthority(Authorities.CREATE_USER.getAuthority());
+      ).hasAuthority(IAuthority.CREATE_USER.getAuthority());
 
       request.requestMatchers(
         HttpMethod.GET, 
@@ -59,37 +59,42 @@ public class SecurityConfig {
         "/latte-api/v1/users/info/*",
         "/latte-api/v1/users/count"
       ).hasAnyAuthority(
-        Authorities.CREATE_USER.getAuthority(), 
-        Authorities.EDIT_USER.getAuthority(), 
-        Authorities.DELETE_USER.getAuthority(), 
-        Authorities.RESET_USER_PASSWORD.getAuthority()
+        IAuthority.CREATE_USER.getAuthority(), 
+        IAuthority.EDIT_USER.getAuthority(), 
+        IAuthority.DELETE_USER.getAuthority(), 
+        IAuthority.RESET_USER_PASSWORD.getAuthority()
       );
 
       request.requestMatchers(
         HttpMethod.PUT, 
         "/latte-api/v1/users/*"
-      ).hasAuthority(Authorities.EDIT_USER.getAuthority());
+      ).hasAuthority(IAuthority.EDIT_USER.getAuthority());
 
       request.requestMatchers(
         HttpMethod.PATCH, 
         "/latte-api/v1/users/*"
-      ).hasAuthority(Authorities.RESET_USER_PASSWORD.getAuthority());
+      ).hasAuthority(IAuthority.RESET_USER_PASSWORD.getAuthority());
 
       request.requestMatchers(
         HttpMethod.DELETE, 
         "/latte-api/v1/users/**"
-      ).hasAuthority(Authorities.DELETE_USER.getAuthority());
+      ).hasAuthority(IAuthority.DELETE_USER.getAuthority());
 
       request.requestMatchers(
         HttpMethod.POST, 
         "/latte-api/v1/tickets"
-      ).hasAuthority(Authorities.CREATE_TICKET.getAuthority());
+      ).hasAuthority(IAuthority.CREATE_TICKET.getAuthority());
 
       request.requestMatchers(
         HttpMethod.PATCH,
         "/latte-api/v1/tickets/lock/*",
         "/latte-api/v1/tickets/unlock/*"
-      ).hasAuthority(Authorities.LOCK_TICKET.getAuthority());
+      ).hasAuthority(IAuthority.LOCK_TICKET.getAuthority());
+      
+      request.requestMatchers(
+        HttpMethod.POST,
+        "/latte-api/v1/roles"
+      ).hasAuthority(IAuthority.CREATE_ROLE.getAuthority());
 
       request.anyRequest().authenticated();
     });

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.example.latte_api.role.authority.Authorities;
 import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,14 +59,5 @@ public class Role {
     return authorities.stream()
       .map(a -> new SimpleGrantedAuthority(a.getAuthority()))
       .toList();
-  }
-
-  public boolean hasAuthority(Authorities authority) {
-    for (Authority a : authorities) {
-      if (a.getAuthority().equals(authority.getAuthority())) {
-        return true;
-      }
-    }
-    return false;
   }
 }

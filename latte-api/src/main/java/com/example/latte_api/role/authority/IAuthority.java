@@ -2,7 +2,7 @@ package com.example.latte_api.role.authority;
 
 import lombok.Getter;
 
-public enum Authorities {
+public enum IAuthority {
   CREATE_USER("user::create"),
   EDIT_USER("user::edit"),
   DELETE_USER("user::delete"),
@@ -10,7 +10,7 @@ public enum Authorities {
   CREATE_TICKET("ticket::create"),
   EDIT_TICKET("ticket::edit"),
   DELETE_TICKET("ticket::delete"),
-  LOCK_TICKET("ticket::lock"),
+  LOCK_TICKET("ticket::lock-unlock"),
   ASSIGN_TICKET("ticket::assign"),
   CREATE_ROLE("role::create"),
   EDIT_ROLE("role::edit"),
@@ -19,7 +19,7 @@ public enum Authorities {
   @Getter
   private String authority;
 
-  Authorities(String authority) {
+  IAuthority(String authority) {
     this.authority = authority;
   }
 }

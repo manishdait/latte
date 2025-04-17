@@ -2,6 +2,7 @@ package com.example.latte_api.handler;
 
 import java.time.Instant;
 
+import com.example.latte_api.error.OperationNotPermittedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,8 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-  @ExceptionHandler(BadCredentialsException.class)
-  public ResponseEntity<ErrorResponse> handleBadCredential(BadCredentialsException e, HttpServletRequest request) {
+  @ExceptionHandler({BadCredentialsException.class, OperationNotPermittedException.class})
+  public ResponseEntity<ErrorResponse> handleBadCredential(Exception e, HttpServletRequest request) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
       new ErrorResponse(
         Instant.now(), 
@@ -41,7 +42,6 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException.class) 
   public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException e, HttpServletRequest request) {
-    e.printStackTrace();
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
       new ErrorResponse(
         Instant.now(), 

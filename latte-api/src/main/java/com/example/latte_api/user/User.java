@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.latte_api.role.Role;
+import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.shared.AbstractAuditingEntity;
 
 import jakarta.persistence.Column;
@@ -76,5 +77,18 @@ public class User extends AbstractAuditingEntity implements UserDetails, Princip
     List<SimpleGrantedAuthority> authorities = new ArrayList<>(this.role.getAuthorities());
     authorities.add(new SimpleGrantedAuthority(this.role.getRole()));
     return authorities;
+  }
+
+  public boolean hasAuthority(IAuthority authority) {
+    return hasAuthority(authority.getAuthority());
+  }
+
+  public boolean hasAuthority(String authority) {
+    for (GrantedAuthority _authority : getAuthorities()) {
+      if (_authority.getAuthority().equals(authority)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

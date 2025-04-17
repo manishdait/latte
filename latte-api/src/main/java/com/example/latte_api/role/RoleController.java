@@ -29,7 +29,6 @@ public class RoleController {
 
   @PostMapping()
   public ResponseEntity<RoleResponse> createRole (@RequestBody RoleRequest request) {
-    return ResponseEntity.status(HttpStatus.OK).body(roleService.createRole(request));
+    return ResponseEntity.status(HttpStatus.CREATED).body(roleService.createRole(request));
   }
-  
 }
