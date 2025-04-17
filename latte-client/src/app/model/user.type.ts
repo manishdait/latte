@@ -8,7 +8,18 @@ export interface UserResponse {
   deletable: boolean,
 }
 
+export interface UserRequest {
+  firstname: string,
+  email: string,
+  role: string
+}
+
 export interface ResetPasswordRequest {
   updatePassword: string,
   confirmPassword: string
+}
+
+export interface UserDto {
+  firstname: string,
+  email: string
 }

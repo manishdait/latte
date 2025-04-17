@@ -27,7 +27,11 @@ export class ProfileComponent implements OnInit {
   userDetails = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER,
+    role: {
+      id: 0,
+      role: '',
+      authorities: []
+    },
     editable: false,
     deletable: false
   });
@@ -35,7 +39,11 @@ export class ProfileComponent implements OnInit {
   buffer = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER,
+    role: {
+      id: 0,
+      role: '',
+      authorities: []
+    },
     editable: false,
     deletable: false
   });

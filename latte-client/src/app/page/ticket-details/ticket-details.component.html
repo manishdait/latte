@@ -10,14 +10,16 @@
           }
         </div>
 
-        <div class="flex gap-4">
-          @if (!editTitle()) {
-            <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
-          } @else {
-            <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
-            <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
-          }
-        </div>
+        @if (editTicketOps()) {
+          <div class="flex gap-4">
+            @if (!editTitle()) {
+              <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
+            } @else {
+              <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
+              <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
+            }
+          </div>
+        }
       </div>
 
       <div class="flex items-center justify-between gap-2">
@@ -30,7 +32,7 @@
           </div>
         </div>
 
-        @if (admin()) {
+        @if (deleteTicketOps() || lockTicketOps()) {
           <div class="relative">
             <div class="flex items-center justify-center hover:bg-neutral-200 w-[1rem] h-[1rem] rounded-[100%] p-4 cursor-pointer" (click)="toggleUtil()">
               <fa-icon class="text-neutral-800" [icon]="util()? 'close' : 'ellipsis'"/>
@@ -39,11 +41,15 @@
             @if (util()) {
               <div class="absolute right-8 bg-neutral-50 border-[.1em] border-neutral-200 rounded-sm">
                 <ul>
-                  <li class="text-[.9rem] px-2 py-1 text-red-600 hover:bg-neutral-200 cursor-pointer border-b-[.1em] border-neutral-200" (click)="delete()" (click)="toggleUtil()">Delete</li>
-                  @if (ticket().lock) {
-                    <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="unlockTicket()" (click)="toggleUtil()">Unlock</li>
-                  } @else {
-                    <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="lockTicket()" (click)="toggleUtil()">Lock</li> 
+                  @if (deleteTicketOps()) {
+                    <li class="text-[.9rem] px-2 py-1 text-red-600 hover:bg-neutral-200 cursor-pointer border-b-[.1em] border-neutral-200" (click)="delete()" (click)="toggleUtil()">Delete</li>
+                  }
+                  @if (lockTicketOps()) {
+                    @if (ticket().lock) {
+                      <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="unlockTicket()" (click)="toggleUtil()">Unlock</li>
+                    } @else {
+                      <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="lockTicket()" (click)="toggleUtil()">Lock</li> 
+                    }
                   }
                 </ul>
               </div>
@@ -90,7 +96,9 @@
           }   @else {
             <span class="text-[.9rem] text-neutral-600">None</span>
           }
-          <span class="text-[.8rem] cursor-pointer text-neutral-500 mt-2" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditAssignee()">Edit</span>
+          @if (assignTicketOps()) {
+            <span class="text-[.8rem] cursor-pointer text-neutral-500 mt-2" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditAssignee()">Edit</span>
+          }
         } @else {
           <app-edit-assign [ticketId]="ticketId()" [value]="getAssignee() ?? ''" (cancel)="toggleEditAssignee()" (changes)="refresh()"/>
         }

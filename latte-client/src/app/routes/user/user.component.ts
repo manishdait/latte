@@ -15,7 +15,6 @@ import { UserFormComponent } from '../../components/form/user-from/user-form.com
 import { PasswordFormComponent } from '../../components/form/password-form/password-form.component';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
-import { Role } from '../../model/role.enum';
 
 @Component({
   selector: 'app-user',
@@ -31,7 +30,11 @@ export class UserComponent implements OnInit {
   buffer = signal<UserResponse>({
     firstname: '',
     email: '',
-    role: Role.USER,
+    role: {
+      id: 0,
+      role: '',
+      authorities: []
+    },
     editable: false,
     deletable: false
   });

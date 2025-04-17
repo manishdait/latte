@@ -12,6 +12,7 @@ import { AppState } from '../../../state/app.state';
 import { addTicket, incrementTicketOpenCount } from '../../../state/ticket/ticket.action';
 import { AlertService } from '../../../service/alert.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-ticket-form',
@@ -21,6 +22,7 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
 })
 export class TicketFormComponent implements OnInit {
   ticketService = inject(TicketService);
+  authService = inject(AuthService);
   userService = inject(UserService);
   alertService = inject(AlertService);
   faLibrary = inject(FaIconLibrary);
@@ -104,5 +106,9 @@ export class TicketFormComponent implements OnInit {
         this.alertService.alert = err.error.error;
       }
     })
+  }
+
+  assignOps() {
+    return this.authService.assignTicket();
   }
 }

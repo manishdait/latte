@@ -1,5 +1,5 @@
 import { HttpBackend, HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AuthRequest, AuthResponse, RegistrationRequest } from '../model/auth.type';
 import { catchError, map, Observable, of } from 'rxjs';
@@ -50,7 +50,7 @@ export class AuthService {
     this.localStorage.store('username', response.email);
     this.localStorage.store('accessToken', response.accessToken);
     this.localStorage.store('refreshToken', response.refreshToken);
-    this.localStorage.store('roles', response.role);
+    this.localStorage.store('role', response.role);
   }
 
   getAccessToken(): string {
@@ -58,7 +58,7 @@ export class AuthService {
   }
 
   getRole(): Role {
-    return this.localStorage.retrieve('roles');
+    return this.localStorage.retrieve('role');
   }
 
   getFirstname(): string {
@@ -86,5 +86,53 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  createUser() {
+    return this.getRole().authorities.includes('user::create');
+  }
+  
+  editUser() {
+    return this.getRole().authorities.includes('user::edit');
+  }
+  
+  deleteUser() {
+    return this.getRole().authorities.includes('user::delete');
+  }
+  
+  resetUserPassword() {
+    return this.getRole().authorities.includes('user::reset-password');
+  }
+  
+  createTicket() {
+    return this.getRole().authorities.includes('ticket::create');
+  }
+  
+  editTicket() {
+    return this.getRole().authorities.includes('ticket::edit');
+  }
+  
+  deleteTicket() {
+    return this.getRole().authorities.includes('ticket::delete');
+  }
+  
+  assignTicket() {
+    return this.getRole().authorities.includes('ticket::assign');
+  }
+  
+  lockTicket() {
+    return this.getRole().authorities.includes('ticket::lock');
+  }
+  
+  createRole() {
+    return this.getRole().authorities.includes('role::create');
+  }
+  
+  editRole() {
+    return this.getRole().authorities.includes('role::edit');
+  }
+  
+  deleteRole() {
+    return this.getRole().authorities.includes('role::delete');
   }
 }

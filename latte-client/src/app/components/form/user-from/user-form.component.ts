@@ -1,7 +1,6 @@
-import { Component, EventEmitter, OnInit, output, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, output, Output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistrationRequest } from '../../../model/auth.type';
-import { Role, roles } from '../../../model/role.enum';
 import { AuthService } from '../../../service/auth.service';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
@@ -10,6 +9,7 @@ import { UserResponse } from '../../../model/user.type';
 import { AlertService } from '../../../service/alert.service';
 import { PasswordComponent } from '../../password/password.component';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
+import { RoleService } from '../../../service/role.service';
 
 @Component({
   selector: 'app-user-form',
@@ -18,23 +18,30 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
   styleUrl: './user-form.component.css'
 })
 export class UserFormComponent implements OnInit {
+  authService = inject(AuthService);
+  roleService = inject(RoleService);
+
   cancel = output<boolean>();
 
   formErrors = signal(false);
-  roles = signal<string[]>(roles);
+  roles = signal<string[]>([]);
   
   form: FormGroup;
 
-  constructor(private authService: AuthService, private alertService: AlertService, private store: Store<AppState>) {
+  constructor(private alertService: AlertService, private store: Store<AppState>) {
     this.form = new FormGroup({
       firstname: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(8)]),
-      role: new FormControl('User', [Validators.required])
+      role: new FormControl('', [Validators.required])
     })
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.roleService.getRoles().subscribe({
+      next: (res) => {this.roles.set(res.map(r => r.role))}
+    })
+  }
 
   get formControls() {
     return this.form.controls;
@@ -52,7 +59,7 @@ export class UserFormComponent implements OnInit {
       firstname: this.form.get('firstname')?.value,
       email: this.form.get('email')?.value,
       password: this.form.get('password')?.value,
-      role: this.form.get('role')?.value === 'Admin'? Role.ADMIN : Role.USER
+      role: this.form.get('role')?.value
     }
     
     this.authService.registerUser(request).subscribe({

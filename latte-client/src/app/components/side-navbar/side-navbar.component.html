@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-2">
-  <a class="flex items-center gap-4 text-neutral-700 rounded-sm cursor-pointer px-2 py-1" (click)="toggleCreateTopic()">
-    <span class="text-base font-normal">Create Ticket</span>
-  </a>
+  @if(createTicketOps()) {
+    <a class="flex items-center gap-4 text-neutral-700 rounded-sm cursor-pointer px-2 py-1" (click)="toggleCreateTopic()">
+      <span class="text-base font-normal">Create Ticket</span>
+    </a>
+  }
   
   <a class="flex items-center gap-4 text-neutral-700 rounded-sm cursor-pointer px-2 py-1" routerLink="/home/dashboard" routerLinkActive="active">
     <span class="text-base font-normal">Dashboard</span>
@@ -21,8 +23,12 @@
 
         @if(adminDropDownToggle()) {
           <div class="absolute flex flex-col">
-            <a class="text-neutral-500 text-base cursor-pointer py-1" routerLink="/home/users">Users</a>
-            <a class="text-neutral-500 text-base cursor-pointer py-1" routerLink="/home/users">Roles</a>
+            @if (userOps()) {
+              <a class="text-neutral-500 text-base cursor-pointer py-1" routerLink="/home/users">Users</a>
+            }
+            @if (roleOps()) {
+              <a class="text-neutral-500 text-base cursor-pointer py-1" routerLink="/home/roles">Roles</a>
+            }
           </div>
         }
       </div>
