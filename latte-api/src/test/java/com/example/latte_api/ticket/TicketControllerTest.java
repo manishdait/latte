@@ -42,7 +42,6 @@ import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.dto.UserDto;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
