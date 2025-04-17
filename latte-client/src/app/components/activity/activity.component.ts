@@ -1,38 +1,37 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, Input, OnInit, signal, ViewChild } from '@angular/core';
+import { TicketResponse } from '../../model/ticket.type';
+import { ActivityResponse, ActivityType } from '../../model/activity.type';
+import { CommentRequest } from '../../model/comment.type';
 import { ActivityService } from '../../service/activity.service';
-import { ActivityResponse, ActivityType } from '../../models/activity.type';
 import { CommentService } from '../../service/comment.service';
-import { CommentRequest } from '../../models/comment.type';
 import { getDate } from '../../shared/utils';
+import { CommentBoxComponent } from '../comment-box/comment-box.component';
 
 @Component({
   selector: 'app-activity',
-  imports: [],
+  imports: [CommentBoxComponent],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.css'
 })
 export class ActivityComponent implements OnInit {
-  @ViewChild('message') message!: ElementRef;
-  @Input('ticketId') ticketId: number | undefined;
+  activityService = inject(ActivityService);
+  commentService = inject(CommentService);
 
-  hasMore: boolean = false;
+  ticketId = input.required<number>();
 
-  count: number = 0;
-  size: number = 6;
+  more = signal(false);
+  count = signal(0);
+  size = signal(6);
 
-  activities: ActivityResponse[] = [];
-
-  constructor(private activityService: ActivityService, private commentService: CommentService) {}
+  activities = signal<ActivityResponse[]>([]);
 
   ngOnInit(): void {
-    if(this.ticketId) {
-      this.activityService.getActivitiesForTicket(this.ticketId, this.count, this.size).subscribe({
-        next: (response) => {
-          this.activities = response.content;
-          this.hasMore = response.next;
-        }
-      });
-    }
+    this.activityService.getActivitiesForTicket(this.ticketId(), this.count(), this.size()).subscribe({
+      next: (response) => {
+        this.activities.set(response.content);
+        this.more.set(response.next);
+      }
+    });
   }
 
   getType(type: ActivityType) {
@@ -43,32 +42,18 @@ export class ActivityComponent implements OnInit {
     return getDate(date);
   }
 
-  comment(message: string) {
-    const input = this.message.nativeElement as HTMLInputElement;
-    if (this.ticketId && message !== '') {
-      const request: CommentRequest = {
-        ticketId: this.ticketId,
-        message: message
+  loadPrevious() {
+    this.count.update(count => count + 1);
+    
+    this.activityService.getActivitiesForTicket(this.ticketId(), this.count(), this.size()).subscribe({
+      next: (response) => {
+        this.activities.update(arr => arr.concat(response.content));
+        this.more.set(response.next);
       }
-      input.value = '';
-      this.commentService.createComment(request).subscribe({
-        next: () => {
-          this.ngOnInit();
-        }
-      })
-    }
+    });
   }
 
-  loadPrevious() {
-    if (this.ticketId) {
-      this.count += 1;
-    
-      this.activityService.getActivitiesForTicket(this.ticketId, this.count, this.size).subscribe({
-        next: (response) => {
-          this.activities = this.activities.concat(response.content);
-          this.hasMore = response.next;
-        }
-      });
-    }
+  refresh() {
+    this.ngOnInit();
   }
 }

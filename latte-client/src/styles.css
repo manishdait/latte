@@ -1,27 +1,39 @@
 @import "tailwindcss";
 
-body {
-  background-color: #fff;
+* {
+  outline: none;
+}
+
+*::-webkit-scrollbar {
+  width: .3em;
+  height: .3em;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(163, 163, 163);
+  border-radius: .5em;
+}
+*::-webkit-scrollbar-track {
+  background-color: rgb(231, 231, 231);
 }
 
 html {
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 600px) {
   html {
-    font-size: 0.8;
+    font-size: .9rem;
   }
 }
 
 @media screen and (max-width: 400px) {
   html {
-    font-size: 0.7;
+    font-size: .8rem;
   }
 }
 
 @media screen and (max-width: 200px) {
   html {
-    font-size: 0.6;
+    font-size: .7rem;
   }
 }

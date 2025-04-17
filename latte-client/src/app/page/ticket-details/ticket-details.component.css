@@ -1,0 +1,14 @@
+.low {
+  background-color: #b9f8cf;
+  color: oklch(0.627 0.194 149.214);
+}
+
+.medium {
+  background-color: #fee685;
+  color: oklch(0.666 0.179 58.318);
+}
+
+.high {
+  background-color: oklch(0.885 0.062 18.334);
+  color: oklch(0.577 0.245 27.325);
+}

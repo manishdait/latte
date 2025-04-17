@@ -12,11 +12,18 @@ RUN jlink --output jre --compress=2 --no-header-files --no-man-pages --add-modul
 
 FROM alpine
 RUN apk update
+
 WORKDIR /app
 COPY --from=build app/target/latte-api.jar app.jar
 COPY --from=jre target/jre jre
+
+ARG PROFILE=dev
+
 ENV DATASOURCE_USERNAME=postgres
 ENV DATASOURCE_PASSWORD=password
 ENV DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/latte_db
+ENV JWT_SECRETKEY=815F1298534CA2989B84C1C2F48D4609E7A05811E0700653661466A6
+ENV PROFILE=${PROFILE}
+
 EXPOSE 8080
-ENTRYPOINT [ "jre/bin/java", "-jar", "app.jar", "--spring.profiles.active=dev" ]
+ENTRYPOINT [ "jre/bin/java", "-jar", "app.jar" ]

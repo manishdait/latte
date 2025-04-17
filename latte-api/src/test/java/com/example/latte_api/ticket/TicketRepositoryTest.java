@@ -11,20 +11,22 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import com.example.latte_api.role.Role;
 import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
 
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 public class TicketRepositoryTest {
   @Container
   @ServiceConnection
@@ -40,6 +42,7 @@ public class TicketRepositoryTest {
     .title("Test Ticket")
     .description("Ticket for test")
     .priority(Priority.LOW)
+    .lock(false)
     .status(Status.OPEN)
     .build();
 

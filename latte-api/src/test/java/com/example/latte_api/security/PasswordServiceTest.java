@@ -20,12 +20,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.latte_api.role.Role;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.dto.ResetPasswordRequest;
-import com.example.latte_api.user.dto.UserDto;
+import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
-import com.example.latte_api.user.role.Role;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class PasswordServiceTest {
@@ -61,10 +63,12 @@ public class PasswordServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
+      .editable(true)
+      .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
@@ -75,7 +79,7 @@ public class PasswordServiceTest {
     when(passwordEncoder.encode(eq(request.updatePassword()))).thenReturn(encodedPass);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = passwordService.resetPassword(request, authentication);
+    final UserResponse result = passwordService.resetPassword(request, authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -90,7 +94,32 @@ public class PasswordServiceTest {
   }
 
   @Test
-  void shouldThrow_exception_forPasswordUpdate_ifUpdatePassword_adnConfirmPassword_diff() {
+  void shouldThrow_exception_forPasswordUpdate_ifUserisNotEditable() {
+    // mock
+    final User user = User.builder()
+      .id(101L)
+      .firstname("Peter")
+      .email("peter@test.in")
+      .password("Peter@01")
+      .editable(false)
+      .deletable(true)
+      .role(Role.builder().role("USER").build())
+      .build();
+
+    // given
+    final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
+    final Authentication authentication = Mockito.mock(Authentication.class);
+
+    // when
+    when(authentication.getPrincipal()).thenReturn(user);
+
+    Assertions.assertThatThrownBy(() -> passwordService.resetPassword(request, authentication))
+      .isInstanceOf(IllegalStateException.class);
+
+  }
+
+  @Test
+  void shouldThrow_exception_forPasswordUpdate_ifUpdatePassword_andConfirmPassword_diff() {
     // mock
     final User user = Mockito.mock(User.class);
 
@@ -100,9 +129,11 @@ public class PasswordServiceTest {
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
+    when(user.isEditable()).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, authentication));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, authentication))
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -113,10 +144,12 @@ public class PasswordServiceTest {
       .firstname("Peter")
       .email("peter@test.in")
       .password("Peter@01")
+      .editable(true)
+      .deletable(true)
       .role(Role.builder().role("USER").build())
       .build();
     final String encodedPass = "encoded-pass";
-    final UserDto userDto = Mockito.mock(UserDto.class);
+    final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
     final String email = "peter@test.in";
@@ -127,7 +160,7 @@ public class PasswordServiceTest {
     when(passwordEncoder.encode(eq(request.updatePassword()))).thenReturn(encodedPass);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserDto result = passwordService.resetPassword(request, email);
+    final UserResponse result = passwordService.resetPassword(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -142,6 +175,31 @@ public class PasswordServiceTest {
   }
 
   @Test
+  void shouldThrow_exception_forPasswordUpdate_forEmail_userIsNotEditable() {
+    // mock
+    final User user = User.builder()
+      .id(101L)
+      .firstname("Peter")
+      .email("peter@test.in")
+      .password("Peter@01")
+      .editable(false)
+      .deletable(true)
+      .role(Role.builder().role("USER").build())
+      .build();
+
+    // given
+    final String email = "peter@test.in";
+    final ResetPasswordRequest request = new ResetPasswordRequest("updated-pass", "updated-pass");
+
+    // when
+    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+    Assertions.assertThatThrownBy(() -> passwordService.resetPassword(request, email))
+      .isInstanceOf(IllegalStateException.class);
+  }
+
+
+  @Test
   void shouldThrow_exception_forPasswordUpdate_forUser_ifUpdatePassword_adnConfirmPassword_diff() {
     // mock
     final User user = Mockito.mock(User.class);
@@ -152,9 +210,11 @@ public class PasswordServiceTest {
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    when(user.isEditable()).thenReturn(true);
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email))
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -167,6 +227,7 @@ public class PasswordServiceTest {
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email));
+    Assertions.assertThatThrownBy(() ->  passwordService.resetPassword(request, email))
+      .isInstanceOf(EntityNotFoundException.class);
   }
 }

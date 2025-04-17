@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
+import { AuthComponent } from './page/auth/auth.component';
+import { HomeComponent } from './page/home/home.component';
+import { TicketDetailsComponent } from './page/ticket-details/ticket-details.component';
+import { UserComponent } from './routes/user/user.component';
+import { TicketComponent } from './routes/ticket/ticket.component';
+import { ProfileComponent } from './routes/profile/profile.component';
 import { homeGuard } from './guard/home.guard';
-import { AuthComponent } from './pages/auth/auth.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { HomeComponent } from './pages/home/home.component';
-import { ProfileComponent } from './pages/profile/profile.component';
-import { TicketDetailsComponent } from './pages/ticket-details/ticket-details.component';
-import { TicketComponent } from './pages/ticket/ticket.component';
-import { UserComponent } from './pages/user/user.component';
+import { DashboardComponent } from './routes/dashboard/dashboard.component';
+import { RoleComponent } from './routes/role/role.component';
 
 export const routes: Routes = [
   {path: '', pathMatch: 'full', redirectTo: 'home'},
@@ -19,6 +20,7 @@ export const routes: Routes = [
       {path: 'tickets', component: TicketComponent},
       {path: 'tickets/:id', component: TicketDetailsComponent},
       {path: 'users', component: UserComponent},
+      {path: 'roles', component: RoleComponent},
       {path: 'profile', component: ProfileComponent},
       {path: '', pathMatch: 'full', redirectTo: 'dashboard'}
     ],

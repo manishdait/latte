@@ -1,0 +1,80 @@
+@if(confirm()) {
+  <app-dialog [message]="message()" (trigger)="confirmTrigger($event)"/>
+} 
+
+<div class="w-full p-4 flex flex-col gap-4">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl text-neutral-800 font-semibold">Profile</h1>
+    <span class="text-base text-neutral-800">The information is related to your account so be careful while updating</span>
+  </div>
+  
+  <div class="bg-neutral-50 rounded-sm border-[.1em] border-neutral-200 p-4">
+    <form [formGroup]="userDetailsForm" (ngSubmit)="onUpdateUserDetails()">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-neutral-800" for="firstname">Firstname</label>
+        <input class="text-base text-neutral-800 border-[.1em] border-neutral-200 px-2 py-1 rounded-sm outline-none focus:border-green-500" type="text" id="firstname" [value]="userDetails().firstname" (input)="changeFirstname(firstname.value)" placeholder="Enter firstname for user..." formControlName="firstname" #firstname>
+        @if(userDetailsFormError() && (userDetailsFormControl['firstname'].errors && userDetailsFormControl['firstname'].errors['required'])) {
+          <span class="text-sm text-red-600">*Required firstname</span>
+        }
+      </div>
+    
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-neutral-800" for="email">Email</label>
+        <input class="text-base text-neutral-800 border-[.1em] border-gray-200 px-2 py-1 rounded-sm outline-none focus:border-green-500" type="text" id="email" [value]="userDetails().email" (input)="changeEmail(email.value)" placeholder="Enter email for user..." formControlName="email" #email>
+        @if(userDetailsFormError() && (userDetailsFormControl['email'].errors && userDetailsFormControl['email'].errors['required'])) {
+          <span class="text-sm text-red-600">*Required email address</span>
+        }
+        @if(userDetailsFormError() && (userDetailsFormControl['email'].errors && userDetailsFormControl['email'].errors['email'])) {
+          <span class="text-sm text-red-600">*Enter valid email address</span>
+        }
+      </div>
+    
+      <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600 disabled:bg-neutral-300 disabled:border-neutral-300 disabled:cursor-auto" [disabled]="!bufferUpdated()">Save</button>  
+    </form>
+  </div>
+
+  @if(passwordReset()) {
+    <div class="bg-neutral-50 rounded-sm border-[.1em] border-neutral-200 p-4">
+      <h1 class="text-[1.2rem] font-medium mb-4">Reset Password</h1>
+  
+      <form [formGroup]="passwordResetForm" (ngSubmit)="onResetPassword()">
+        <div class="flex flex-col gap-1 my-4">
+          <label class="text-sm" for="updatedPassword">Updated Password</label>
+          <app-password [id]="'updatedPassword'" [placeholder]="'Enter updated password'" formControlName="updatedPassword"/>
+          @if(passwordResetFormError() && (passwordResetControl['updatedPassword'].errors && passwordResetControl['updatedPassword'].errors['required'])) {
+            <span class="text-sm text-red-500">*Required password</span>
+          }
+          @if(passwordResetFormError() && (passwordResetControl['updatedPassword'].errors && passwordResetControl['updatedPassword'].errors['minlength'])) {
+            <span class="text-sm text-red-500">*Pasword must have minimum 8 character</span>
+          }
+        </div>
+  
+        <div class="flex flex-col gap-1 my-4">
+          <label class="text-sm" for="confirmPassword">Confirm Password</label>
+          <app-password [id]="'confirmPassword'" [placeholder]="'Confirm password'" formControlName="confirmPassword"/>
+          @if(passwordResetFormError() && (passwordResetControl['confirmPassword'].errors && passwordResetControl['confirmPassword'].errors['required'])) {
+            <span class="text-sm text-red-600">*Required password</span>
+          }
+          @if(passwordResetFormError() && (passwordResetControl['confirmPassword'].errors && passwordResetControl['confirmPassword'].errors['minlength'])) {
+            <span class="text-sm text-red-600">*Pasword must have minimum 8 character</span>
+          }
+          @if(passwordResetFormError() && (!passwordResetControl['confirmPassword'].errors && passwordResetControl['confirmPassword'].value !== passwordResetControl['updatedPassword'].value)) {
+            <span class="text-sm text-red-600">*Update password and Confirm password not match</span>
+          }
+        </div>
+  
+        <div class="flex gap-4">
+          <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600">Reset</button>
+          <button class="text-[.9rem] font-medium px-2 py-1 border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="togglePasswordReset()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="flex gap-2">
+    <button class="text-[.9rem] font-medium px-2 py-1 bg-red-600 border-[.1em] border-red-600 text-white rounded-sm cursor-pointer hover:bg-red-700 hover:border-red-700" type="button" (click)="logout()">Logout</button>
+    @if(!passwordReset()) {
+      <button class="text-[.9rem] font-medium px-2 py-1  border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="togglePasswordReset()">Reset Password</button>
+    }
+  </div>
+</div>

@@ -2,8 +2,8 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { Page } from "../models/page.type";
-import { ActivityResponse } from "../models/activity.type";
+import { Page } from "../model/page.type";
+import { ActivityResponse } from "../model/activity.type";
 
 const URL: string = `${environment.API_ENDPOINT}/activities`;
 

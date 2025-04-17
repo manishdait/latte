@@ -1,13 +1,21 @@
 import { createReducer, on } from "@ngrx/store";
-import { UserResponse } from "../../models/user.type";
-import { addUser, removeUser, setUsers } from "./user.action";
+import { UserResponse } from "../../model/user.type";
+import { addUser, decrementUserCount, incrementUserCount, removeUser, setUserCount, setUsers } from "./user.action";
 
 export interface UserState {
   users: UserResponse[]
 }
 
+export interface UserCount {
+  count: number
+}
+
 export const initialUserState: UserState = {
   users: []
+}
+
+export const initialUserCount: UserCount = {
+  count: 0
 }
 
 export const userReducer = createReducer(
@@ -15,7 +23,7 @@ export const userReducer = createReducer(
 
   on(addUser, (state, {user}) => ({
     ...state,
-    users: [...state.users, user]
+    users: [user, ...state.users]
   })),
 
   on(setUsers, (state, {users}) => ({
@@ -28,3 +36,22 @@ export const userReducer = createReducer(
     users: [...state.users.filter(u => u.email !== email)]
   }))
 )
+
+export const userCountReducer = createReducer(
+  initialUserCount,
+
+  on(setUserCount, (state, {userCount}) => ({
+    ...state,
+    count: userCount
+  })),
+
+  on(incrementUserCount, (state) => ({
+    ...state,
+    count: state.count + 1
+  })),
+
+  on(decrementUserCount, (state) => ({
+    ...state,
+    count: state.count - 1
+  })),
+);

@@ -19,6 +19,7 @@ import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
 import com.example.latte_api.ticket.dto.TicketResponse;
+import com.example.latte_api.ticket.enums.Status;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,11 @@ public class TicketController {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTickets(page, size));
   }
 
+  @GetMapping("/status/{status}")
+  public ResponseEntity<PagedEntity<TicketResponse>> getTicketByStatus(@PathVariable Status status, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTicketByStatus(status, page, size));
+  }
+
   @GetMapping("/info")
   public ResponseEntity<Map<String, Integer>> getTicketsInfo(Authentication authentication) {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTicketsInfo(authentication));
@@ -53,9 +59,19 @@ public class TicketController {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.editTicket(id, request, authentication));
   }
 
+  @PatchMapping("/lock/{id}")
+  public ResponseEntity<TicketResponse> lockTicket(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.lockTicket(id));
+  }
+
+  @PatchMapping("/unlock/{id}")
+  public ResponseEntity<TicketResponse> unlockTicket(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(ticketService.unlockTicket(id));
+  }
+
   @DeleteMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable Long id) {
-    ticketService.deleteTicket(id);
+  public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable Long id, Authentication authentication) {
+    ticketService.deleteTicket(id, authentication);
     return ResponseEntity.status(HttpStatus.OK).body(Map.of("key", id, "deleted", true));
   }
 }

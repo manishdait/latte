@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,11 +30,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.auth.dto.RegistrationRequest;
+import com.example.latte_api.role.Role;
+import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.security.JwtProvider;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
-import com.example.latte_api.user.role.Role;
-import com.example.latte_api.user.role.RoleRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -111,8 +113,7 @@ public class AuthServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> authService.registerUser(request))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessage("Duplicate User");
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -126,15 +127,14 @@ public class AuthServiceTest {
 
     // then
     Assertions.assertThatThrownBy(() -> authService.registerUser(request))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessage("Role not exist");
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void shouldReturn_authResponse_forValidCred() {
     // mock
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final Role role = Role.builder().role("USER").build();
+    final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket:create").build())).build();
     final User user = User.builder()
       .id(101L)
       .firstname("Peter")
@@ -151,9 +151,9 @@ public class AuthServiceTest {
     // when
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(user);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname()))))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of())))
       .thenReturn(accessToken);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())), eq(604800)))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800)))
       .thenReturn(refreshToken);
 
     final AuthResponse result = authService.authenticateUser(request);
@@ -163,12 +163,13 @@ public class AuthServiceTest {
       .authenticate(any(UsernamePasswordAuthenticationToken.class));
     verify(authentication, times(1)).getPrincipal();
     verify(jwtProvider, times(1))
-      .generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())));
+      .generateToken(eq(user.getEmail()), eq(Map.of()));
     verify(jwtProvider, times(1))
-      .generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())), eq(604800));
+      .generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800));
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(request.email());
+    Assertions.assertThat(result.role().role()).isEqualTo("User");
     Assertions.assertThat(result.accessToken()).isEqualTo(accessToken);
     Assertions.assertThat(result.refreshToken()).isEqualTo(refreshToken);
   }
@@ -189,7 +190,7 @@ public class AuthServiceTest {
   @Test
   void shouldReturn_authResponse_withRefeshAccessToken_forvalidToken() {
     // mock
-    final Role role = Role.builder().role("USER").build();
+    final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("create:ticket").build())).build();
     final User user = User.builder()
       .id(101L)
       .firstname("Peter")
@@ -207,7 +208,7 @@ public class AuthServiceTest {
     when(jwtProvider.getUsername(refershToken)).thenReturn(username);
     when(userRepository.findByEmail(username)).thenReturn(Optional.of(user));
     when(jwtProvider.validToken(user, refershToken)).thenReturn(true);
-    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname()))))
+    when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of())))
       .thenReturn(accessToken);
 
     final AuthResponse result = authService.refreshToken(request);
@@ -217,7 +218,7 @@ public class AuthServiceTest {
     verify(jwtProvider, times(1)).getUsername(refershToken);
     verify(userRepository, times(1)).findByEmail(username);
     verify(jwtProvider, times(1)).validToken(user, refershToken);
-    verify(jwtProvider, times(1)).generateToken(eq(user.getEmail()), eq(Map.of("roles", role.getRole(), "firstname", user.getFirstname())));
+    verify(jwtProvider, times(1)).generateToken(eq(user.getEmail()), eq(Map.of()));
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(username);

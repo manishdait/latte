@@ -7,7 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,8 @@ import com.example.latte_api.activity.mapper.ActivityMapper;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.user.User;
+
+import javax.swing.text.html.Option;
 
 @ExtendWith(MockitoExtension.class)
 public class ActivityServiceTest {
@@ -47,7 +51,7 @@ public class ActivityServiceTest {
   }
 
   @Test
-  void shouldReturn_activityDto_whenActivityCreaeted() {
+  void shouldReturn_activityDto_whenActivityCreated() {
     // mock
     final User user = Mockito.mock(User.class);
     final Ticket ticket = Mockito.mock(Ticket.class);
@@ -58,7 +62,7 @@ public class ActivityServiceTest {
       .type(ActivityType.EDIT)
       .author(user)
       .ticket(ticket)
-      .message(String.format("Created ticket"))
+      .message("Created ticket")
       .build();
 
     // when
@@ -119,5 +123,63 @@ public class ActivityServiceTest {
     verify(activityMapper, times(1)).mapToActivityDto(any(Activity.class));
 
     Assertions.assertThat(result).isNotNull();
+  }
+
+  @Test
+  void shouldReturn_activity_forId() {
+    // mock
+    final Activity activity = Mockito.mock(Activity.class);
+    // given
+    final Long id = 101L;
+
+    // when
+    when(activityRepository.findById(id)).thenReturn(Optional.of(activity));
+    final Activity result = activityService.getActivity(id);
+
+    // then
+    verify(activityRepository, times(1)).findById(id);
+
+    Assertions.assertThat(result).isNotNull();
+  }
+
+  @Test
+  void shouldThrowException_whenGetActivity_forInvalidId() {
+    // given
+    final Long id = 300L;
+
+    // when
+    when(activityRepository.findById(id)).thenReturn(Optional.empty());
+    Assertions.assertThatThrownBy(() -> activityService.getActivity(id))
+            .isInstanceOf(EntityNotFoundException.class);
+  }
+
+  @Test
+  void shouldReturn_activityDto_whenUpdateActivity() {
+    // mock
+    final Activity activity = Mockito.mock(Activity.class);
+    final ActivityDto activityDto = Mockito.mock(ActivityDto.class);
+
+
+    // when
+    when(activityMapper.mapToActivityDto(activity)).thenReturn(activityDto);
+    final ActivityDto result = activityService.updateActivity(activity);
+
+    // then
+    verify(activityRepository, times(1)).save(activity);
+    verify(activityMapper, times(1)).mapToActivityDto(activity);
+
+    Assertions.assertThat(result).isNotNull();
+  }
+
+  @Test
+  void shouldDelete_activity() {
+    // given
+    final Activity activity = Mockito.mock(Activity.class);
+
+    // when
+    activityService.deleteActivity(activity);
+
+    // then
+    verify(activityRepository, times(1)).delete(activity);
   }
 }
