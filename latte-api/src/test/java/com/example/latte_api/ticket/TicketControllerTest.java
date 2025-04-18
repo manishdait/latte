@@ -475,7 +475,7 @@ public class TicketControllerTest {
 
     final RoleRequest roleRequest = new RoleRequest("Temp", List.of());
 
-    final ResponseEntity<RoleResponse> role = testRestTemplate.exchange(
+    testRestTemplate.exchange(
             "/latte-api/v1/roles",
             HttpMethod.POST,
             new HttpEntity<>(roleRequest, headers),
@@ -484,7 +484,7 @@ public class TicketControllerTest {
 
     final RegistrationRequest regRequest = new RegistrationRequest("Temp", "temp@test.in", "password", "Temp");
 
-    final ResponseEntity<UserResponse> user = testRestTemplate.exchange(
+    testRestTemplate.exchange(
             "/latte-api/v1/auth/sign-up",
             HttpMethod.POST,
             new HttpEntity<>(regRequest, headers),

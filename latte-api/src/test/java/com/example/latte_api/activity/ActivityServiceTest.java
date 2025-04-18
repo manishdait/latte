@@ -28,8 +28,6 @@ import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.user.User;
 
-import javax.swing.text.html.Option;
-
 @ExtendWith(MockitoExtension.class)
 public class ActivityServiceTest {
   private ActivityService activityService;
