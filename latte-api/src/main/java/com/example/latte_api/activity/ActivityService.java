@@ -12,6 +12,7 @@ import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.mapper.ActivityMapper;
 import com.example.latte_api.shared.PagedEntity;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -43,4 +44,19 @@ public class ActivityService {
     response.setContent(activities.getContent().stream().map(a -> activityMapper.mapToActivityDto(a)).toList());
     return response;
   }
+
+  public Activity getActivity(Long id) {
+    return activityRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Activity not found")
+    );
+  }
+  
+  public ActivityDto updateActivity(Activity activity) {
+    activityRepository.save(activity);
+    return activityMapper.mapToActivityDto(activity);
+  }
+
+  public void deleteActivity (Activity activity) {
+    activityRepository.delete(activity);
+  }  
 }

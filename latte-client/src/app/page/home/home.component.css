@@ -1,0 +1,18 @@
+.active {
+  background-color: #00c950;
+  color: #fff;
+}
+
+@media screen and (max-width: 800px) {
+  .sidenav {
+    position: fixed;
+    transition: all 1s 1ms;
+  }
+
+  .in {
+    left: -100%;
+  }
+  .out {
+    left: 0;
+  }
+}

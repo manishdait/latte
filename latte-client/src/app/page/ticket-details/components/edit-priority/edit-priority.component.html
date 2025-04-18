@@ -1,0 +1,10 @@
+<div class="flex items-center justify-center py-1">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full flex flex-col gap-2">
+    <app-dropdown [id]="'priority'" [placeholder]="'Please select priority...'" [list]="list" formControlName="priority" />
+
+    <div class="flex gap-4">
+      <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="submit">Save</button>
+      <button class="text-[.9rem] font-medium px-2 py-1 bg-transparent border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCancel()">Cancel</button>
+    </div>
+  </form>
+</div>

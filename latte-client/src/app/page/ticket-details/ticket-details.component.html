@@ -1,0 +1,119 @@
+<div class="w-[min(1400px,100%)] flex flex-col flex-wrap gap-8 p-4 mx-auto">
+  <div class="border-b-[.1em] border-gray-200 flex flex-wrap gap-4 py-4">
+    <div class="grow flex flex-col gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-full">
+          @if(!editTitle()) {
+            <h1 class="text-[2rem] text-neutral-800 font-semibold leading-none">{{ ticket().title }}</h1>
+          } @else {
+            <input class="w-full text-[1rem] text-neutral-800 border-[.1em] border-neutral-200 outline-none px-2 py-1 focus-within:border-green-600" type="text" placeholder="Edit title" #title>
+          }
+        </div>
+
+        @if (editTicketOps()) {
+          <div class="flex gap-4">
+            @if (!editTitle()) {
+              <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
+            } @else {
+              <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
+              <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-fit text-[.9rem] text-white font-medium px-5 py-1 rounded-[5em]" [class]="getStatus(ticket().status) === 'OPEN'? 'bg-green-600' : 'bg-purple-600'">
+            {{ ticket().status }}
+          </span>
+          <div class="w-[2rem] h-[2rem] text-[.9rem] flex items-center justify-center gap-2 px-4 py-1 border-[.1em] border-neutral-200 rounded-[100%]">
+            <fa-icon class="text-neutral-500" [icon]="ticket().lock? 'lock' : 'lock-open'"/>
+          </div>
+        </div>
+
+        @if (deleteTicketOps() || lockTicketOps()) {
+          <div class="relative">
+            <div class="flex items-center justify-center hover:bg-neutral-200 w-[1rem] h-[1rem] rounded-[100%] p-4 cursor-pointer" (click)="toggleUtil()">
+              <fa-icon class="text-neutral-800" [icon]="util()? 'close' : 'ellipsis'"/>
+            </div>
+
+            @if (util()) {
+              <div class="absolute right-8 bg-neutral-50 border-[.1em] border-neutral-200 rounded-sm">
+                <ul>
+                  @if (deleteTicketOps()) {
+                    <li class="text-[.9rem] px-2 py-1 text-red-600 hover:bg-neutral-200 cursor-pointer border-b-[.1em] border-neutral-200" (click)="delete()" (click)="toggleUtil()">Delete</li>
+                  }
+                  @if (lockTicketOps()) {
+                    @if (ticket().lock) {
+                      <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="unlockTicket()" (click)="toggleUtil()">Unlock</li>
+                    } @else {
+                      <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="lockTicket()" (click)="toggleUtil()">Lock</li> 
+                    }
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-8">
+    <div class="w-[min(820px,100%)] flex flex-col py-2">
+      <app-description-box [ticket]="ticket()" [owner]="owner()" (refresh)="refresh()"/>
+      <div class="min-h-8 h-fit ml-[.68em] w-[.1em] bg-neutral-200"></div>
+
+      <app-activity [ticketId]="ticketId()" #activity/>
+
+      <div class="min-w-[300px] flex flex-col justify-center gap-4 py-4">
+        <textarea class="text-base w-full h-32 border-[.1em] border-neutral-200 p-2 outline-none focus:border-green-500 rounded-sm" placeholder="Enter a comment..."  #message></textarea>
+        
+        <div class="flex flex-wrap gap-2">
+          @if(ticket().status == 'OPEN') {
+            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-purple-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm disabled:hover:bg-neutral-50 disabled:text-neutral-500 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
+          } @else {
+            <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-green-600 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm disabled:text-neutral-500 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
+          }
+          <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm disabled:bg-neutral-300 disabled:border-neutral-300 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="comment(message)">Comment</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-fit grow">
+      <div class="w-full flex text-base flex-col gap-1 border-b-[.1em] border-neutral-200 py-2">
+        <span class="text-[.9rem] text-neutral-500 font-medium mb-1">Assigned To</span>
+        @if (!editAssignee()) {
+          @if (ticket().assignedTo) {
+            <div class="flex gap-2 items-center">
+              <div class="w-[1.8rem] h-[1.8rem] rounded-[100%] flex items-center justify-center" [style.background-color]="color(ticket().assignedTo?.firstname)">
+                <span class="text-[.8rem] text-center font-medium text-white">{{ ticket().assignedTo?.firstname?.charAt(0) }}</span>
+              </div>
+
+              <span class="text-[.9rem] text-neutral-800">{{ ticket().assignedTo?.firstname }}</span>
+            </div>
+          }   @else {
+            <span class="text-[.9rem] text-neutral-600">None</span>
+          }
+          @if (assignTicketOps()) {
+            <span class="text-[.8rem] cursor-pointer text-neutral-500 mt-2" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditAssignee()">Edit</span>
+          }
+        } @else {
+          <app-edit-assign [ticketId]="ticketId()" [value]="getAssignee() ?? ''" (cancel)="toggleEditAssignee()" (changes)="refresh()"/>
+        }
+      </div>
+
+      <div class="w-full flex text-base flex-col gap-1 py-2">
+        <span class="text-[.9rem] text-neutral-500 font-medium mb-1">Priority</span>
+        @if (!editPriority()) {
+          <span class=" w-fit text-[.8rem] px-4 py-1 rounded-[5em] cursor-pointer" [class]="{'low': ticket().priority === 'LOW', 'medium': ticket().priority === 'MEDIUM' , 'high': ticket().priority === 'HIGH' }" (click)="toggleEditPriority()">
+            {{ ticket().priority }}
+          </span>
+        } @else {
+          <app-edit-priority [ticketId]="ticketId()" [value]="getPriority()" (cancel)="toggleEditPriority()" (changes)="refresh()"/>
+        }
+      </div>
+    </div>
+  </div>
+</div>

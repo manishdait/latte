@@ -12,6 +12,7 @@ public record TicketResponse(
   String description, 
   Priority priority, 
   Status status, 
+  Boolean lock,
   UserDto createdBy, 
   UserDto assignedTo,
   Instant createdAt,

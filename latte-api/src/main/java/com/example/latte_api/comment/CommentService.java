@@ -12,6 +12,7 @@ import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.User;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,7 +25,13 @@ public class CommentService {
   public ActivityDto createComment(CommentRequest request, Authentication authentication){
     User user = (User) authentication.getPrincipal();
 
-    Ticket ticket = ticketRepository.findById(request.ticketId()).orElseThrow();
+    Ticket ticket = ticketRepository.findById(request.ticketId()).orElseThrow(
+      () -> new EntityNotFoundException("Ticket not found")
+    );
+
+    if (ticket.getLock()) {
+      throw new IllegalStateException("Ticket is locked");
+    }
 
     Activity comment = Activity.builder()
       .type(ActivityType.COMMENT)
@@ -34,5 +41,35 @@ public class CommentService {
       .build();
       
     return activityService.createActivity(comment);
+  }
+
+  public void deleteComment(Long id, Authentication authentication) {
+    User user = (User) authentication.getPrincipal();
+    Activity activity = activityService.getActivity(id);
+    
+    if (activity.getTicket().getLock()) {
+      throw new IllegalStateException("Ticket is locked");
+    }
+
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) || !activity.getType().equals(ActivityType.COMMENT)) {
+      throw new IllegalArgumentException("Operation not permitted");
+    }
+    activityService.deleteActivity(activity);
+  }
+
+  public ActivityDto updateComment(Long id, CommentRequest request, Authentication authentication) {
+    User user = (User) authentication.getPrincipal();
+    Activity activity = activityService.getActivity(id);
+
+    if (activity.getTicket().getLock()) {
+      throw new IllegalStateException("Ticket is locked");
+    }
+    
+    if (!activity.getAuthor().getEmail().equals(user.getEmail()) || !activity.getType().equals(ActivityType.COMMENT)) {
+      throw new IllegalArgumentException("Operation not permitted");
+    }
+
+    activity.setMessage(request.message());
+    return activityService.updateActivity(activity);
   }
 }

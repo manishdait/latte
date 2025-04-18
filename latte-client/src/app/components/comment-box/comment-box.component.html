@@ -1,0 +1,41 @@
+<div class="w-full border-[.1em] overflow-hidden rounded-sm bg-neutral-50" [class]="owner()? 'border-blue-200' : 'border-neutral-200'">
+  <div class="flex text-base px-2 py-1 items-center justify-between gap-2 border-b-[.1em]" [class]="owner()? 'bg-blue-50 border-blue-200' : 'bg-neutral-50 border-neutral-200'">
+    <div class="flex gap-2">
+      <span class="text-[.9rem] font-medium text-neutral-800">{{ activity().author }}</span>
+      <span class="text-[.9rem] text-neutral-500">{{ 'commented ' + getDate(activity().createdAt) }}</span>
+    </div>
+
+    @if (owner()) {
+      <div class="relative flex gap-2">
+        <span class="text-[.8rem] text-blue-300 border-[.1em] border-blue-200 px-2  rounded-sm">owner</span>
+        <div class="w-[1rem] h-[1rem] cursor-pointer hover:bg-neutral-200/50 flex items-center justify-center p-3 rounded-[100%]" (click)="toggleUtil()">
+          <fa-icon class="text-[.9rem] text-neutral-500" [icon]="util()? 'close' :'ellipsis-vertical'"/>
+        </div>
+
+        @if (util()) {
+          <div class="absolute right-8 bg-neutral-50 border-[.1em] border-neutral-200 rounded-sm">
+            <ul>
+              <li class="text-[.9rem] px-2 py-1 hover:bg-neutral-200 cursor-pointer" (click)="toggleEdit()" (click)="toggleUtil()">Edit</li>
+              <li class="text-[.9rem] text-red-600 hover:bg-neutral-200 px-2 py-1 border-t-[.1em] border-neutral-200 cursor-pointer" (click)="delete()" (click)="toggleUtil()">Delete</li>
+            </ul>
+          </div>
+        }
+      </div>
+
+    }
+  </div>
+    
+  <div class="p-2">
+    @if (!edit()) {
+      <span class="text-base text-neutral-800 text-justify">{{ activity().message }}</span>
+    } @else {
+      <div class="w-full flex flex-col gap-2">
+        <textarea class="text-base w-full h-20 border-[.1em] border-neutral-200 p-2 outline-none focus:border-green-500 rounded-sm" placeholder="Enter a comment..."  #message></textarea>
+        <div class="flex flex-wrap gap-2">
+          <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateComment()">Save</button>
+          <button class="max-w-[150px] text-[.9rem] py-1 px-2 bg-transparent hover:bg-neutral-900/5 text-neutral-500 border-[.1em] border-neutral-200 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEdit()">Cancel</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

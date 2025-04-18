@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AlertService } from '../../service/alert.service';
 
 @Component({
@@ -8,18 +8,18 @@ import { AlertService } from '../../service/alert.service';
   styleUrl: './alert.component.css'
 })
 export class AlertComponent {
-  message: string | undefined;
+  message =  signal<string>('');
 
   constructor(private alertService: AlertService) {
     alertService.alert$.subscribe((message) => {
-      this.message = message;
+      this.message.set(message ?? '');
       this.reset();
     })
   }
 
   reset() {
     setTimeout(() => {
-      this.message = undefined;
+      this.message.set('');
     }, 4000)
   }
 }
