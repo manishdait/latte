@@ -32,11 +32,13 @@ NO CYCLE;
 
 CREATE TABLE IF NOT EXISTS role (
   id BIGINT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('role_seq'),
+  editable BOOLEAN NOT NULL DEFAULT true,
+  deletable BOOLEAN NOT NULL DEFAULT true,
   role VARCHAR(255) UNIQUE NOT NULL
 );
 
-INSERT INTO role (role) VALUES ('Admin');
-INSERT INTO role (role) VALUES ('User');
+INSERT INTO role (role, editable, deletable) VALUES ('Admin', false, false);
+INSERT INTO role (role, editable, deletable) VALUES ('User', true, true);
 
 CREATE TABLE IF NOT EXISTS role_authority (
   role_id BIGINT REFERENCES role(id),

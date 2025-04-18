@@ -53,7 +53,7 @@ public class RoleServiceTest {
   @Test
   void shouldReturn_roleResponseList() {
     // mock
-    final Role role = new Role(101L, "User", List.of(), List.of());
+    final Role role = new Role(101L, "User", true, true, List.of(), List.of());
 
     // when
     when(roleRepository.findAll()).thenReturn(List.of(role));

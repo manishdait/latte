@@ -43,6 +43,12 @@ public class Role {
   @Column(name = "role", unique = true)
   private String role;
 
+  @Column(name = "editable")
+  private boolean editable;
+
+  @Column(name = "deletable")
+  private boolean deletable;
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
     name = "role_authority",
