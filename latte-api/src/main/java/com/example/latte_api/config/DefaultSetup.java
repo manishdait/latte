@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class DefaultSetup {
 
   private final PasswordEncoder encoder;
 
+  @Value("${spring.profiles.active}")
+  private String profile;
+
   @PostConstruct
   @Transactional
   public void init() {
@@ -52,7 +56,7 @@ public class DefaultSetup {
         cred.createNewFile();
       }
 
-      String password = UUID.randomUUID().toString() + LocalTime.now().hashCode();
+      String password = profile.equals("deploy")? "Password" : UUID.randomUUID().toString() + LocalTime.now().hashCode();
   
       FileWriter fileWriter = new FileWriter(cred);
       fileWriter.append(password + "\n");
@@ -60,15 +64,22 @@ public class DefaultSetup {
         
       cred.setReadOnly();
   
-      Role roleAdmin = roleRepository.findByRole("ROLE_Admin").orElseThrow();
+      Role roleAdmin = roleRepository.findByRole("Admin").orElseThrow();
       User admin = User.builder()
         .firstname("Admin")
         .email("admin@admin.com")
         .password(encoder.encode(password))
         .role(roleAdmin)
-        .editable(true)
         .deletable(false)
         .build();
+
+      if (profile.equals("deploy")) {
+        admin.setEditable(false);
+      } else {
+        admin.setEditable(true);
+      }
+      
+      
   
       userRepository.save(admin);
     } catch (Exception e) {
