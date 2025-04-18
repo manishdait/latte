@@ -8,7 +8,7 @@ WORKDIR /target
 COPY --from=build app/target/latte-api.jar app.jar
 RUN jar -xf app.jar
 RUN jdeps --print-module-deps --ignore-missing-deps --multi-release 17 --class-path 'BOOT-INF/lib/*' app.jar > deps.info
-RUN jlink --output jre --compress=2 --no-header-files --no-man-pages --add-modules "$(cat deps.info)"
+RUN jlink --output jre --compress=2 --no-header-files --no-man-pages --add-modules "$(cat deps.info),java.naming,java.security.jgss,java.security.sasl,jdk.crypto.ec,jdk.security.jgss,jdk.naming.dns"
 
 FROM alpine
 RUN apk update
