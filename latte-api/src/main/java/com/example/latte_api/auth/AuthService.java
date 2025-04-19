@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,23 +58,28 @@ public class AuthService {
   }
 
   public AuthResponse authenticateUser(AuthRequest request) {
-    Authentication authentication = authenticationManager.authenticate(
-      new UsernamePasswordAuthenticationToken(request.email(), request.password())
-    );
+    try {
+      Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.email(), request.password())
+      );
 
-    User user = (User) authentication.getPrincipal();
+      User user = (User) authentication.getPrincipal();
 
-    String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
-    String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
+      String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
+      String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
 
-    Role role = user.getRole();
-    return new AuthResponse(
-      user.getFirstname(), 
-      user.getEmail(), 
-      accessToken, 
-      refreshToken, 
-      new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList())
-    );
+      Role role = user.getRole();
+      return new AuthResponse(
+        user.getFirstname(), 
+        user.getEmail(), 
+        accessToken, 
+        refreshToken, 
+        new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList())
+      );
+    } catch (Exception e) {
+      throw new BadCredentialsException("Invalid username or passeord");
+    }
+    
   }
 
   public AuthResponse refreshToken(HttpServletRequest request) {
