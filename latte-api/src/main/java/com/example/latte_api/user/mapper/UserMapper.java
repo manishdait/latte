@@ -12,6 +12,6 @@ import com.example.latte_api.user.dto.UserResponse;
 public interface UserMapper {
   UserMapper INSTANT = Mappers.getMapper(UserMapper.class);
 
-  @Mapping(target = "role", expression = "java(new RoleResponse(user.getRole().getId(), user.getRole().getRole(), user.getRole().getAuthorities().stream().map(a -> a.getAuthority()).toList()))")
+  @Mapping(target = "role", expression = "java(new RoleResponse(user.getRole().getId(), user.getRole().getRole(), user.getRole().getAuthorities().stream().map(a -> a.getAuthority()).toList(), user.isEditable(), user.isDeletable()))")
   UserResponse mapToUserDto(User user);
 }
