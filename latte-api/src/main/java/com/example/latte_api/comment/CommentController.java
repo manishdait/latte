@@ -18,7 +18,6 @@ import com.example.latte_api.comment.dto.CommentRequest;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/latte-api/v1/comments")
 @RequiredArgsConstructor

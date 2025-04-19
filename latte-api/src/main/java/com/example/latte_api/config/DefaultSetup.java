@@ -56,7 +56,7 @@ public class DefaultSetup {
         cred.createNewFile();
       }
 
-      String password = profile.equals("deploy")? "Password" : UUID.randomUUID().toString() + LocalTime.now().hashCode();
+      String password = profile.equals("deploy")? "password" : UUID.randomUUID().toString() + LocalTime.now().hashCode();
   
       FileWriter fileWriter = new FileWriter(cred);
       fileWriter.append(password + "\n");
@@ -79,8 +79,6 @@ public class DefaultSetup {
         admin.setEditable(true);
       }
       
-      
-  
       userRepository.save(admin);
     } catch (Exception e) {
       e.printStackTrace();

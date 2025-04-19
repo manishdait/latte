@@ -13,7 +13,6 @@ import com.example.latte_api.shared.PagedEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @RestController
 @RequestMapping("/latte-api/v1/activities")
 @RequiredArgsConstructor
