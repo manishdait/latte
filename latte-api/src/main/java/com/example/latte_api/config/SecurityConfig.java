@@ -96,6 +96,16 @@ public class SecurityConfig {
         "/latte-api/v1/roles"
       ).hasAuthority(IAuthority.CREATE_ROLE.getAuthority());
 
+      request.requestMatchers(
+        HttpMethod.PATCH,
+        "/latte-api/v1/roles/**"
+      ).hasAuthority(IAuthority.EDIT_ROLE.getAuthority());
+
+      request.requestMatchers(
+        HttpMethod.DELETE,
+        "/latte-api/v1/roles/**"
+      ).hasAuthority(IAuthority.DELETE_ROLE.getAuthority());
+
       request.anyRequest().authenticated();
     });
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
