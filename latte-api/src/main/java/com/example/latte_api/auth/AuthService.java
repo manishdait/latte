@@ -15,7 +15,7 @@ import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.auth.dto.RegistrationRequest;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
-import com.example.latte_api.role.dto.RoleResponse;
+import com.example.latte_api.role.mapper.RoleMapper;
 import com.example.latte_api.security.JwtProvider;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
@@ -27,8 +27,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
+
+  private final RoleMapper roleMapper;
 
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
@@ -68,13 +71,12 @@ public class AuthService {
       String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
       String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
 
-      Role role = user.getRole();
       return new AuthResponse(
         user.getFirstname(), 
         user.getEmail(), 
         accessToken, 
         refreshToken, 
-        new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList())
+        roleMapper.mapToRoleResponse(user.getRole())
       );
     } catch (Exception e) {
       throw new BadCredentialsException("Invalid username or passeord");
@@ -101,8 +103,12 @@ public class AuthService {
       throw new RuntimeException("Forbidden access");
     }
 
-    Role role = userDetails.getRole();
     String accessToken = jwtProvider.generateToken(username, Map.of());
-    return new AuthResponse(userDetails.getFirstname(), userDetails.getUsername(), accessToken, token, new RoleResponse(role.getId(), role.getRole(), role.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
+    return new AuthResponse(
+      userDetails.getFirstname(), 
+      userDetails.getUsername(), 
+      accessToken, token, 
+      roleMapper.mapToRoleResponse(userDetails.getRole())
+    );
   }
 }

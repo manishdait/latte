@@ -33,6 +33,8 @@ import com.example.latte_api.auth.dto.RegistrationRequest;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.role.authority.Authority;
+import com.example.latte_api.role.dto.RoleResponse;
+import com.example.latte_api.role.mapper.RoleMapper;
 import com.example.latte_api.security.JwtProvider;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
@@ -58,12 +60,15 @@ public class AuthServiceTest {
   @Mock
   private JwtProvider jwtProvider;
 
+  @Mock
+  private RoleMapper roleMapper;
+
   @Captor
   private ArgumentCaptor<User> useCaptor;
 
   @BeforeEach
   void setup() {
-  authService = new AuthService(userRepository, roleRepository, passwordEncoder, authenticationManager, jwtProvider);
+  authService = new AuthService(userRepository, roleRepository, roleMapper, passwordEncoder, authenticationManager, jwtProvider);
   }
 
   @AfterEach
@@ -133,6 +138,7 @@ public class AuthServiceTest {
   @Test
   void shouldReturn_authResponse_forValidCred() {
     // mock
+    final RoleResponse roleResponse = Mockito.mock(RoleResponse.class);
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket:create").build())).build();
     final User user = User.builder()
@@ -155,6 +161,7 @@ public class AuthServiceTest {
       .thenReturn(accessToken);
     when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800)))
       .thenReturn(refreshToken);
+    when(roleMapper.mapToRoleResponse(role)).thenReturn(roleResponse);
 
     final AuthResponse result = authService.authenticateUser(request);
 
@@ -166,10 +173,12 @@ public class AuthServiceTest {
       .generateToken(eq(user.getEmail()), eq(Map.of()));
     verify(jwtProvider, times(1))
       .generateToken(eq(user.getEmail()), eq(Map.of()), eq(604800));
+    verify(roleMapper, times(1))
+      .mapToRoleResponse(role);
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(request.email());
-    Assertions.assertThat(result.role().role()).isEqualTo("User");
+    Assertions.assertThat(result.role()).isEqualTo(roleResponse);
     Assertions.assertThat(result.accessToken()).isEqualTo(accessToken);
     Assertions.assertThat(result.refreshToken()).isEqualTo(refreshToken);
   }
@@ -190,6 +199,7 @@ public class AuthServiceTest {
   @Test
   void shouldReturn_authResponse_withRefeshAccessToken_forvalidToken() {
     // mock
+    final RoleResponse roleResponse = Mockito.mock(RoleResponse.class);
     final Role role = Role.builder().role("User").authorities(List.of(Authority.builder().authority("create:ticket").build())).build();
     final User user = User.builder()
       .id(101L)
@@ -210,6 +220,7 @@ public class AuthServiceTest {
     when(jwtProvider.validToken(user, refershToken)).thenReturn(true);
     when(jwtProvider.generateToken(eq(user.getEmail()), eq(Map.of())))
       .thenReturn(accessToken);
+    when(roleMapper.mapToRoleResponse(role)).thenReturn(roleResponse);
 
     final AuthResponse result = authService.refreshToken(request);
     
@@ -219,6 +230,7 @@ public class AuthServiceTest {
     verify(userRepository, times(1)).findByEmail(username);
     verify(jwtProvider, times(1)).validToken(user, refershToken);
     verify(jwtProvider, times(1)).generateToken(eq(user.getEmail()), eq(Map.of()));
+    verify(roleMapper, times(1)).mapToRoleResponse(role);
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.email()).isEqualTo(username);
