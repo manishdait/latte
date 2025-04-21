@@ -23,9 +23,8 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/sign-up")
-  public ResponseEntity<Map<String, Boolean>> registerUser(@RequestBody RegistrationRequest request) {
-    authService.registerUser(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("user_created", true));
+  public ResponseEntity<AuthResponse> registerUser(@RequestBody RegistrationRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(request));
   }
 
   @PostMapping("/login")

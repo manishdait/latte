@@ -39,7 +39,7 @@ public class AuthService {
   private final JwtProvider jwtProvider;
 
   @Transactional
-  public void registerUser(RegistrationRequest request) {
+  public AuthResponse registerUser(RegistrationRequest request) {
     userRepository.findByEmailOrFirstname(request.email(), request.firstname()).ifPresent((user) -> {
       throw new IllegalArgumentException("Duplicate User");
     });
@@ -57,7 +57,18 @@ public class AuthService {
       .deletable(true)
       .build();
 
-    userRepository.save(user);  
+    userRepository.save(user); 
+
+    String accessToken = jwtProvider.generateToken(user.getEmail(), Map.of());
+    String refreshToken = jwtProvider.generateToken(user.getEmail(), Map.of(),  604800);
+
+    return new AuthResponse(
+      user.getFirstname(), 
+      user.getEmail(), 
+      accessToken, 
+      refreshToken, 
+      roleMapper.mapToRoleResponse(user.getRole())
+    );
   }
 
   public AuthResponse authenticateUser(AuthRequest request) {

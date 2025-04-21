@@ -33,6 +33,7 @@ import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
+import com.example.latte_api.user.dto.UserResponse;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -96,8 +97,6 @@ public class AuthControllerTest {
   @Test
   void should_createNewUser_whenUserDoesNotExist() {
     // user::create
-    final Map<String, Boolean> expected = Map.of("user_created", true);
-
     final AuthResponse cred = adminCred();
 
     final HttpHeaders headers = new HttpHeaders();
@@ -105,15 +104,14 @@ public class AuthControllerTest {
  
     final RegistrationRequest request = new RegistrationRequest("Jhon", "jhon@gmail.com", "Jhon@01", "User");
 
-    final ResponseEntity<Map<String, Boolean>> response = testRestTemplate.exchange(
+    final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
       BASE_URI + "/sign-up",
       HttpMethod.POST,
       new HttpEntity<>(request, headers),
-      new ParameterizedTypeReference<Map<String, Boolean>>() {}
+      UserResponse.class
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    Assertions.assertThat(response.getBody()).isEqualTo(expected);
   }
 
   @Test

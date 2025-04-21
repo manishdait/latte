@@ -89,13 +89,17 @@ public class AuthServiceTest {
     when(userRepository.findByEmailOrFirstname(request.email(), request.firstname())).thenReturn(Optional.empty());
     when(roleRepository.findByRole(request.role())).thenReturn(Optional.of(role));
     when(passwordEncoder.encode(request.password())).thenReturn(encodedPass);
+    when(jwtProvider.generateToken(eq("peter@test.in"), eq(Map.of()))).thenReturn("access-token");
+    when(jwtProvider.generateToken(eq("peter@test.in"), eq(Map.of()), eq(604800))).thenReturn("refresh-token");
 
-    authService.registerUser(request);
+    final AuthResponse result = authService.registerUser(request);
 
     // then
     verify(userRepository, times(1)).findByEmailOrFirstname(request.email(), request.firstname());
     verify(roleRepository, times(1)).findByRole(request.role());
     verify(userRepository, times(1)).save(useCaptor.capture());
+    verify(jwtProvider, times(1)).generateToken(eq("peter@test.in"), eq(Map.of()));
+    verify(jwtProvider, times(1)).generateToken(eq("peter@test.in"), eq(Map.of()), eq(604800));
 
     final User saved = useCaptor.getValue();
 
@@ -103,6 +107,7 @@ public class AuthServiceTest {
     Assertions.assertThat(saved.getEmail()).isEqualTo(request.email());
     Assertions.assertThat(saved.getRole()).isEqualTo(role);
     Assertions.assertThat(saved.getPassword()).isEqualTo(encodedPass);
+    Assertions.assertThat(result).isNotNull();
   }
 
   @Test
