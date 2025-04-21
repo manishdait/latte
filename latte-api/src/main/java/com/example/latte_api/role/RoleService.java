@@ -2,6 +2,7 @@ package com.example.latte_api.role;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,13 @@ public class RoleService {
     respone.setContent(rolePage.getContent().stream().map(r -> roleMapper.mapToRoleResponse(r)).toList());
 
     return respone;
+  }
+
+  public RoleResponse getRole(Long id) {
+    Role role = roleRepository.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("Role not found")
+    );
+    return roleMapper.mapToRoleResponse(role);
   }
 
   @Transactional
@@ -99,6 +107,10 @@ public class RoleService {
 
   @Transactional
   public void deleteRole(Long id, Long newId) {
+    if (id == newId) {
+      throw new IllegalArgumentException("Role delete id and Update id can not be same");
+    }
+
     Role prevRole = roleRepository.findById(id).orElseThrow(
       () -> new EntityNotFoundException("Role not found")
     );
@@ -117,5 +129,9 @@ public class RoleService {
     userRepository.saveAll(users);
 
     roleRepository.delete(prevRole);
+  }
+
+  public Map<String, Long> getRoleCount() {
+    return Map.of("count", roleRepository.count());
   }
 }
