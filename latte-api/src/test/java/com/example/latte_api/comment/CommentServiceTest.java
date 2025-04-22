@@ -24,7 +24,7 @@ import org.springframework.security.core.Authentication;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.dto.ActivityDto;
-import com.example.latte_api.comment.dto.CommentRequest;
+import com.example.latte_api.comment.dto.CommentDto;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.User;
@@ -61,7 +61,7 @@ public class CommentServiceTest {
 
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final CommentRequest request = new CommentRequest("Message", 101L);
+    final CommentDto request = new CommentDto("Message", 101L);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -84,7 +84,7 @@ public class CommentServiceTest {
 
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final CommentRequest request = new CommentRequest("Message", 101L);
+    final CommentDto request = new CommentDto("Message", 101L);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -103,7 +103,7 @@ public class CommentServiceTest {
 
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final CommentRequest request = new CommentRequest("Message", 101L);
+    final CommentDto request = new CommentDto("Message", 101L);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -127,7 +127,7 @@ public class CommentServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final long id = 101L;
-    final CommentRequest request = new CommentRequest("new_comment", id);
+    final CommentDto request = new CommentDto("new_comment", id);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -155,7 +155,7 @@ public class CommentServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final long id = 101L;
-    final CommentRequest request = new CommentRequest("new_comment", id);
+    final CommentDto request = new CommentDto("new_comment", id);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -175,7 +175,7 @@ public class CommentServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final long id = 101L;
-    final CommentRequest request = new CommentRequest("new_comment", id);
+    final CommentDto request = new CommentDto("new_comment", id);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -195,7 +195,7 @@ public class CommentServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final long id = 101L;
-    final CommentRequest request = new CommentRequest("new_comment", id);
+    final CommentDto request = new CommentDto("new_comment", id);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -212,7 +212,7 @@ public class CommentServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final long id = 101L;
-    final CommentRequest request = new CommentRequest("new_comment", id);
+    final CommentDto request = new CommentDto("new_comment", id);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);

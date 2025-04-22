@@ -28,7 +28,7 @@ import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.enums.ActivityType;
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
-import com.example.latte_api.comment.dto.CommentRequest;
+import com.example.latte_api.comment.dto.CommentDto;
 import com.example.latte_api.handler.ErrorResponse;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
@@ -111,7 +111,7 @@ public class CommentControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ResponseEntity<ActivityDto> response = testRestTemplate.exchange(
       BASE_URI,
@@ -135,7 +135,7 @@ public class CommentControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final CommentRequest request = new CommentRequest("Test", 300L);
+    final CommentDto request = new CommentDto("Test", 300L);
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -150,7 +150,7 @@ public class CommentControllerTest {
   @Test
   void shouldGiveForbidden_onCreateNewComment_requestMissingAuthorizationHeader() {
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -170,7 +170,7 @@ public class CommentControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ActivityDto activity= testRestTemplate.exchange(
             BASE_URI,
@@ -179,7 +179,7 @@ public class CommentControllerTest {
             ActivityDto.class
     ).getBody();
 
-    final CommentRequest updateReq = new CommentRequest("New", ticket.id());
+    final CommentDto updateReq = new CommentDto("New", ticket.id());
 
     final ResponseEntity<ActivityDto> response = testRestTemplate.exchange(
             BASE_URI + "/" + activity.id(),
@@ -202,7 +202,7 @@ public class CommentControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ActivityDto activity= testRestTemplate.exchange(
             BASE_URI,
@@ -211,7 +211,7 @@ public class CommentControllerTest {
             ActivityDto.class
     ).getBody();
 
-    final CommentRequest updateReq = new CommentRequest("New", ticket.id());
+    final CommentDto updateReq = new CommentDto("New", ticket.id());
     final AuthResponse _cred = adminCred();
 
     final HttpHeaders _headers = new HttpHeaders();
@@ -230,7 +230,7 @@ public class CommentControllerTest {
   @Test
     void shouldGiveNotFound_forInvalidId() {
     final AuthResponse cred = userCred();
-      final CommentRequest updateReq = new CommentRequest("New", 101L);
+      final CommentDto updateReq = new CommentDto("New", 101L);
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
@@ -254,7 +254,7 @@ public class CommentControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ActivityDto activity= testRestTemplate.exchange(
             BASE_URI,
@@ -281,7 +281,7 @@ public class CommentControllerTest {
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
     final TicketResponse ticket = getTicket();
-    final CommentRequest request = new CommentRequest("Test", ticket.id());
+    final CommentDto request = new CommentDto("Test", ticket.id());
 
     final ActivityDto activity= testRestTemplate.exchange(
             BASE_URI,

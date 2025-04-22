@@ -7,7 +7,7 @@ import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.dto.ActivityDto;
 import com.example.latte_api.activity.enums.ActivityType;
-import com.example.latte_api.comment.dto.CommentRequest;
+import com.example.latte_api.comment.dto.CommentDto;
 import com.example.latte_api.ticket.Ticket;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.User;
@@ -22,7 +22,7 @@ public class CommentService {
   
   private final ActivityService activityService;
 
-  public ActivityDto createComment(CommentRequest request, Authentication authentication){
+  public ActivityDto createComment(CommentDto request, Authentication authentication){
     User user = (User) authentication.getPrincipal();
 
     Ticket ticket = ticketRepository.findById(request.ticketId()).orElseThrow(
@@ -57,7 +57,7 @@ public class CommentService {
     activityService.deleteActivity(activity);
   }
 
-  public ActivityDto updateComment(Long id, CommentRequest request, Authentication authentication) {
+  public ActivityDto updateComment(Long id, CommentDto request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     Activity activity = activityService.getActivity(id);
 

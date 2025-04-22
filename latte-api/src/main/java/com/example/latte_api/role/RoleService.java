@@ -132,6 +132,6 @@ public class RoleService {
   }
 
   public Map<String, Long> getRoleCount() {
-    return Map.of("count", roleRepository.count());
+    return Map.of("role_count", roleRepository.count());
   }
 }
