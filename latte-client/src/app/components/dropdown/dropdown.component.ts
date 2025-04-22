@@ -19,11 +19,11 @@ import { CustomControlDirective } from '../../shared/directives/custom-control.d
 export class DropdownComponent extends CustomControlDirective {
   id = input('');
   placeholder = input('');
-  list = input<string[]>();
-  more = input(false);
-  unassign = input(false);
+  dropdownItems = input<string[]>();
+  hasMore = input(false);
+  hasUnassign = input(false);
 
-  next = output<boolean>();
+  onNext = output<boolean>();
 
   dropdown = signal(false);
 

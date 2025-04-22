@@ -4,13 +4,13 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Status } from '../../model/status.enum';
+import { Status } from '../../model/status.type';
 import { TicketResponse } from '../../model/ticket.type';
 import { TicketService } from '../../service/ticket.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { AppState } from '../../state/app.state';
-import { setTicketOpenCount, setTicketCloseCount, setTickets } from '../../state/ticket/ticket.action';
-import { selectTickets, selectTicketOpenCount, selectTicketCloseCount } from '../../state/ticket/ticket.selector';
+import { setCloseCount, setOpenCount, setTicketCount, setTickets } from '../../state/ticket/ticket.action';
+import { closeTickets, openTickets, tickets } from '../../state/ticket/ticket.selector';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { ListItemComponent } from '../../components/list-item/list-item.component';
 
@@ -29,78 +29,67 @@ export class TicketComponent implements OnInit {
   openCount$: Observable<number>;
   closeCount$: Observable<number>;
 
-  status = signal(Status.OPEN);
-  pageCount = signal(0);
+  status = signal<Status>('OPEN');
+
+  page = signal(0);
   size = signal(10);
-  page = signal<Record<string, boolean>>({
+  
+  ticketPage = signal<Record<string, boolean>>({
     'prev': false,
     'next': false
   });
 
+  loading = signal(true);
+
   constructor(private store: Store<AppState>) {
-    this.tickets$ = store.select(selectTickets);
-    this.openCount$ = store.select(selectTicketOpenCount);
-    this.closeCount$ = store.select(selectTicketCloseCount);
+    this.tickets$ = store.select(tickets);
+    this.openCount$ = store.select(openTickets);
+    this.closeCount$ = store.select(closeTickets);
   }
 
   ngOnInit(): void {
     this.ticketService.fetchTicktsInfo().subscribe({
       next: (response) => {
         const info =  response as any;
-        this.store.dispatch(setTicketOpenCount({ticketCount: info.open_tickets}))
-        this.store.dispatch(setTicketCloseCount({ticketCount: info.closed_tickets}))
-      },
-      error: (err) => {
-        console.error(err.error);
+        this.store.dispatch(setOpenCount({count: info.open_tickets}))
+        this.store.dispatch(setCloseCount({count: info.closed_tickets}))
+        this.store.dispatch(setTicketCount({count: info.open_tickets + info.closed_tickets}))
       }
     })
 
-    this.ticketService.fetchPagedTicketsByStaus(this.status(), this.pageCount(), this.size()).subscribe({
-      next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
-
-        this.store.dispatch(setTickets({tickets: response.content}))
-      }
-    });
-
+    this.getTickets();
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
-  next() {
-    this.pageCount.update(count => count + 1);
-    this.ticketService.fetchPagedTickets(this.pageCount(), this.size()).subscribe({
-      next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
-
-        this.store.dispatch(setTickets({tickets: response.content}))
-      }
-    });
+  getNext() {
+    this.page.update(count => count + 1);
+    this.getTickets();
   }
 
-  prev() {
-    this.pageCount.update(count => count - 1);
-    this.ticketService.fetchPagedTicketsByStaus(this.status(), this.pageCount(), this.size()).subscribe({
-      next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
-
-        this.store.dispatch(setTickets({tickets: response.content}))
-      }
-    });
+  getPrev() {
+    this.page.update(count => count - 1);
+    this.getTickets();
   }
 
   getStatus() {
     return this.status.toString()
   }
 
-  setStatus(status: string) {
-    if(status === 'OPEN'){
-      this.status.set(Status.OPEN);
-    } else {
-      this.status.set(Status.CLOSE);
-    }
+  setStatus(status: Status) {
+    this.status.set(status);
     this.ngOnInit();
+  }
+
+  getTickets() {
+    this.loading.set(true);
+    this.ticketService.fetchPagedTicketsByStaus(this.status(), this.page(), this.size()).subscribe({
+      next: (response) => {
+        this.ticketPage()['prev'] = response.prev;
+        this.ticketPage()['next'] = response.next;
+
+        this.store.dispatch(setTickets({tickets: response.content}));
+        this.loading.set(false);
+      }
+    });
   }
 }

@@ -1,9 +1,9 @@
-import { Priority } from "./priority.enum";
-import { Status } from "./status.enum";
+import { Priority } from "./priority.type";
+import { Status } from "./status.type";
 import { UserDto } from "./user.type";
 
 export interface TicketResponse {
-  id: number,
+  readonly id: number,
   title: string,
   description: string,
   priority: Priority,

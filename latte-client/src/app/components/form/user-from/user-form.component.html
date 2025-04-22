@@ -35,7 +35,7 @@
 
       <div class="flex flex-col gap-1 my-4">
         <label class="text-sm text-neutral-800" for="role">Password</label>
-        <app-dropdown [id]="'role'" [placeholder]="'Select a role...'" [list]="roles()" formControlName="role"/>
+        <app-dropdown [id]="'role'" [placeholder]="'Select a role...'" [hasMore]="hasNext()" (onNext)="getNext()" [dropdownItems]="roles()" formControlName="role"/>
       </div>
 
       <div class="flex gap-4">

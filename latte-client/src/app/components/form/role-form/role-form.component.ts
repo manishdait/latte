@@ -1,8 +1,11 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { RoleService } from '../../../service/role.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RoleRequest } from '../../../model/role.enum';
-import { authority } from '../../../model/authority.type';
+import { RoleRequest } from '../../../model/role.type';
+import { Authority } from '../../../model/authority.type';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../../state/app.state';
+import { addRole, updateRoleCount } from '../../../state/role/role.action';
 
 @Component({
   selector: 'app-role-form',
@@ -15,14 +18,14 @@ export class RoleFormComponent {
 
   cancel = output<boolean>();
 
-  permissions: authority[] = [
+  permissions: Authority[] = [
     'user::create', 'user::delete',  'user::delete', 'user::reset-password', 'ticket::create', 'ticket::edit', 
-    'ticket::delete', 'ticket::lock', 'ticket::assign', 'role::create', 'role::edit', 'role::delete'
+    'ticket::delete', 'ticket::lock-unlock', 'ticket::assign', 'role::create', 'role::edit', 'role::delete'
   ];
   formError = signal(false);
   form: FormGroup;
 
-  constructor() {
+  constructor(private store: Store<AppState>) {
     this.form = new FormGroup({
       'role': new FormControl('', [Validators.required]),
       'user::create': new FormControl(false),
@@ -59,12 +62,16 @@ export class RoleFormComponent {
 
     for (let permission of this.permissions) {
       if (this.form.get(permission)?.value === true) {
-        request.authorities.push(permission);
+        request.authorities?.push(permission);
       }
     }
 
     this.roleService.createRole(request).subscribe({
-      next: (res) => {this.cancel.emit(true)}
+      next: (res) => {
+        this.store.dispatch(addRole({role: res}));
+        this.store.dispatch(updateRoleCount({count: 1}));
+        this.cancel.emit(true);
+      }
     })
   }
 }

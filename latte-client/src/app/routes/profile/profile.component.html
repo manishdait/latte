@@ -33,7 +33,7 @@
     </form>
   </div>
 
-  @if(passwordReset()) {
+  @if(userDetails().editable && passwordReset()) {
     <div class="bg-neutral-50 rounded-sm border-[.1em] border-neutral-200 p-4">
       <h1 class="text-[1.2rem] font-medium mb-4">Reset Password</h1>
   
@@ -73,7 +73,7 @@
 
   <div class="flex gap-2">
     <button class="text-[.9rem] font-medium px-2 py-1 bg-red-600 border-[.1em] border-red-600 text-white rounded-sm cursor-pointer hover:bg-red-700 hover:border-red-700" type="button" (click)="logout()">Logout</button>
-    @if(!passwordReset()) {
+    @if(userDetails().editable && !passwordReset()) {
       <button class="text-[.9rem] font-medium px-2 py-1  border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="togglePasswordReset()">Reset Password</button>
     }
   </div>

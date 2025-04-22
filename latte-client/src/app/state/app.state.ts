@@ -1,10 +1,10 @@
-import { TicketCount, TicketState } from "./ticket/ticket.reducer";
-import { UserCount, UserState } from "./user/user.reducer";
+import { RoleState } from "./role/role.reducer";
+import { TicketState } from "./ticket/ticket.reducer";
+import { UserState } from "./user/user.reducer";
 
 export interface AppState {
   tickets: TicketState,
-  ticketOpenCount: TicketCount,
-  ticketCloseCount: TicketCount,
   users: UserState,
-  userCount: UserCount
+  roles: RoleState
 }
+

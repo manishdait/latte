@@ -1,10 +1,10 @@
 import { HttpBackend, HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AuthRequest, AuthResponse, RegistrationRequest } from '../model/auth.type';
 import { catchError, map, Observable, of } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
-import { Role } from '../model/role.enum';
+import { Role } from '../model/role.type';
 
 const URL: string = `${environment.API_ENDPOINT}/auth`;
 
@@ -27,8 +27,8 @@ export class AuthService {
     );
   }
 
-  registerUser(request: RegistrationRequest): Observable<Map<string, boolean>> {
-    return this.secureClient.post<Map<string, boolean>>(`${URL}/sign-up`, request);
+  registerUser(request: RegistrationRequest): Observable<AuthResponse> {
+    return this.secureClient.post<AuthResponse>(`${URL}/sign-up`, request);
   }
 
   refreshToken(): Observable<AuthResponse> {
@@ -121,7 +121,7 @@ export class AuthService {
   }
   
   lockTicket() {
-    return this.getRole().authorities.includes('ticket::lock');
+    return this.getRole().authorities.includes('ticket::lock-unlock');
   }
   
   createRole() {

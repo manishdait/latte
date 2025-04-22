@@ -1,36 +1,58 @@
 @if (createRole()) {
   <app-role-form (cancel)="toggleCreateRole()"/>
 }
+
+@if (editRole()) {
+  <app-edit-role-form [id]="bufferId()" (cancel)="toggleEditRole(0)"/>
+}
+
+@if (deleteRole()) {
+  <app-role-delete [toDelete]="bufferId()" (cancel)="toggleDeleteRole(0)"/>
+}
+
 <div class="h-full w-full p-4">
   <div class="flex py-2 gap-5 items-center">
     <h1 class="text-2xl font-medium text-neutral-800">Roles</h1>
-    <button class="bg-green-500 text-[.9rem] text-white font-medium py-1 px-2 rounded-sm cursor-pointer hover:bg-green-600" type="button" (click)="toggleCreateRole()">Create role</button>
+    @if(createRoleOps()) {
+      <button class="bg-green-500 text-[.9rem] text-white font-medium py-1 px-2 rounded-sm cursor-pointer hover:bg-green-600" type="button" (click)="toggleCreateRole()">Create role</button>
+    }
   </div>
 
   <div class="border-[.1em] border-neutral-200 rounded-sm">
     <div class="flex gap-4 bg-neutral-50 py-2 px-4">
       <span class="text-base font-semibold text-neutral-800">
-        Roles <span class="text-[.7rem] text-neutral-600 bg-neutral-200 py-0.5 px-1 rounded-sm">0</span>
+        Roles <span class="text-[.7rem] text-neutral-600 bg-neutral-200 py-0.5 px-1 rounded-sm">{{ count$ | async }}</span>
       </span>
     </div>
 
-    @for(role of roles().slice(0, size()); track role.id) {
-      <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4 border-t-[.1em] border-gray-200 cursor-pointer">
-        <div class="flex flex-col gap-0.5">
-          <span class="text-[1rem] text-neutral-800">{{ role.role }}</span>
-        </div>
-
-        <div class="flex gap-2 flex-wrap">
-          <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="button">Edit</button>
-          <button class="text-[.9rem] font-medium px-2 py-1 disabled:bg-neutral-200 disabled:border-neutral-200 bg-red-600 border-[.1em] disabled:cursor-auto border-red-600 text-white rounded-sm cursor-pointer hover:bg-red-700 hover:border-red-700" type="button">Delete</button>
-        </div>
+    @if(loading()) {
+      <div class="flex gap-4 py-3 px-4 border-t-[.1em] border-neutral-200 cursor-pointer">
+        <span class="text-base text-neutral-500">Fetching Roles...</span>
       </div>
+    } @else {
+      @for(role of (roles$ | async)?.slice(0, size()); track role.id) {
+        <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4 border-t-[.1em] border-gray-200 cursor-pointer">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-[1rem] text-neutral-800">{{ role.role }}</span>
+          </div>
+  
+          <div class="flex gap-2 flex-wrap">
+            @if(editRoleOps() && role.editable) {
+              <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="button" (click)="toggleEditRole(role.id)">Edit</button>
+            }
+
+            @if(deleteRoleOps() && role.deletable) {
+              <button class="text-[.9rem] font-medium px-2 py-1 disabled:bg-neutral-200 disabled:border-neutral-200 bg-red-600 border-[.1em] disabled:cursor-auto border-red-600 text-white rounded-sm cursor-pointer hover:bg-red-700 hover:border-red-700" type="button" (click)="toggleDeleteRole(role.id)">Delete</button>
+            }
+          </div>
+        </div>
+      }
     }
 
-    <!-- @if(page()['prev'] || page()['next']) {
+    @if(rolePage()['prev'] || rolePage()['next']) {
       <div class="flex gap-4 p-2 border-t-[.1em] border-neutral-200 justify-end">
-        <app-pagination [nextPage]="page()['next']" [prevPage]="page()['prev']" [pageCount]="pageCount()" (next)="next()" (prev)="prev()"/>
+        <app-pagination [hasNext]="rolePage()['next']" [hasPrev]="rolePage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </div>
-    } -->
+    }
   </div>
 </div>

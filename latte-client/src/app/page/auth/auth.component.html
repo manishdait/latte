@@ -30,7 +30,13 @@
           }
         </div>
   
-        <button class="w-full bg-green-500 text-base text-white font-medium border-[.1em] border-green-500 rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600 px-2 py-1 my-2" type="submit">Sign in</button>
+        <button class="w-full bg-green-500 text-base text-white font-medium border-[.1em] border-green-500 rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600 px-2 py-1 my-2" type="submit">
+          @if(processing()) {
+            <app-spinner/>
+          } @else {
+            <span>Sign in</span>
+          }
+        </button>
       </form>
     </div>
   </div>

@@ -13,7 +13,7 @@
     </div>
   }
 
-  @if(more()) {
+  @if(hasMore()) {
     <div class="w-full p-2 flex flex-col gap-1">
       <button class="mx-auto text-base border-[.1em] border-neutral-200 px-2 py-1 cursor-pointer rounded-sm text-neutral-500 hover:bg-neutral-900/5" type="button" (click)="loadPrevious()">Load Previous</button>
       <div class="mx-auto w-[.05rem] h-[1rem] bg-neutral-200"></div>

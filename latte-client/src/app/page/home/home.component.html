@@ -3,7 +3,7 @@
 }
 
 <div class="w-screen h-screen flex flex-col bg-neutral-50 overflow-hidden">
-  <app-navbar [sidenavToggle]="sidenav()" (sidenav)="toggleSidenav()"/>
+  <app-navbar [sidenavState]="sidenav()" (sidenavToggle)="toggleSidenav()"/>
 
   <div class="w-full h-full flex">
     <div class="w-[min(100%,230px)] h-full flex flex-col bg-neutral-50 border-r-[.1em] border-neutral-200 py-4 px-2 sidenav" [class]="sidenav()? 'out' : 'in'">

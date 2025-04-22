@@ -1,7 +1,6 @@
-import { Component, ElementRef, inject, input, Input, OnInit, signal, ViewChild } from '@angular/core';
-import { TicketResponse } from '../../model/ticket.type';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { ActivityResponse, ActivityType } from '../../model/activity.type';
-import { CommentRequest } from '../../model/comment.type';
+import { CommentDto } from '../../model/comment.type';
 import { ActivityService } from '../../service/activity.service';
 import { CommentService } from '../../service/comment.service';
 import { getDate } from '../../shared/utils';
@@ -19,17 +18,17 @@ export class ActivityComponent implements OnInit {
 
   ticketId = input.required<number>();
 
-  more = signal(false);
-  count = signal(0);
+  hasMore = signal(false);
+  page = signal(0);
   size = signal(6);
 
   activities = signal<ActivityResponse[]>([]);
 
   ngOnInit(): void {
-    this.activityService.getActivitiesForTicket(this.ticketId(), this.count(), this.size()).subscribe({
+    this.activityService.getActivitiesForTicket(this.ticketId(), this.page(), this.size()).subscribe({
       next: (response) => {
         this.activities.set(response.content);
-        this.more.set(response.next);
+        this.hasMore.set(response.next);
       }
     });
   }
@@ -43,12 +42,12 @@ export class ActivityComponent implements OnInit {
   }
 
   loadPrevious() {
-    this.count.update(count => count + 1);
+    this.page.update(count => count + 1);
     
-    this.activityService.getActivitiesForTicket(this.ticketId(), this.count(), this.size()).subscribe({
+    this.activityService.getActivitiesForTicket(this.ticketId(), this.page(), this.size()).subscribe({
       next: (response) => {
         this.activities.update(arr => arr.concat(response.content));
-        this.more.set(response.next);
+        this.hasMore.set(response.next);
       }
     });
   }

@@ -4,7 +4,7 @@ import { RegistrationRequest } from '../../../model/auth.type';
 import { AuthService } from '../../../service/auth.service';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
-import { addUser, incrementUserCount } from '../../../state/user/user.action';
+import { addUser, updateUserCount } from '../../../state/user/user.action';
 import { UserResponse } from '../../../model/user.type';
 import { AlertService } from '../../../service/alert.service';
 import { PasswordComponent } from '../../password/password.component';
@@ -28,6 +28,10 @@ export class UserFormComponent implements OnInit {
   
   form: FormGroup;
 
+  page = signal(0);
+  size = signal(5);
+  hasNext = signal(false);
+
   constructor(private alertService: AlertService, private store: Store<AppState>) {
     this.form = new FormGroup({
       firstname: new FormControl('', [Validators.required]),
@@ -38,13 +42,26 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.roleService.getRoles().subscribe({
-      next: (res) => {this.roles.set(res.map(r => r.role))}
+    this.roleService.getRoles(this.page(), this.size()).subscribe({
+      next: (res) => {
+        this.roles.set(res.content.map(r => r.role));
+        this.hasNext.set(res.next);
+      }
     })
   }
 
   get formControls() {
     return this.form.controls;
+  }
+
+  getNext() {
+    this.page.update(count => count+1);
+    this.roleService.getRoles(this.page(), this.size()).subscribe({
+      next: (res) => {
+        this.roles.set(res.content.map(r => r.role));
+        this.hasNext.set(res.next);
+      }
+    })
   }
 
   onSubmit() {
@@ -63,16 +80,16 @@ export class UserFormComponent implements OnInit {
     }
     
     this.authService.registerUser(request).subscribe({
-      next: (response) => {
+      next: (res) => {
         const user: UserResponse = {
-          firstname: request.firstname,
-          email: request.email,
-          role: request.role,
-          editable: false,
-          deletable: false
+          firstname: res.firstname,
+          email: res.email,
+          role: res.role,
+          editable: true,
+          deletable: true
         }
         this.store.dispatch(addUser({user: user}));
-        this.store.dispatch(incrementUserCount());
+        this.store.dispatch(updateUserCount({count: 1}));
         this.alertService.alert = `User created with name ${user.firstname}`;
         this.cancel.emit(true);
       },

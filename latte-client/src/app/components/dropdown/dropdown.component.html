@@ -7,17 +7,17 @@
 
     @if (dropdown()) {
       <div class="absolute w-full max-h-40 flex bg-neutral-50 border-[.1em] border-gray-200 flex-col overflow-hidden overflow-y-scroll rounded-sm z-10">
-        @if(unassign() && control.value !== '') {
+        @if(hasUnassign() && control.value !== '') {
           <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-20" (click)="select('')">Unassigned</span>
         }
   
-        @for(element of list(); track element) {
+        @for(element of dropdownItems(); track element) {
           @if (control.value !== element) {
             <span class="text-base text-neutral-800 px-2 py-1 cursor-pointer hover:bg-neutral-100 not-last:border-b-[.1em] not-last:border-b-gray-200" (click)="select(element)">{{ element }}</span>
           }
         }
-        @if(more()) {
-          <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-200" (click)="next.emit(true)">Show more</span>
+        @if(hasMore()) {
+          <span class="bg-neutral-50 text-base text-neutral-600 px-2 py-1 cursor-pointer hover:bg-neutral-200" (click)="onNext.emit(true)">Show more</span>
         }
       </div>
     }

@@ -1,10 +1,9 @@
 import { createAction, props } from "@ngrx/store";
 import { UserResponse } from "../../model/user.type";
 
-export const addUser = createAction('[User] Add', props<{user: UserResponse}>());
-export const setUsers = createAction('[User] Set', props<{users: UserResponse[]}>());
-export const removeUser = createAction('[User] Remove', props<{email: string}>());
+export const setUsers = createAction('[User] Set User', props<{users: UserResponse[]}>());
+export const addUser = createAction('[User] Add User', props<{user: UserResponse}>());
+export const removeUser = createAction('[User] Remove User', props<{email: string}>());
 
-export const setUserCount = createAction('[User Count] Set', props<{userCount: number}>());
-export const incrementUserCount = createAction('[User Count] Increment');
-export const decrementUserCount = createAction('[User Count] Decrement');
+export const setUserCount = createAction('[User Count] Set UserCount', props<{count: number}>());
+export const updateUserCount = createAction('[User Count] Update UserCount', props<{count: number}>());

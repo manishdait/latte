@@ -1,8 +1,8 @@
-import { Component, EventEmitter, inject, input, Input, output, Output, signal } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Priority } from '../../../../model/priority.enum';
-import { TicketResponse, PatchTicketRequest } from '../../../../model/ticket.type';
+import { Priority } from '../../../../model/priority.type';
+import { PatchTicketRequest } from '../../../../model/ticket.type';
 import { TicketService } from '../../../../service/ticket.service';
 import { fontawsomeIcons } from '../../../../shared/fa-icons';
 import { DropdownComponent } from '../../../../components/dropdown/dropdown.component';
@@ -23,7 +23,7 @@ export class EditPriorityComponent {
   ticketService = inject(TicketService);
   
   list: string[] = ['Low', 'Medium', 'High'];
-  priorities: Record<string, Priority> = {'Low': Priority.LOW, 'Medium': Priority.MEDIUM, 'High': Priority.HIGH};
+  priorities: Record<string, Priority> = {'Low': 'LOW', 'Medium': 'MEDIUM', 'High': 'HIGH'};
 
   form: FormGroup;
 
@@ -48,7 +48,7 @@ export class EditPriorityComponent {
     }
 
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
-      next: (response) => {
+      next: (res) => {
         this.changes.emit(true);
         this.toggleCancel();
       }

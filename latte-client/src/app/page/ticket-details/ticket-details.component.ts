@@ -4,15 +4,14 @@ import { fontawsomeIcons } from '../../shared/fa-icons';
 import { TicketService } from '../../service/ticket.service';
 import { PatchTicketRequest, TicketResponse } from '../../model/ticket.type';
 import { ActivatedRoute, Router } from '@angular/router';
-import { getColor, getDate } from '../../shared/utils';
-import { Status } from '../../model/status.enum';
+import { generateColor, getDate } from '../../shared/utils';
+import { Status } from '../../model/status.type';
 import { AuthService } from '../../service/auth.service';
 import { EditPriorityComponent } from './components/edit-priority/edit-priority.component';
 import { EditAssignComponent } from './components/edit-assign/edit-assign.component';
 import { ActivityComponent } from '../../components/activity/activity.component';
-import { CommentRequest } from '../../model/comment.type';
+import { CommentDto } from '../../model/comment.type';
 import { CommentService } from '../../service/comment.service';
-import { Priority } from '../../model/priority.enum';
 import { DescriptionBoxComponent } from '../../components/description-box/description-box.component';
 
 @Component({
@@ -38,8 +37,8 @@ export class TicketDetailsComponent implements OnInit {
     id: 0,
     title: '',
     description: '',
-    priority: Priority.LOW,
-    status: Status.OPEN,
+    priority: 'LOW',
+    status: 'OPEN',
     lock: false,
     createdBy: {
       firstname: '',
@@ -59,8 +58,8 @@ export class TicketDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.ticketService.fetchTicket(this.ticketId()).subscribe({
-      next: (response) => {
-        this.ticket.set(response);
+      next: (res) => {
+        this.ticket.set(res);
         this.owner.set(this.ticket().createdBy.firstname === this.authService.getFirstname());
       }
     });
@@ -68,9 +67,9 @@ export class TicketDetailsComponent implements OnInit {
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
-  color(username: any): string {
+  getColor(username: any): string {
     if (!username) {return '#ddd'}
-    return getColor(username);
+    return generateColor(username);
   }
 
   getDate(date: any) {
@@ -89,9 +88,9 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   getPriority() {
-    if (this.ticket().priority === Priority.LOW) {
+    if (this.ticket().priority === 'LOW') {
       return 'Low';
-    } else if (this.ticket().priority === Priority.MEDIUM) {
+    } else if (this.ticket().priority === 'MEDIUM') {
       return 'Medium';
     } else {
       return 'High';
@@ -109,7 +108,7 @@ export class TicketDetailsComponent implements OnInit {
         title: null,
         description: null,
         priority: null,
-        status: this.ticket().status === Status.OPEN? Status.CLOSE : Status.OPEN,
+        status: this.ticket().status,
         assignedTo: null
       }
 
@@ -180,13 +179,15 @@ export class TicketDetailsComponent implements OnInit {
 
   delete() {
     this.ticketService.deleteTicket(this.ticketId()).subscribe({
-      next: (res) => {this.router.navigate(['home/tickets'], {replaceUrl: true})}
+      next: (res) => {
+        this.router.navigate(['home/tickets'], {replaceUrl: true})
+      }
     })
   }
 
   comment(message: HTMLTextAreaElement) {
     if (message.value !== '') {
-      const request: CommentRequest = {
+      const request: CommentDto = {
         ticketId: this.ticketId(),
         message: message.value
       }

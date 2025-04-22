@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { TicketService } from '../../service/ticket.service';
-import { getColor } from '../../shared/utils';
+import { generateColor } from '../../shared/utils';
 import { AppState } from '../../state/app.state';
-import { setTicketOpenCount, setTicketCloseCount } from '../../state/ticket/ticket.action';
-import { selectTicketOpenCount, selectTicketCloseCount } from '../../state/ticket/ticket.selector';
+import { setCloseCount, setOpenCount, setTicketCount } from '../../state/ticket/ticket.action';
+import { closeTickets, openTickets, totalTickets } from '../../state/ticket/ticket.selector';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,32 +23,27 @@ export class DashboardComponent implements OnInit {
 
   openTickets$: Observable<number>;
   closedTickets$: Observable<number>;
-  totalTickets = signal(0);
+  totalTickets$: Observable<number>;
 
   constructor (private store: Store<AppState>) {
-    this.openTickets$ = store.select(selectTicketOpenCount);
-    this.closedTickets$ = store.select(selectTicketCloseCount);
+    this.totalTickets$ = store.select(totalTickets);
+    this.openTickets$ = store.select(openTickets);
+    this.closedTickets$ = store.select(closeTickets);
   }
 
   ngOnInit(): void {
     this.ticketService.fetchTicktsInfo().subscribe({
-      next: (response) => {
-        let open = response['open_tickets'] ?? 0;
-        let close = response['closed_tickets'] ?? 0;
-
-        this.store.dispatch(setTicketOpenCount({ticketCount: open}));
-        this.store.dispatch(setTicketCloseCount({ticketCount: close}));
-        this.totalTickets.set(open + close);
-      },
-      error: (err) => {
-        console.error(err.error);
+      next: (res) => {
+        this.store.dispatch(setOpenCount({count: res['open_tickets']}));
+        this.store.dispatch(setCloseCount({count: res['closed_tickets']}));
+        this.store.dispatch(setTicketCount({count: res['total_tickets']}));
       }
     });
   }
 
-  color(username: any): string {
+  getColor(username: any): string {
     if (!username) {return '#ddd'}
-    return getColor(username);
+    return generateColor(username);
   }
 
   greet(): string {
