@@ -49,7 +49,7 @@ export class UserComponent implements OnInit {
   confirm = signal(false);
   
   page = signal(0);
-  size = signal(2);
+  size = signal(10);
   userPage = signal<Record<string, boolean>> ({
     'prev': false,
     'next': false

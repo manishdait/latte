@@ -24,7 +24,7 @@ export class RoleComponent implements OnInit {
   authService = inject(AuthService);
 
   page = signal(0);
-  size = signal(5);
+  size = signal(10);
   rolePage = signal<Record<string, boolean>> ({
     'prev': false,
     'next': false
