@@ -5,7 +5,7 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { AuthService } from '../../service/auth.service';
 import { CommentService } from '../../service/comment.service';
-import { CommentRequest } from '../../model/comment.type';
+import { CommentDto } from '../../model/comment.type';
 
 @Component({
   selector: 'app-comment-box',
@@ -58,7 +58,7 @@ export class CommentBoxComponent implements OnInit {
       return;
     }
 
-    const request: CommentRequest = {
+    const request: CommentDto = {
       ticketId: 0,
       message: message
     }

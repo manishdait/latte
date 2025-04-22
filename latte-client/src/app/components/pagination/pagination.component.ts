@@ -7,18 +7,18 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './pagination.component.css'
 })
 export class PaginationComponent {
-  prevPage = input.required<boolean>();
-  nextPage = input.required<boolean>();
-  pageCount = input.required<number>();
+  hasPrev = input.required<boolean>();
+  hasNext = input.required<boolean>();
+  page = input.required<number>();
 
-  next = output<boolean>();
-  prev = output<boolean>();
+  onNext = output<boolean>();
+  onPrev = output<boolean>();
 
   getNext() {
-    this.next.emit(true);
+    this.onNext.emit(true);
   }
 
   getPrev() {
-    this.prev.emit(true);
+    this.onPrev.emit(true);
   }
 }

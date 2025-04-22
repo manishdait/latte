@@ -1,14 +1,14 @@
 <div class="flex gap-2 flex-wrap">
-  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!prevPage()" (click)="getPrev()">Previous</button>
+  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!hasPrev" (click)="getPrev()">Previous</button>
 
-  @if(prevPage()) {
-    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ pageCount() }}</span>
+  @if(hasPrev()) {
+    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ page() }}</span>
   }
 
-  <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 bg-neutral-200">{{ pageCount() + 1 }}</span>
+  <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 bg-neutral-200">{{ page() + 1 }}</span>
 
-  @if(nextPage()) {
-    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ pageCount() + 2 }}</span>
+  @if(hasNext()) {
+    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ page() + 2 }}</span>
   }
-  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!nextPage()" (click)="getNext()">Next</button>
+  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!hasNext()" (click)="getNext()">Next</button>
 </div>

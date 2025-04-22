@@ -5,10 +5,11 @@ import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
 import { AlertService } from '../../service/alert.service';
 import { PasswordComponent } from '../../components/password/password.component';
+import { SpinnerComponent } from '../../components/spinner/spinner.component';
 
 @Component({
   selector: 'app-auth',
-  imports: [ReactiveFormsModule, PasswordComponent],
+  imports: [ReactiveFormsModule, PasswordComponent, SpinnerComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })
@@ -19,6 +20,8 @@ export class AuthComponent implements OnInit {
   
   formError = signal(false);
   form: FormGroup;
+  
+  processing = signal(false);
   
   constructor() {
     this.form = new FormGroup({
@@ -44,12 +47,14 @@ export class AuthComponent implements OnInit {
       email: this.form.get('email')?.value,
       password: this.form.get('password')?.value
     }
+    this.processing.set(true);
 
     this.authService.authenticateUser(request).subscribe({
       next: () => {
-        this.router.navigate(['home'], {replaceUrl: true})
+        this.router.navigate(['home'], {replaceUrl: true});
       },
       error: (err) => {
+        this.processing.set(false);
         this.form.reset();
         this.alertService.alert = err.error.error;
       }

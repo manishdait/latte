@@ -87,7 +87,7 @@
         @if (!editAssignee()) {
           @if (ticket().assignedTo) {
             <div class="flex gap-2 items-center">
-              <div class="w-[1.8rem] h-[1.8rem] rounded-[100%] flex items-center justify-center" [style.background-color]="color(ticket().assignedTo?.firstname)">
+              <div class="w-[1.8rem] h-[1.8rem] rounded-[100%] flex items-center justify-center" [style.background-color]="getColor(ticket().assignedTo?.firstname)">
                 <span class="text-[.8rem] text-center font-medium text-white">{{ ticket().assignedTo?.firstname?.charAt(0) }}</span>
               </div>
 

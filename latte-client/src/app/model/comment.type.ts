@@ -1,4 +1,4 @@
-export interface CommentRequest {
+export interface CommentDto {
   ticketId: number,
   message: string
 }

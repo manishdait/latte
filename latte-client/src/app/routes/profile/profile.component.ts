@@ -9,7 +9,6 @@ import { UserService } from '../../service/user.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PasswordComponent } from '../../components/password/password.component';
-import { Role } from '../../model/role.enum';
 
 @Component({
   selector: 'app-profile',
@@ -30,7 +29,9 @@ export class ProfileComponent implements OnInit {
     role: {
       id: 0,
       role: '',
-      authorities: []
+      authorities: [],
+      editable: false,
+      deletable: false
     },
     editable: false,
     deletable: false
@@ -42,7 +43,9 @@ export class ProfileComponent implements OnInit {
     role: {
       id: 0,
       role: '',
-      authorities: []
+      authorities: [],
+      editable: false,
+      deletable: false
     },
     editable: false,
     deletable: false
@@ -79,6 +82,10 @@ export class ProfileComponent implements OnInit {
         this.userDetails.set(response);
         this.buffer.set({...response});
 
+        if (!this.userDetails().editable) {
+          this.userDetailsForm.controls['firstname'].disable({onlySelf: true});
+          this.userDetailsForm.controls['email'].disable({onlySelf: true});
+        }
         this.userDetailsForm.controls['firstname'].setValue(this.userDetails().firstname);
         this.userDetailsForm.controls['email'].setValue(this.userDetails().email);
       },

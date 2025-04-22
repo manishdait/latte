@@ -5,8 +5,8 @@ import { EditUserComponent } from '../../components/form/edit-user-form/edit-use
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
 import { Observable } from 'rxjs';
-import { userCountSelector, userSelector } from '../../state/user/user.selector';
-import { decrementUserCount, removeUser, setUserCount, setUsers } from '../../state/user/user.action';
+import { users, userCount } from '../../state/user/user.selector';
+import { removeUser, setUserCount, setUsers, updateUserCount } from '../../state/user/user.action';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../../service/alert.service';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,6 +15,7 @@ import { UserFormComponent } from '../../components/form/user-from/user-form.com
 import { PasswordFormComponent } from '../../components/form/password-form/password-form.component';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-user',
@@ -26,6 +27,7 @@ export class UserComponent implements OnInit {
   userService = inject(UserService);
   alertService = inject(AlertService);
   faLibrary = inject(FaIconLibrary);
+  authService = inject(AuthService);
   
   buffer = signal<UserResponse>({
     firstname: '',
@@ -33,7 +35,9 @@ export class UserComponent implements OnInit {
     role: {
       id: 0,
       role: '',
-      authorities: []
+      authorities: [],
+      editable: false,
+      deletable: false
     },
     editable: false,
     deletable: false
@@ -44,37 +48,31 @@ export class UserComponent implements OnInit {
   resetPassword = signal(false);
   confirm = signal(false);
   
-  pageCount = signal(0);
+  page = signal(0);
   size = signal(2);
-  page = signal<Record<string, boolean>> ({
+  userPage = signal<Record<string, boolean>> ({
     'prev': false,
     'next': false
   });
   
   users$: Observable<UserResponse[]>;
   userCount$: Observable<number>;
+
+  loading = signal(true);
   
   constructor(private store: Store<AppState>) {
-    this.users$ = store.select(userSelector);
-    this.userCount$ = store.select(userCountSelector);
+    this.users$ = store.select(users);
+    this.userCount$ = store.select(userCount);
   }
 
   ngOnInit(): void {
     this.userService.fetchUserCount().subscribe({
-      next: (response) => {
-        const res = response as any;
-        this.store.dispatch(setUserCount({userCount: res.user_count}));
+      next: (res) => {
+        this.store.dispatch(setUserCount({count: res['user_count']}))
       }
     })
 
-    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
-      next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
-        this.store.dispatch(setUsers({users: response.content}));
-      }
-    });
-
+    this.getUsers();
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
@@ -92,46 +90,64 @@ export class UserComponent implements OnInit {
     this.resetPassword.set(true);
   }
 
-  delete(user: UserResponse) {
-    this.buffer.set(user);
-    this.toggleConfirm();
-  }
-
   toggleConfirm() {
     this.confirm.update(toggle => !toggle);
   } 
 
+  createUserOps() {
+    return this.authService.createUser();
+  }
+
+  editUserOps() {
+    return this.authService.editUser();
+  }
+
+  deleteUserOps() {
+    return this.authService.deleteUser();
+  }
+
+  resetPasswordOps() {
+    return this.authService.resetUserPassword();
+  }
+
+  deleteUser(user: UserResponse) {
+    this.buffer.set(user);
+    this.toggleConfirm();
+  }
+
   confirmTrigger(event: boolean) {
     this.toggleConfirm();
+
     if (event) {
       this.userService.deleteUser(this.buffer().email).subscribe({
         next: (response) => {
           this.store.dispatch(removeUser({email: this.buffer().email}));
-          this.store.dispatch(decrementUserCount());
+          this.store.dispatch(updateUserCount({count: -1}));
           this.alertService.alert = `User with name ${this.buffer().firstname} deleted`;
         }
       })
     }
   }
 
-  next() {
-    this.pageCount.update(count => count + 1);
-    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
-      next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
-        this.store.dispatch(setUsers({users: response.content}));
-      }
-    });
+  getNext() {
+    this.page.update(count => count + 1);
+    this.getUsers();
   }
 
-  prev() {
-    this.pageCount.update(count => count - 1);
-    this.userService.fetchPagedUsers(this.pageCount(), this.size()).subscribe({
+  getPrev() {
+    this.page.update(count => count - 1);
+    this.getUsers();
+  }
+
+  getUsers() {
+    this.loading.set(true);
+
+    this.userService.fetchPagedUsers(this.page(), this.size()).subscribe({
       next: (response) => {
-        this.page()['prev'] = response.prev;
-        this.page()['next'] = response.next;
+        this.userPage()['prev'] = response.prev;
+        this.userPage()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
+        this.loading.set(false);
       }
     });
   }

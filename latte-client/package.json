@@ -22,7 +22,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.1",
     "@ngrx/store": "^19.0.1",
     "@tailwindcss/postcss": "^4.0.7",
-    "jwt-decode": "^4.0.0",
     "ngx-webstorage": "^19.0.1",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",

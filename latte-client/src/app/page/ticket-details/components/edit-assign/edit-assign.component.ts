@@ -1,7 +1,7 @@
-import { Component, EventEmitter, inject, input, Input, OnInit, output, Output, signal } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { TicketResponse, PatchTicketRequest } from '../../../../model/ticket.type';
+import { PatchTicketRequest } from '../../../../model/ticket.type';
 import { TicketService } from '../../../../service/ticket.service';
 import { UserService } from '../../../../service/user.service';
 import { fontawsomeIcons } from '../../../../shared/fa-icons';
@@ -25,16 +25,16 @@ export class EditAssignComponent implements OnInit {
 
   dropdown = signal(false);
   engineers = signal<string[]>([]);
-  next = signal(false);
-  pageCount = signal(0);
+  hasNext = signal(false);
+  page = signal(0);
   size = signal(5);
 
   form: FormGroup;
 
   constructor() {
-    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+    this.userService.fetchUserList(this.page(), this.size()).subscribe((data) => {
       this.engineers.set(data.content);
-      this.next.set(data.next);
+      this.hasNext.set(data.next);
     })
 
     this.form = new FormGroup({
@@ -52,11 +52,11 @@ export class EditAssignComponent implements OnInit {
   }
 
   showMore() {
-    this.pageCount.update(count => count + 1);
+    this.page.update(count => count + 1);
 
-    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+    this.userService.fetchUserList(this.page(), this.size()).subscribe((data) => {
       this.engineers.update(arr => arr.concat(data.content));
-      this.next.set(data.next);
+      this.hasNext.set(data.next);
     })
   }
 
@@ -68,9 +68,6 @@ export class EditAssignComponent implements OnInit {
       status: null,
       assignedTo: this.form.get('assignedTo')?.value
     }
-
-    console.log(request);
-    
 
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
       next: (response) => {

@@ -1,5 +1,5 @@
 export interface ActivityResponse {
-  id: number,
+  readonly id: number,
   type: ActivityType,
   author: string,
   message: string,
@@ -7,7 +7,4 @@ export interface ActivityResponse {
   lastUpdated: Date
 }
 
-export enum ActivityType {
-  EDIT,
-  COMMENT
-}
+export type ActivityType = 'EDIT' |'COMMENT';

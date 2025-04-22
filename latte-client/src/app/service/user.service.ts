@@ -29,8 +29,8 @@ export class UserService {
     return this.client.get<UserResponse>(`${URL}/info`);
   }
 
-  fetchUserCount(): Observable<Map<string, number>> {
-    return this.client.get<Map<string, number>>(`${URL}/count`);
+  fetchUserCount(): Observable<{[key: string]: number}> {
+    return this.client.get<{[key: string]: number}>(`${URL}/count`);
   }
 
   updateUser(request: UserResponse): Observable<UserResponse> {
@@ -49,7 +49,7 @@ export class UserService {
     return this.client.patch<UserResponse>(`${URL}/${_user}`, request);
   }
 
-  deleteUser(_user:string): Observable<Map<string, any>> {
-    return this.client.delete<Map<string, any>>(`${URL}/${_user}`);
+  deleteUser(_user:string): Observable<{[key: string]: any}> {
+    return this.client.delete<{[key: string]: any}>(`${URL}/${_user}`);
   }
 }

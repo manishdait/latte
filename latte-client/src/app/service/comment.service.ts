@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
-import { CommentRequest } from "../model/comment.type";
+import { CommentDto } from "../model/comment.type";
 import { Observable } from "rxjs";
 import { ActivityResponse } from "../model/activity.type";
 import { HttpClient } from "@angular/common/http";
@@ -13,11 +13,11 @@ const URL: string = `${environment.API_ENDPOINT}/comments`;
 export class CommentService {
   constructor(private client: HttpClient) {}
 
-  createComment(request: CommentRequest): Observable<ActivityResponse> {
+  createComment(request: CommentDto): Observable<ActivityResponse> {
     return this.client.post<ActivityResponse>(`${URL}`, request);
   }
 
-  updateCommnet(id: number, request: CommentRequest): Observable<ActivityResponse> {
+  updateCommnet(id: number, request: CommentDto): Observable<ActivityResponse> {
     return this.client.patch<ActivityResponse>(`${URL}/${id}`, request);
   }
 

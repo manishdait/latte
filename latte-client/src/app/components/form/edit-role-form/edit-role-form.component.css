@@ -1,0 +1,35 @@
+[type=checkbox] {
+  display: none;
+}
+
+[type=checkbox] + label {
+  position: relative;
+  display: inline-block;
+  padding-left: 1.4em;
+  line-height: .9rem;
+  cursor: pointer;
+}
+
+[type=checkbox] + label::before {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  left: 0;
+  top: 0;
+  border: .1em solid #ddd;
+  border-radius: .1em;
+}
+
+[type=checkbox]:checked + label::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  background: url(../../../../../public/asset/check.svg) center no-repeat;
+  border: .1em solid #0066ff;
+  border-radius: .1em;
+}

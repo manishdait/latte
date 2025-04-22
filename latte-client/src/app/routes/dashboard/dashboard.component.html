@@ -3,7 +3,7 @@
     <h1 class="text-3xl text-neutral-900 font-semibold">{{ greet() + ', ' + username() }}</h1>
 
     <div class="flex items-center gap-2">
-      <div class="w-[2.5rem] h-[2.5rem] flex items-center justify-center rounded-[100%]" [style.background-color]="color(username())">
+      <div class="w-[2.5rem] h-[2.5rem] flex items-center justify-center rounded-[100%]" [style.background-color]="getColor(username())">
         <span class="text-base font-bold text-white">{{ username().charAt(0) }}</span>
       </div>
 
@@ -14,7 +14,7 @@
   <div class="flex flex-wrap gap-8">
     <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
       <span class="text-base">Total Tickets</span>
-      <span class="text-4xl font-semibold">{{ totalTickets() }}</span>
+      <span class="text-4xl font-semibold">{{ totalTickets$ | async }}</span>
     </div>
 
     <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">  

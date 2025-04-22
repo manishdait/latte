@@ -26,6 +26,10 @@ export class EditUserComponent implements OnInit {
   roles = signal<string[]>([]);
   
   form: FormGroup;
+
+  page = signal(0);
+  size = signal(5);
+  hasNext = signal(false);
   
   constructor() {
     this.form = new FormGroup({
@@ -42,13 +46,26 @@ export class EditUserComponent implements OnInit {
     this.form.controls['email'].setValue(this.user().email);
     this.form.controls['role'].setValue(this.user().role.role);
 
-    this.roleService.getRoles().subscribe({
-      next: (res) => {this.roles.set(res.map(r => r.role))}
-    });
+    this.roleService.getRoles(this.page(), this.size()).subscribe({
+      next: (res) => {
+        this.roles.set(res.content.map(r => r.role));
+        this.hasNext.set(res.next);
+      }
+    })
   }
   
   get formControls() {
     return this.form.controls;
+  }
+
+  getNext() {
+    this.page.update(count => count+1);
+    this.roleService.getRoles(this.page(), this.size()).subscribe({
+      next: (res) => {
+        this.roles.set(res.content.map(r => r.role));
+        this.hasNext.set(res.next);
+      }
+    })
   }
 
   onSubmit() {
