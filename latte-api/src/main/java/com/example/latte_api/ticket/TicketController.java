@@ -45,7 +45,7 @@ public class TicketController {
   }
 
   @GetMapping("/info")
-  public ResponseEntity<Map<String, Integer>> getTicketsInfo(Authentication authentication) {
+  public ResponseEntity<Map<String, Long>> getTicketsInfo(Authentication authentication) {
     return ResponseEntity.status(HttpStatus.OK).body(ticketService.getTicketsInfo(authentication));
   }
 

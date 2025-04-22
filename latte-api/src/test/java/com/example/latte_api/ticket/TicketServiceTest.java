@@ -318,16 +318,19 @@ public class TicketServiceTest {
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
+    when(ticketRepository.count()).thenReturn((long)tickets.size());
     when(ticketRepository.findAll()).thenReturn(tickets);
     
-    final Map<String, Integer> result = ticketService.getTicketsInfo(authentication);
+    final Map<String, Long> result = ticketService.getTicketsInfo(authentication);
 
     // then
     verify(ticketRepository, times(1)).findAll();
+    verify(ticketRepository, times(1)).count();
 
     Assertions.assertThat(result).isNotNull();
     Assertions.assertThat(result.get("open_tickets")).isEqualTo(1);
     Assertions.assertThat(result.get("closed_tickets")).isEqualTo(1);
+    Assertions.assertThat(result.get("total_tickets")).isEqualTo(2);
   }
 
   @Test

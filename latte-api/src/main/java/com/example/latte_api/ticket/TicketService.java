@@ -109,11 +109,12 @@ public class TicketService {
     return response;
   }
 
-  public Map<String, Integer> getTicketsInfo(Authentication authentication) {
+  public Map<String, Long> getTicketsInfo(Authentication authentication) {
     List<Ticket> tickets = ticketRepository.findAll();
-    int closed = tickets.stream().filter(t -> t.getStatus().equals(Status.CLOSE)).toList().size();
-    int open = tickets.stream().filter(t -> t.getStatus().equals(Status.OPEN)).toList().size();
-    return Map.of("open_tickets", open, "closed_tickets", closed);
+    long closed = tickets.stream().filter(t -> t.getStatus().equals(Status.CLOSE)).toList().size();
+    long open = tickets.stream().filter(t -> t.getStatus().equals(Status.OPEN)).toList().size();
+    long total = ticketRepository.count();
+    return Map.of("total_tickets", total, "open_tickets", open, "closed_tickets", closed);
   }
 
   public TicketResponse getTicket(Long id) {

@@ -3,10 +3,6 @@ package com.example.latte_api.ticket;
 import java.util.List;
 import java.util.Map;
 
-import com.example.latte_api.auth.dto.RegistrationRequest;
-import com.example.latte_api.role.dto.RoleRequest;
-import com.example.latte_api.role.dto.RoleResponse;
-import com.example.latte_api.user.dto.UserResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +27,12 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
+import com.example.latte_api.auth.dto.RegistrationRequest;
 import com.example.latte_api.handler.ErrorResponse;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.role.dto.RoleRequest;
+import com.example.latte_api.role.dto.RoleResponse;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
 import com.example.latte_api.ticket.dto.TicketRequest;
@@ -42,6 +41,7 @@ import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
+import com.example.latte_api.user.dto.UserResponse;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -287,17 +287,17 @@ public class TicketControllerTest {
 
   @Test
   void shouldGetInfo_ofTicketsOnSystem() {
-    final Map<String, Integer> expected = Map.of("open_tickets", 1, "closed_tickets", 1);
+    final Map<String, Long> expected = Map.of("total_tickets", 2L, "open_tickets", 1L, "closed_tickets", 1L);
     final AuthResponse cred = userCred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<Map<String, Integer>> response = testRestTemplate.exchange(
+    final ResponseEntity<Map<String, Long>> response = testRestTemplate.exchange(
       BASE_URI + "/info",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<Map<String, Integer>>() {}
+      new ParameterizedTypeReference<Map<String, Long>>() {}
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
