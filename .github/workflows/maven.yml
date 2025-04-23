@@ -5,10 +5,13 @@ on:
     paths:
      - latte-api/**
      - .github/**
+    branches:
+      - main
+      - dev
   pull_request:
     branches:
       - main
-      - release
+      - dev
 
 jobs:
   build-test:
@@ -28,3 +31,36 @@ jobs:
         run: | 
           cd latte-api 
           ./mvnw verify
+      
+    build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Api
+        uses: docker/build-push-actions@v5
+        with:
+          context: latte-api
+          file: latte-api/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERAME }}/latte-api:0.0.2, ${{ secrets.DOCKERHUB_USERAME }}/latte-api:latest
+          build-args: |
+            PROFILE=local
+
+      - name: Build and Push Client
+        uses: docker/build-push-actions@v5
+        with:
+          context: latte-client
+          file: latte-client/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERAME }}/latte-client:0.0.2, ${{ secrets.DOCKERHUB_USERAME }}/latte-client:latest
+          build-args: |
+            PROFILE=local
