@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AlertComponent } from './components/alert/alert.component';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,5 @@ import { AlertComponent } from './components/alert/alert.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  profile = signal(environment.PROFILE);
 }
