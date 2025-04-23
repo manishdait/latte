@@ -45,7 +45,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/latte-api:0.0.2,${{ secrets.DOCKERHUB_USERNAME }}/latte-api:latest
           build-args: |
-            PROFILE=local
+            PROFILE=dev
 
       - name: Build and Push Client
         uses: docker/build-push-action@v5
