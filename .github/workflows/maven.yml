@@ -2,9 +2,15 @@ name: Java CI with Maven
 
 on:
   push:
+    branches-ignore:
+      - release
     paths:
      - latte-api/**
      - .github/**
+
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-test:
