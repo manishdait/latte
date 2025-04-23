@@ -2,7 +2,7 @@ FROM node:18.20.5 AS build
 WORKDIR /app
 COPY package*.json .
 RUN npm install
-ARG PROFILE=dev
+ARG PROFILE=local
 # temporary workaround to prevent parsing of unwanted files by tailwind
 RUN find node_modules -path '*/needle/test/files/*' -delete
 COPY . .
