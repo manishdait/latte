@@ -5,6 +5,10 @@ on:
     paths:
      - latte-api/**
      - .github/**
+  pull_request:
+    branches:
+      - main
+      - release
 
 jobs:
   build-test:
