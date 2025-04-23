@@ -15,7 +15,7 @@ services:
       - latte-network
   latte-api:
     container_name: latte-api
-    image: manishdait/latte-api:0.0.2
+    image: manishdait/latte-api
     restart: always
     depends_on:
       - postgres-db
@@ -25,7 +25,7 @@ services:
       - data:/app/data
   latte-client:
     container_name: latte-client
-    image: manishdait/latte-client:0.0.2
+    image: manishdait/latte-client
     restart: always
     depends_on:
       - latte-api
