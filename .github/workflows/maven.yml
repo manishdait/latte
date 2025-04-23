@@ -9,8 +9,6 @@ on:
      - .github/**
 
   pull_request:
-    branches:
-      - release
 
 jobs:
   build-test:
