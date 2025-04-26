@@ -108,7 +108,7 @@ export class TicketDetailsComponent implements OnInit {
         title: null,
         description: null,
         priority: null,
-        status: this.ticket().status,
+        status: this.ticket().status == 'OPEN' ? 'CLOSE' : 'OPEN',
         assignedTo: null
       }
 
