@@ -2,18 +2,14 @@
   <app-ticket-form (cancel)="createTicketToggle()"/>
 }
 
-<div class="w-screen h-screen flex flex-col bg-neutral-50 overflow-hidden">
-  <app-navbar [sidenavState]="sidenav()" (sidenavToggle)="toggleSidenav()"/>
+<div class="w-screen h-screen flex gap-[2em] bg-primary-light-100 p-[2em] window">
+  <div class="w-[min(100%,300px)] menubar">
+    <app-menubar/>
+  </div>
 
-  <div class="w-full h-full flex">
-    <div class="w-[min(100%,230px)] h-full flex flex-col bg-neutral-50 border-r-[.1em] border-neutral-200 py-4 px-2 sidenav" [class]="sidenav()? 'out' : 'in'">
-      <app-side-navbar (createTicket)="createTicketToggle()"/>
-    </div>
-
-    <div class="grow overflow-y-scroll">
-      <main class="w-[min(1400px,100%)] mx-auto">
-        <router-outlet/>
-      </main>
+  <div class="grow overflow-y-scroll">
+    <div class="w-[min(1400px,100%)] mx-auto">
+      <router-outlet/>
     </div>
   </div>
 </div>

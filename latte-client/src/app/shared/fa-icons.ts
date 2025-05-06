@@ -8,7 +8,21 @@ import {
   faLock,
   IconDefinition, 
   faLockOpen,
-  faEllipsis
+  faEllipsis,
+  faAnglesRight,
+  faBars,
+  faCalendarDays,
+  faGears,
+  faHome,
+  faList,
+  faNoteSticky,
+  faPlus,
+  faTicketSimple,
+  faUsers,
+  faXmark,
+  faSliders,
+  faRightFromBracket,
+  faUpRightFromSquare
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
@@ -20,5 +34,19 @@ export const fontawsomeIcons: IconDefinition[] = [
   faAngleDown, 
   faEllipsisVertical,
   faEllipsis, 
-  faArrowRightToBracket
+  faArrowRightToBracket,
+  faBars,
+  faAnglesRight,
+  faList,
+  faCalendarDays,
+  faNoteSticky,
+  faPlus,
+  faTicketSimple,
+  faUsers,
+  faGears,
+  faHome,
+  faXmark,
+  faSliders,
+  faRightFromBracket,
+  faUpRightFromSquare
 ];

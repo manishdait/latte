@@ -3,7 +3,16 @@
   color: #fff;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 790px) {
+  .window {
+    flex-direction: column;
+  }
+  .menubar {
+    width: 100%;
+  }
+}
+
+/* @media screen and (max-width: 800px) {
   .sidenav {
     position: fixed;
     transition: all 1s 1ms;
@@ -15,4 +24,4 @@
   .out {
     left: 0;
   }
-}
+} */

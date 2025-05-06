@@ -1,6 +1,6 @@
 .low {
-  background-color: #b9f8cf;
-  color: oklch(0.627 0.194 149.214);
+  background-color: #00a63d21;
+  color: #00a63e;
 }
 
 .medium {
@@ -9,6 +9,46 @@
 }
 
 .high {
-  background-color: oklch(0.885 0.062 18.334);
-  color: oklch(0.577 0.245 27.325);
+  background-color: #e7000b21;
+  color: #e7000b;
+}
+
+.open {
+  background-color: #155dfc21;
+  color: #155dfc;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td, th {
+  border-top: .1em solid #ebebeb;
+  border-bottom: .1em solid #ebebeb;
+  padding: .8em .6em;
+  text-align: left;
+  color: #444444;
+}
+
+td {
+  font-size: .9rem;
+}
+
+th {
+  font-size: .85rem;
+  background: #f5f5f5;
+}
+
+.card {
+  display: none;
+}
+
+@media screen and (max-width: 1155px) {
+  .card {
+    display: flex;
+  }
+  table {
+    display: none;
+  }
 }

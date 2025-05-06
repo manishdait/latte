@@ -29,7 +29,8 @@ export class TicketComponent implements OnInit {
   openCount$: Observable<number>;
   closeCount$: Observable<number>;
 
-  status = signal<Status>('OPEN');
+  availableStatus = ['All Tickets', 'Open Tickets', 'Closed Tickets'];
+  status = signal<string>('All Tickets');
 
   page = signal(0);
   size = signal(10);
@@ -40,6 +41,7 @@ export class TicketComponent implements OnInit {
   });
 
   loading = signal(true);
+  statusToggle = signal(false);
 
   constructor(private store: Store<AppState>) {
     this.tickets$ = store.select(tickets);
@@ -75,21 +77,40 @@ export class TicketComponent implements OnInit {
     return this.status.toString()
   }
 
-  setStatus(status: Status) {
+  setStatus(status: string) {
     this.status.set(status);
+    this.toggleStatus();
     this.ngOnInit();
+  }
+
+  toggleStatus() {
+    this.statusToggle.update(toggle => !toggle);
   }
 
   getTickets() {
     this.loading.set(true);
-    this.ticketService.fetchPagedTicketsByStaus(this.status(), this.page(), this.size()).subscribe({
-      next: (response) => {
-        this.ticketPage()['prev'] = response.prev;
-        this.ticketPage()['next'] = response.next;
-
-        this.store.dispatch(setTickets({tickets: response.content}));
-        this.loading.set(false);
-      }
-    });
+    if (this.status() === 'All Tickets') {
+      this.ticketService.fetchPagedTickets(this.page(), this.size()).subscribe({
+        next: (response) => {
+          this.ticketPage()['prev'] = response.prev;
+          this.ticketPage()['next'] = response.next;
+  
+          this.store.dispatch(setTickets({tickets: response.content}));
+          this.loading.set(false);
+        }
+      });
+    } else {
+      const status: Status = this.status() === 'Open Tickets'? 'OPEN' : 'CLOSE';
+      this.ticketService.fetchPagedTicketsByStaus(status, this.page(), this.size()).subscribe({
+        next: (response) => {
+          this.ticketPage()['prev'] = response.prev;
+          this.ticketPage()['next'] = response.next;
+  
+          this.store.dispatch(setTickets({tickets: response.content}));
+          this.loading.set(false);
+        }
+      });
+    }
+    
   }
 }

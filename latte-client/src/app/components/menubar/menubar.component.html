@@ -1,0 +1,85 @@
+<input id="toggle" class="fixed hidden" type="checkbox">
+
+<div class="w-full flex items-center justify-between bg-primary-light-200 p-[1em] rounded-[.5em] navbar">
+  <section class="flex items-center justify-center gap-[1em]">
+    <a class="flex items-end gap-[.5em]" target="_blank" href="https://github.com/manishdait/latte">
+      <div class="w-[5rem] h-[1.6rem]">
+        <img class="w-full h-full object-contain" src="asset/icon.svg">
+      </div>
+
+      <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">v0.0.3</span>
+    </a>
+  </section>
+
+  <label class="cursor-pointer" for="toggle">
+    <fa-icon class="text-[1rem]" [icon]="'bars'" />
+  </label>
+</div>
+
+<label class="w-full h-full menubar" for="toggle">
+  <div class="relative flex flex-col w-full h-full bg-primary-light-200 p-[1em] rounded-[.5em] sidenav">
+    <label class="absolute top-4 right-4 cursor-pointer nav-toggle" for="toggle">
+      <fa-icon class="text-secondary-light-100" [icon]="'xmark'"/>
+    </label>
+
+    <section class="flex items-center justify-center gap-[1em]">
+      <a class="flex items-end gap-[.5em]" target="_blank" href="https://github.com/manishdait/latte">
+        <div class="w-[7rem] h-[2.4rem]">
+          <img class="w-full h-full object-contain" src="asset/icon.svg">
+        </div>
+  
+        <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">v0.0.3</span>
+      </a>
+    </section>
+  
+    <section class="mt-[1.5em]">
+      <span class="text-[.8rem] font-bold text-secondary-light-200">MENU</span>
+  
+      <ul class="list-none py-[.5em]">
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" routerLink="/home/dashboard" routerLinkActive="active">
+          <fa-icon class="text-secondary-light-100" [icon]="'home'"/>
+          <span>Dashboard</span>
+        </li>
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" routerLink="/home/tickets" routerLinkActive="active">
+          <fa-icon class="text-secondary-light-100" [icon]="'note-sticky'"/>
+          <span>Tickets</span>
+        </li>
+  
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300">
+          <fa-icon class="text-secondary-light-100" [icon]="'plus'"/>
+          <span class="font-medium">Create New Ticket</span>
+        </li>
+      </ul>
+    </section>
+  
+    <section class="mt-[1em]">
+      <span class="text-[.8rem] font-bold text-secondary-light-200">ADMIN</span>
+  
+      <ul class="list-none py-[.5em]">
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" routerLink="/home/users" routerLinkActive="active">
+          <fa-icon class="text-secondary-light-100" [icon]="'users'"/>
+          <span>Users</span>
+        </li>
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" routerLink="/home/roles" routerLinkActive="active">
+          <fa-icon class="text-secondary-light-100" [icon]="'gears'"/>
+          <span>Roles</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="mt-auto">
+      <ul class="list-none py-[.5em]">
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" routerLink="/home/profile" routerLinkActive="active">
+          <fa-icon class="text-secondary-light-100" [icon]="'sliders'"/>
+          <span>Settings</span>
+        </li>
+        <li class="flex items-center gap-[.8em] text-[1rem] text-red-800 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300">
+          <fa-icon class="text-red-800" [icon]="'right-from-bracket'"/>
+          <span>Logout</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</label>
+
+

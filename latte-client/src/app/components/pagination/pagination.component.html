@@ -1,14 +1,14 @@
 <div class="flex gap-2 flex-wrap">
-  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!hasPrev" (click)="getPrev()">Previous</button>
+  <button class="border-[.1em] text-[.8rem] rounded-sm py-1 px-2 font-medium border-primary-light-300 text-secondary-light-100 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-primary-light-200 cursor-pointer" [disabled]="!hasPrev" (click)="getPrev()">Previous</button>
 
   @if(hasPrev()) {
-    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ page() }}</span>
+    <span class="border-[.1em] text-[.8rem] rounded-sm py-1 px-2 font-medium border-primary-light-300 text-secondary-light-100">{{ page() }}</span>
   }
 
-  <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 bg-neutral-200">{{ page() + 1 }}</span>
+  <span class="border-[.1em] text-[.8rem] rounded-sm py-1 px-2 font-medium border-primary-light-300 text-secondary-light-100 bg-primary-light-200">{{ page() + 1 }}</span>
 
   @if(hasNext()) {
-    <span class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500">{{ page() + 2 }}</span>
+    <span class="border-[.1em] text-[.8rem] rounded-sm py-1 px-2 font-medium border-primary-light-300 text-secondary-light-100">{{ page() + 2 }}</span>
   }
-  <button class="border-[.1em] text-[.9rem] rounded-sm py-1 px-2 font-medium border-neutral-200 text-neutral-500 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!hasNext()" (click)="getNext()">Next</button>
+  <button class="border-[.1em] text-[.8rem] rounded-sm py-1 px-2 font-medium border-primary-light-300 text-secondary-light-100 disabled:text-neutral-300 disabled:cursor-auto disabled:hover:bg-transparent hover:bg-neutral-200 cursor-pointer" [disabled]="!hasNext()" (click)="getNext()">Next</button>
 </div>

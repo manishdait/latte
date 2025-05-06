@@ -1,7 +1,44 @@
-<div class="flex flex-col gap-1">
-  <div class="flex flex-wrap gap-2 items-center">
-    <span class="text-[1.1rem] font-semibold">{{ ticket().title.length > 100 ? ticket().title.substring(100) + '...' : ticket().title  }}</span>
-    <span class="text-[.7rem] text-center font-semibold py-0.5 px-4 rounded-[4em]" [class]="{'low': ticket().priority === 'LOW', 'medium': ticket().priority === 'MEDIUM' , 'high': ticket().priority === 'HIGH' }">{{ ticket().priority }}</span>
-  </div>
-  <span class="text-[.9rem] font-normal text-neutral-500">{{ '#' + ticket().id + ' ' + ticket().createdBy.firstname + ' create on ' +  getDate(ticket().createdAt)}}</span>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th class="w-20">ID</th>
+      <th>TITLE</th>
+      <th class="w-25">PRIORITY</th>
+      <th class="w-25">STATUS</th>
+      <th class="w-35">ASSIGNEE</th>
+      <th class="w-35">LAST UPDATED</th>
+      <th class="w-10"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for(ticket of (tickets$() | async); track ticket.id) {
+      <tr>
+        <td>{{ '#' + ticket.id }}</td>
+        <td>
+          <div class="flex flex-col">
+            <span class="font-semibold">{{ ticket.title }}</span>
+            <span>{{ ticket.description }}</span>
+          </div>
+        </td>
+        <td><span class="bg-green-600/10 px-2 py-1 rounded-md text-green-600">Low</span></td>
+        <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+        <td>{{ ticket.assignedTo? ticket.assignedTo.firstname : 'None' }}</td>
+        <td>Sept 24, 2002</td>
+        <td><fa-icon [icon]="'up-right-from-square'"/></td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<ul class="card flex flex-col list-none">
+  @for(ticket of (tickets$() | async); track ticket.id) {
+    <li class="flex flex-col gap-1 p-2 border-b-[.1em] border-primary-light-300">
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-[1rem] font-semibold">{{ ticket.title.length > 100 ? ticket.title.substring(100) + '...' : ticket.title  }}</span>
+        <span class=" px-2 py-1 rounded-md text-[.8rem]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ ticket.priority }}</span>
+      </div>
+      <span class="text-[.9rem] font-normal text-neutral-500">{{ '#' + ticket.id + ' ' + ticket.createdBy.firstname + ' create on ' +  getDate(ticket.createdAt)}}</span>
+    </li>
+  }
+</ul>

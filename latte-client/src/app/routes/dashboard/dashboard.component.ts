@@ -8,10 +8,11 @@ import { generateColor } from '../../shared/utils';
 import { AppState } from '../../state/app.state';
 import { setCloseCount, setOpenCount, setTicketCount } from '../../state/ticket/ticket.action';
 import { closeTickets, openTickets, totalTickets } from '../../state/ticket/ticket.selector';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

@@ -1,0 +1,34 @@
+.active {
+  background-color: #ebebeb;
+  font-weight: bold;
+}
+
+.navbar, .nav-toggle {
+  display: none;
+}
+
+@media screen and (max-width: 790px) {
+  .menubar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000021;
+    padding: 2rem;
+  }
+
+  #toggle:checked ~ .menubar {
+    display: block;
+  }
+
+  .sidenav {
+    width: min(100%, 300px);
+  }
+  
+  .navbar {
+    display: flex;
+  }
+  .nav-toggle {
+    display: block;
+  }
+}

@@ -1,34 +1,112 @@
-<div class="flex flex-col gap-8 p-4 mx-auto">
-  <div class="bg-neutral-50 flex flex-col gap-6 border-[.1em] border-neutral-200 rounded-sm p-4">
-    <h1 class="text-3xl text-neutral-900 font-semibold">{{ greet() + ', ' + username() }}</h1>
-
-    <div class="flex items-center gap-2">
-      <div class="w-[2.5rem] h-[2.5rem] flex items-center justify-center rounded-[100%]" [style.background-color]="getColor(username())">
-        <span class="text-base font-bold text-white">{{ username().charAt(0) }}</span>
-      </div>
-
-      <span class="text-base text-neutral-900">{{ username() }}</span>
-    </div>
+<div class="flex flex-col gap-8 mx-auto">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-[2.5rem] text-neutral-800 font-bold">{{ greet() + ', ' + username() }}</h1>
   </div>
 
   <div class="flex flex-wrap gap-8">
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">
       <span class="text-base">Total Tickets</span>
-      <span class="text-4xl font-semibold">{{ totalTickets$ | async }}</span>
+      <span class="text-[2.5rem] font-medium">{{ totalTickets$ | async }}</span>
     </div>
 
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">  
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">  
       <span class="text-base">Open Tickets</span>
-      <span class="text-4xl font-semibold">{{ (openTickets$ | async) }}</span>
+      <span class="text-[2.5rem] font-medium">{{ (openTickets$ | async) }}</span>
     </div>
 
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-neutral-50 text-neutral-900 border-[.1em] border-neutral-200 rounded-sm p-4">
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">
       <span class="text-base">Closed Tickets</span>
-      <span class="text-4xl font-semibold">{{ (closedTickets$ | async) }}</span>
+      <span class="text-[2.5rem] font-medium">{{ (closedTickets$ | async) }}</span>
     </div>
   </div>
 
   <div>
-    <!-- <h1 class="text-2xl font-semibold">Recent Tickets</h1> -->
+    <h1 class="text-2xl font-medium text-neutral-800">Recent Tickets</h1>
+
+    <table class="mt-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>TITLE</th>
+          <th>PRIORITY</th>
+          <th>STATUS</th>
+          <th>ASSIGNEE</th>
+          <th>LAST UPDATED</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>#100</td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-semibold">Email Verification is unoptimize</span>
+              <span>The code for email verification is suboptimizeist should be optimze...</span>
+            </div>
+          </td>
+          <td><span class="bg-green-600/10 px-2 py-1 rounded-md text-green-600">Low</span></td>
+          <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+          <td>Obama Laden</td>
+          <td>Sept 24, 2002</td>
+        </tr>
+
+        <tr>
+          <td>#101</td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-semibold">Email Verification is unoptimize</span>
+              <span>The code for email verification is suboptimizeist should be optimze...</span>
+            </div>
+          </td>
+          <td><span class="bg-amber-600/10 px-2 py-1 rounded-md text-amber-600">Medium</span></td>
+          <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+          <td>Obama Laden</td>
+          <td>Sept 24, 2002</td>
+        </tr>
+
+        <tr>
+          <td>#101</td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-semibold">Email Verification is unoptimize</span>
+              <span>The code for email verification is suboptimizeist should be optimze...</span>
+            </div>
+          </td>
+          <td><span class="bg-amber-600/10 px-2 py-1 rounded-md text-amber-600">Medium</span></td>
+          <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+          <td>Obama Laden</td>
+          <td>Sept 24, 2002</td>
+        </tr>
+
+        <tr>
+          <td>#101</td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-semibold">Email Verification is unoptimize</span>
+              <span>The code for email verification is suboptimizeist should be optimze...</span>
+            </div>
+          </td>
+          <td><span class="bg-amber-600/10 px-2 py-1 rounded-md text-amber-600">Medium</span></td>
+          <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+          <td>Obama Laden</td>
+          <td>Sept 24, 2002</td>
+        </tr>
+
+        <tr>
+          <td>#101</td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-semibold">Email Verification is unoptimize</span>
+              <span>The code for email verification is suboptimizeist should be optimze...</span>
+            </div>
+          </td>
+          <td><span class="bg-amber-600/10 px-2 py-1 rounded-md text-amber-600">Medium</span></td>
+          <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+          <td>Obama Laden</td>
+          <td>Sept 24, 2002</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
