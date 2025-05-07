@@ -16,7 +16,7 @@
   </label>
 </div>
 
-<label class="w-full h-full menubar" for="toggle">
+<label class="w-full h-full z-20 menubar" for="toggle">
   <div class="relative flex flex-col w-full h-full bg-primary-light-200 p-[1em] rounded-[.5em] sidenav">
     <label class="absolute top-4 right-4 cursor-pointer nav-toggle" for="toggle">
       <fa-icon class="text-secondary-light-100" [icon]="'xmark'"/>
@@ -45,7 +45,7 @@
           <span>Tickets</span>
         </li>
   
-        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300">
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-light-200 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-light-300" (click)="toggleCreateTicket()">
           <fa-icon class="text-secondary-light-100" [icon]="'plus'"/>
           <span class="font-medium">Create New Ticket</span>
         </li>

@@ -1,5 +1,5 @@
 <div class="w-full border-[.1em] overflow-hidden rounded-sm bg-neutral-50" [class]="owner()? 'border-blue-200' : 'border-neutral-200'">
-  <div class="flex text-base px-2 py-1 items-center justify-between gap-2 border-b-[.1em]" [class]="owner()? 'bg-blue-50 border-blue-200' : 'bg-neutral-50 border-neutral-200'">
+  <div class="flex text-base px-2 py-1 items-center justify-between gap-2 border-b-[.1em]" [class]="owner()? 'bg-blue-500/5 border-blue-500' : 'bg-neutral-50 border-neutral-200'">
     <div class="flex gap-2">
       <span class="text-[.9rem] font-medium text-neutral-800">{{ activity().author }}</span>
       <span class="text-[.9rem] text-neutral-500">{{ 'commented ' + getDate(activity().createdAt) }}</span>
@@ -7,7 +7,7 @@
 
     @if (owner()) {
       <div class="relative flex gap-2">
-        <span class="text-[.8rem] text-blue-300 border-[.1em] border-blue-200 px-2  rounded-sm">owner</span>
+        <span class="text-[.8rem] text-blue-500 border-[.1em] border-blue-500 px-2  rounded-md">owner</span>
         <div class="w-[1rem] h-[1rem] cursor-pointer hover:bg-neutral-200/50 flex items-center justify-center p-3 rounded-[100%]" (click)="toggleUtil()">
           <fa-icon class="text-[.9rem] text-neutral-500" [icon]="util()? 'close' :'ellipsis-vertical'"/>
         </div>

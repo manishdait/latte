@@ -4,8 +4,8 @@
 }
 
 .medium {
-  background-color: #fee685;
-  color: oklch(0.666 0.179 58.318);
+  background-color: #e1710021;
+  color: #e17100;
 }
 
 .high {
@@ -16,6 +16,11 @@
 .open {
   background-color: #155dfc21;
   color: #155dfc;
+}
+
+.close {
+  background-color: #9810fa21;
+  color: #9810fa;
 }
 
 table {

@@ -2,9 +2,9 @@
   <app-ticket-form (cancel)="createTicketToggle()"/>
 }
 
-<div class="w-screen h-screen flex gap-[2em] bg-primary-light-100 p-[2em] window">
+<div class="w-screen h-screen flex gap-[2em] bg-primary-light-100 window">
   <div class="w-[min(100%,300px)] menubar">
-    <app-menubar/>
+    <app-menubar (createTicket)="createTicketToggle()"/>
   </div>
 
   <div class="grow overflow-y-scroll">

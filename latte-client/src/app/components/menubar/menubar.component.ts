@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -10,6 +10,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './menubar.component.css'
 })
 export class MenubarComponent implements OnInit {
+  createTicket = output<boolean>();
+
   faLibrary = inject(FaIconLibrary);
 
   sidenav = signal(false);
@@ -20,5 +22,9 @@ export class MenubarComponent implements OnInit {
 
   toggleSidenav() {
     this.sidenav.update(toggle => !toggle);
+  }
+
+  toggleCreateTicket() {
+    this.createTicket.emit(true);
   }
 }

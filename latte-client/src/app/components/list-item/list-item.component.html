@@ -17,15 +17,15 @@
         <td>{{ '#' + ticket.id }}</td>
         <td>
           <div class="flex flex-col">
-            <span class="font-semibold">{{ ticket.title }}</span>
-            <span>{{ ticket.description }}</span>
+            <span class="font-semibold">{{ ticket.title.length > 80 ? ticket.title.substring(80) + '...' : ticket.title  }}</span>
+            <span>{{ ticket.description.length > 50 ? ticket.description.substring(0, 60) + '...' : ticket.description  }}</span>
           </div>
         </td>
-        <td><span class="bg-green-600/10 px-2 py-1 rounded-md text-green-600">Low</span></td>
-        <td><span class="bg-blue-600/10 px-2 py-1 rounded-md text-blue-600">Open</span></td>
+        <td><span class="px-2 py-1 rounded-md" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ priority[ticket.priority] }}</span></td>
+        <td><span class="px-2 py-1 rounded-md" [class]="{'open': ticket.status === 'OPEN', 'close': ticket.status === 'CLOSE'}">{{ status[ticket.status] }}</span></td>
         <td>{{ ticket.assignedTo? ticket.assignedTo.firstname : 'None' }}</td>
         <td>Sept 24, 2002</td>
-        <td><fa-icon [icon]="'up-right-from-square'"/></td>
+        <td routerLink="{{ ticket.id }}"><fa-icon [icon]="'up-right-from-square'"/></td>
       </tr>
     }
   </tbody>
@@ -33,12 +33,13 @@
 
 <ul class="card flex flex-col list-none">
   @for(ticket of (tickets$() | async); track ticket.id) {
-    <li class="flex flex-col gap-1 p-2 border-b-[.1em] border-primary-light-300">
+    <li class="flex flex-col gap-1 py-2 px-4 border-b-[.1em] first:border-t-[.1em] border-primary-light-300" routerLink="{{ ticket.id }}">
       <div class="flex flex-wrap gap-2 items-center">
-        <span class="text-[1rem] font-semibold">{{ ticket.title.length > 100 ? ticket.title.substring(100) + '...' : ticket.title  }}</span>
-        <span class=" px-2 py-1 rounded-md text-[.8rem]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ ticket.priority }}</span>
+        <span class="text-[1rem] text-secondary-light-200 font-semibold">{{ ticket.title.length > 100 ? ticket.title.substring(100) + '...' : ticket.title  }}</span>
+        <span class="px-2 py-1 rounded-md text-[.8rem]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ priority[ticket.priority] }}</span>
+        <span class="px-2 py-1 rounded-md text-[.8rem]" [class]="{'open': ticket.status === 'OPEN', 'close': ticket.status === 'CLOSE'}">{{ status[ticket.status] }}</span>
       </div>
-      <span class="text-[.9rem] font-normal text-neutral-500">{{ '#' + ticket.id + ' ' + ticket.createdBy.firstname + ' create on ' +  getDate(ticket.createdAt)}}</span>
+      <span class="text-[.9rem] font-normal text-secondary-light-100">{{ '#' + ticket.id + ' ' + ticket.createdBy.firstname + ' create on ' +  getDate(ticket.createdAt)}}</span>
     </li>
   }
 </ul>

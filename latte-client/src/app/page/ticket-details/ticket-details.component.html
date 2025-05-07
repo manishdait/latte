@@ -1,21 +1,21 @@
-<div class="w-[min(1400px,100%)] flex flex-col flex-wrap gap-8 p-4 mx-auto">
+<div class="w-[min(1400px,100%)] flex flex-col flex-wrap gap-8 mx-auto">
   <div class="border-b-[.1em] border-gray-200 flex flex-wrap gap-4 py-4">
     <div class="grow flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <div class="w-full">
+      <div class="w-full flex items-center justify-between gap-2">
+        <div class="w-[min(100%,1000px)]">
           @if(!editTitle()) {
-            <h1 class="text-[2rem] text-neutral-800 font-semibold leading-none">{{ ticket().title }}</h1>
+            <h1 class="text-[2rem] text-secondary-light-200 font-semibold leading-none">{{ ticket().title }}</h1>
           } @else {
-            <input class="w-full text-[1rem] text-neutral-800 border-[.1em] border-neutral-200 outline-none px-2 py-1 focus-within:border-green-600" type="text" placeholder="Edit title" #title>
+            <input class="w-full text-[1rem] text-secondary-light-200 border-[.1em] border-neutral-200 rounded-md outline-none px-2 py-1 focus:border-neutral-400" type="text" placeholder="Edit title" #title>
           }
         </div>
 
         @if (editTicketOps()) {
           <div class="flex gap-4">
             @if (!editTitle()) {
-              <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Edit</button>
+              <button class="h-fit text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-md" type="button" (click)="toggleEditTitle()">Edit</button>
             } @else {
-              <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-sm" type="button" (click)="toggleEditTitle()">Cancel</button>
+              <button class="text-[.9rem] py-1 px-2 bg-transparent border-[.1em] border-neutral-200 hover:bg-neutral-900/5 text-neutral-500 font-medium cursor-pointer rounded-md" type="button" (click)="toggleEditTitle()">Cancel</button>
               <button class="text-[.9rem] py-1 px-2 bg-green-500 border-[.1em] border-green-500 hover:border-green-600 hover:bg-green-600 text-white font-medium cursor-pointer rounded-sm" type="button" (click)="updateTitle()">Save</button>
             }
           </div>

@@ -2,7 +2,6 @@ import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Priority } from '../../../model/priority.type';
 import { TicketRequest } from '../../../model/ticket.type';
-import { Status } from '../../../model/status.type';
 import { TicketService } from '../../../service/ticket.service';
 import { UserService } from '../../../service/user.service';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';

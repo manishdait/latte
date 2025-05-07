@@ -3,7 +3,11 @@
   color: #fff;
 }
 
-@media screen and (max-width: 790px) {
+.window {
+  padding: 2em;
+}
+
+@media screen and (max-width: 800px) {
   .window {
     flex-direction: column;
   }
@@ -12,16 +16,8 @@
   }
 }
 
-/* @media screen and (max-width: 800px) {
-  .sidenav {
-    position: fixed;
-    transition: all 1s 1ms;
+@media screen and (max-width: 500px) {
+  .window {
+    padding: 1em;
   }
-
-  .in {
-    left: -100%;
-  }
-  .out {
-    left: 0;
-  }
-} */
+}

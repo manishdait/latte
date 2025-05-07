@@ -111,6 +111,5 @@ export class TicketComponent implements OnInit {
         }
       });
     }
-    
   }
 }

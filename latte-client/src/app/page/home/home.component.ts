@@ -10,7 +10,7 @@ import { MenubarComponent } from '../../components/menubar/menubar.component';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  createTicket = signal(true);
+  createTicket = signal(false);
 
   ngOnInit(): void {}
 

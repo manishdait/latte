@@ -4,15 +4,19 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { TicketService } from '../../service/ticket.service';
-import { generateColor } from '../../shared/utils';
+import { generateColor, getDate } from '../../shared/utils';
 import { AppState } from '../../state/app.state';
 import { setCloseCount, setOpenCount, setTicketCount } from '../../state/ticket/ticket.action';
 import { closeTickets, openTickets, totalTickets } from '../../state/ticket/ticket.selector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TicketResponse } from '../../model/ticket.type';
+import { ListItemComponent } from '../../components/list-item/list-item.component';
+import { Priority } from '../../model/priority.type';
+import { Status } from '../../model/status.type';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, ListItemComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -26,10 +30,29 @@ export class DashboardComponent implements OnInit {
   closedTickets$: Observable<number>;
   totalTickets$: Observable<number>;
 
+  priority: Record<Priority, string> = {
+    'LOW': 'Low',
+    'MEDIUM': 'Medium',
+    'HIGH': 'High'
+  }
+
+  status: Record<Status, string> = {
+    'OPEN': 'Open',
+    'CLOSE': 'Close'
+  }
+
+  tickets = signal<TicketResponse[]>([]);
+
   constructor (private store: Store<AppState>) {
     this.totalTickets$ = store.select(totalTickets);
     this.openTickets$ = store.select(openTickets);
     this.closedTickets$ = store.select(closeTickets);
+
+    this.ticketService.fetchPagedTickets(0, 5).subscribe({
+      next: (res) => {
+        this.tickets.set(res.content);
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -39,12 +62,16 @@ export class DashboardComponent implements OnInit {
         this.store.dispatch(setCloseCount({count: res['closed_tickets']}));
         this.store.dispatch(setTicketCount({count: res['total_tickets']}));
       }
-    });
+    });    
   }
 
   getColor(username: any): string {
     if (!username) {return '#ddd'}
     return generateColor(username);
+  }
+
+  getDate(date: any) {
+    return getDate(date);
   }
 
   greet(): string {
