@@ -2,9 +2,10 @@ import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AuthRequest, AuthResponse, RegistrationRequest } from '../model/auth.type';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
-import { Role } from '../model/role.type';
+import { UserResponse } from '../model/user.type';
+import { UserService } from './user.service';
 
 const URL: string = `${environment.API_ENDPOINT}/auth`;
 
@@ -12,17 +13,36 @@ const URL: string = `${environment.API_ENDPOINT}/auth`;
   providedIn: 'root'
 })
 export class AuthService {
+  private _user: UserResponse = {
+    firstname: '',
+    email: '',
+    role: {
+      id: 0,
+      role: '',
+      editable: false,
+      deletable: false,
+      authorities: []
+    },
+    editable: false,
+    deletable: false
+  };
+
   client: HttpClient;
 
-  constructor(private backend: HttpBackend, private localStorage: LocalStorageService, private secureClient: HttpClient) { 
+  constructor(private backend: HttpBackend, private localStorage: LocalStorageService, private secureClient: HttpClient, private userService: UserService) { 
     this.client = new HttpClient(backend);
   }
 
   authenticateUser(request: AuthRequest): Observable<AuthResponse> {
     return this.client.post<AuthResponse>(`${URL}/login`, request).pipe(
-      map((response) => {
+      switchMap((response) => {
         this.storeCred(response);
-        return response;
+        return this.userService.fetchUserInfo().pipe(
+          map(user => {
+            this._user = user;
+            return response;
+          })
+        )
       })
     );
   }
@@ -46,19 +66,12 @@ export class AuthService {
   }
 
   private storeCred(response: AuthResponse): void {
-    this.localStorage.store('firstname', response.firstname);
-    this.localStorage.store('username', response.email);
     this.localStorage.store('accessToken', response.accessToken);
     this.localStorage.store('refreshToken', response.refreshToken);
-    this.localStorage.store('role', response.role);
   }
 
   getAccessToken(): string {
     return this.localStorage.retrieve('accessToken');
-  }
-
-  getRole(): Role {
-    return this.localStorage.retrieve('role');
   }
 
   getFirstname(): string {
@@ -71,14 +84,19 @@ export class AuthService {
       return of(false);
     }
 
-    return this.secureClient.post<Map<string, boolean>>(`${URL}/verify`, null).pipe(
-      map((response) => {
-        const result = response as any;
-        if(result.success) {
-          return true;
+    return this.secureClient.post<{[key:string]: boolean}>(`${URL}/verify`, null).pipe(
+      switchMap((response) => {
+        if(response['success']) {
+          return this.userService.fetchUserInfo().pipe(
+            map(user => {
+              this._user = user;
+              return true;
+            })
+          )
         }
+
         this.localStorage.clear();
-        return false;
+        return of(false);
       }),
 
       catchError((err) => {
@@ -88,51 +106,7 @@ export class AuthService {
     );
   }
 
-  createUser() {
-    return this.getRole().authorities.includes('user::create');
-  }
-  
-  editUser() {
-    return this.getRole().authorities.includes('user::edit');
-  }
-  
-  deleteUser() {
-    return this.getRole().authorities.includes('user::delete');
-  }
-  
-  resetUserPassword() {
-    return this.getRole().authorities.includes('user::reset-password');
-  }
-  
-  createTicket() {
-    return this.getRole().authorities.includes('ticket::create');
-  }
-  
-  editTicket() {
-    return this.getRole().authorities.includes('ticket::edit');
-  }
-  
-  deleteTicket() {
-    return this.getRole().authorities.includes('ticket::delete');
-  }
-  
-  assignTicket() {
-    return this.getRole().authorities.includes('ticket::assign');
-  }
-  
-  lockTicket() {
-    return this.getRole().authorities.includes('ticket::lock-unlock');
-  }
-  
-  createRole() {
-    return this.getRole().authorities.includes('role::create');
-  }
-  
-  editRole() {
-    return this.getRole().authorities.includes('role::edit');
-  }
-  
-  deleteRole() {
-    return this.getRole().authorities.includes('role::delete');
+  get user(): UserResponse {
+    return this._user;
   }
 }

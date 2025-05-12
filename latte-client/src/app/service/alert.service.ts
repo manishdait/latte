@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
+import { Alert } from "../model/alert.type";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertService {
-  private _alert: Subject<string | undefined> = new Subject();
+  private _alert: Subject<Alert | undefined> = new Subject();
 
   constructor() {
     this._alert.next(undefined);
@@ -15,7 +16,7 @@ export class AlertService {
     return this._alert.asObservable();
   }
 
-  set alert(message: string) {
-    this._alert.next(message);
+  set alert(alert: Alert) {
+    this._alert.next(alert);
   }
 }

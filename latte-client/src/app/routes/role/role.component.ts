@@ -12,16 +12,20 @@ import { AppState } from '../../state/app.state';
 import { roleCount, roles } from '../../state/role/role.selector';
 import { setRoleCount, setRoles } from '../../state/role/role.action';
 import { CommonModule } from '@angular/common';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { fontawsomeIcons } from '../../shared/fa-icons';
+import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
 
 @Component({
   selector: 'app-role',
-  imports: [CommonModule, RoleFormComponent, EditRoleFormComponent, RoleDeleteComponent, PaginationComponent],
+  imports: [CommonModule, FontAwesomeModule, RoleFormComponent, EditRoleFormComponent, RoleDeleteComponent, PaginationComponent, HasAuthorityDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.css'
 })
 export class RoleComponent implements OnInit {
   roleService = inject(RoleService);
   authService = inject(AuthService);
+  faLibrary = inject(FaIconLibrary);
 
   page = signal(0);
   size = signal(10);
@@ -46,6 +50,8 @@ export class RoleComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.faLibrary.addIcons(...fontawsomeIcons);
+    
     this.roleService.getCount().subscribe({
       next: (res) => {
         this.store.dispatch(setRoleCount({count: res['role_count']}))
@@ -67,18 +73,6 @@ export class RoleComponent implements OnInit {
   toggleDeleteRole(id: number) {
     this.bufferId.set(id);
     this.deleteRole.update(toggle => !toggle);
-  }
-
-  editRoleOps() {
-    return this.authService.editRole();
-  }
-
-  deleteRoleOps() {
-    return this.authService.deleteRole();
-  }
-
-  createRoleOps() {
-    return this.authService.createRole();
   }
 
   getNext() {

@@ -33,3 +33,9 @@
     display: block;
   }
 }
+
+@media screen and (max-width: 500px) {
+  .menubar {
+    padding: 1em;
+  }
+}

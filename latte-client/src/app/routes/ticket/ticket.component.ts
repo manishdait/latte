@@ -12,11 +12,12 @@ import { AppState } from '../../state/app.state';
 import { setCloseCount, setOpenCount, setTicketCount, setTickets } from '../../state/ticket/ticket.action';
 import { closeTickets, openTickets, tickets } from '../../state/ticket/ticket.selector';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
-import { ListItemComponent } from '../../components/list-item/list-item.component';
+import { TableItemComponent } from '../../components/table-item/table-item.component';
+import { CardItemComponent } from '../../components/card-item/card-item.component';
 
 @Component({
   selector: 'app-ticket',
-  imports: [PaginationComponent, ListItemComponent, RouterLink, CommonModule, FontAwesomeModule],
+  imports: [PaginationComponent, TableItemComponent, CardItemComponent, RouterLink, CommonModule, FontAwesomeModule],
   templateUrl: './ticket.component.html',
   styleUrl: './ticket.component.css'
 })
@@ -41,7 +42,7 @@ export class TicketComponent implements OnInit {
   });
 
   loading = signal(true);
-  statusToggle = signal(false);
+  statusFilter = signal(false);
 
   constructor(private store: Store<AppState>) {
     this.tickets$ = store.select(tickets);
@@ -79,12 +80,12 @@ export class TicketComponent implements OnInit {
 
   setStatus(status: string) {
     this.status.set(status);
-    this.toggleStatus();
+    this.toggleStatusFilter();
     this.ngOnInit();
   }
 
-  toggleStatus() {
-    this.statusToggle.update(toggle => !toggle);
+  toggleStatusFilter() {
+    this.statusFilter.update(toggle => !toggle);
   }
 
   getTickets() {

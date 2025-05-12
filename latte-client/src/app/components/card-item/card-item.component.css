@@ -1,0 +1,24 @@
+.low {
+  background-color: #00a63d21;
+  color: #00a63e;
+}
+
+.medium {
+  background-color: #e1710021;
+  color: #e17100;
+}
+
+.high {
+  background-color: #e7000b21;
+  color: #e7000b;
+}
+
+.open {
+  background-color: #155dfc21;
+  color: #155dfc;
+}
+
+.close {
+  background-color: #9810fa21;
+  color: #9810fa;
+}

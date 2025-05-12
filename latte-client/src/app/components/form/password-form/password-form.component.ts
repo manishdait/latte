@@ -4,6 +4,7 @@ import { ResetPasswordRequest, UserResponse } from '../../../model/user.type';
 import { UserService } from '../../../service/user.service';
 import { AlertService } from '../../../service/alert.service';
 import { PasswordComponent } from '../../password/password.component';
+import { Alert } from '../../../model/alert.type';
 
 @Component({
   selector: 'app-password-form',
@@ -49,10 +50,20 @@ export class PasswordFormComponent implements OnInit {
 
     this.userService.resetPasswordForUser(request, this.user().email).subscribe({
       next: () => {
-        this.alertService.alert = 'Updated user information';
+        const alert: Alert = {
+          title: 'User Update',
+          message: 'Updated user password',
+          type: 'INFO'
+        }
+        this.alertService.alert = alert;
         this.cancel.emit(true);
       },
       error: (err) => {
+        const alert: Alert = {
+          title: 'User Update',
+          message: 'Fail to updated user password',
+          type: 'FAIL'
+        }
         this.alertService.alert = err.error.error;
         this.form.reset();
       }

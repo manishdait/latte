@@ -1,30 +1,29 @@
 <div class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-neutral-900/15 p-4 z-50">
-  <div class="w-[min(100%,650px)] flex flex-col p-4 rounded-md bg-primary-light-100">
-    <h1 class="text-2xl text-secondary-light-200 font-medium">Create Ticket</h1>
+  <div class="w-[min(100%,650px)] flex flex-col p-4 rounded-md bg-primary-100">
+    <h1 class="text-2xl text-secondary-400 font-medium">Create Ticket</h1>
 
     <form class="w-full" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm text-secondary-light-200" for="title">Ticket Title</label>
-        <input class="text-base text-secondary-light-200 px-2 py-1 border-[.1em] border-neutral-200 rounded-md focus:border-neutral-400" id="title" placeholder="Enter title for the ticket, keep it short..." formControlName="title">
+        <label class="text-sm text-secondary-400" for="title">Ticket Title</label>
+        <input class="text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" id="title" placeholder="Enter title for the ticket, keep it short..." formControlName="title">
         @if(formErrors() && (formControls['title'].errors)) {
           <span class="text-sm text-red-700">*Required a title for ticket</span>
         }
       </div>
 
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm text-secondary-light-200" for="description">Description</label>
-        <textarea class="text-base text-secondary-light-200 px-2 py-1 h-40 border-[.1em] border-neutral-200 rounded-md outline-none focus:border-neutral-400" id="description" placeholder="Enter extra details here..." formControlName="description"></textarea>
+        <label class="text-sm text-secondary-400" for="description">Description</label>
+        <textarea class="h-40 text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" id="description" placeholder="Enter extra details here..." formControlName="description"></textarea>
       </div>
 
-      @if (assignOps()) {
-        <div class="flex flex-col gap-1 my-4">
-          <label class="text-sm text-secondary-light-200" for="assigneto">Assigned To</label>
-          <app-dropdown [id]="'assigneto'" [placeholder]="'Please select an engineer...'" [dropdownItems]="engineers()" [hasMore]="hasMore()" [hasUnassign]="true" (onNext)="showMore()" formControlName="assignedTo" />
-        </div>
-      }
+      <div class="flex flex-col gap-1 my-4" *hasAuthority="['ticket::assign']">
+        <label class="text-sm text-secondary-400" for="assigneto">Assigned To</label>
+        <app-dropdown [id]="'assigneto'" [placeholder]="'Please select an engineer...'" [dropdownItems]="engineers()" [hasMore]="hasMore()" [hasUnassign]="true" (onNext)="showMore()" formControlName="assignedTo" />
+      </div>
+
 
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm text-secondary-light-200" for="priority">Priority</label>
+        <label class="text-sm text-secondary-400" for="priority">Priority</label>
         <app-dropdown [id]="'priority'" [placeholder]="'Select a priority...'" [dropdownItems]="list" formControlName="priority" />
         @if(formErrors() && (formControls['priority'].errors)) {
           <span class="text-sm text-red-700">*Required a priority for ticket</span>
@@ -33,8 +32,8 @@
 
       <div class="flex gap-4">
         @if (!processing()) {
-          <button class="text-[.9rem] font-semibold px-2 py-1 bg-green-600 border-[.1em] border-green-600 text-white rounded-sm cursor-pointer hover:bg-green-700 hover:border-green-700" type="submit">Create</button>
-          <button class="text-[.9rem] font-semibold px-2 py-1 bg-transparent border-[.1em] border-neutral-200 text-secondary-light-100 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="this.cancel.emit(true)">Cancel</button>
+          <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="this.cancel.emit(true)">Cancel</button>
+          <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" type="submit">Create</button>
         } @else { 
           <div class="w-full flex items-center justify-center">
             <app-spinner [size]="'1.5rem'" [color]="'#00c950'" />

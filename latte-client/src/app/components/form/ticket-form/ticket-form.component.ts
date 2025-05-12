@@ -11,18 +11,18 @@ import { AppState } from '../../../state/app.state';
 import { addTicket, updateOpenCount, updateTicketCount } from '../../../state/ticket/ticket.action';
 import { AlertService } from '../../../service/alert.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
-import { AuthService } from '../../../service/auth.service';
 import { SpinnerComponent } from '../../spinner/spinner.component';
+import { Alert } from '../../../model/alert.type';
+import { HasAuthorityDirective } from '../../../shared/directives/has-autority.directive';
 
 @Component({
   selector: 'app-ticket-form',
-  imports: [ReactiveFormsModule, FontAwesomeModule, DropdownComponent, SpinnerComponent],
+  imports: [ReactiveFormsModule, FontAwesomeModule, DropdownComponent, SpinnerComponent, HasAuthorityDirective],
   templateUrl: './ticket-form.component.html',
   styleUrl: './ticket-form.component.css'
 })
 export class TicketFormComponent implements OnInit {
   ticketService = inject(TicketService);
-  authService = inject(AuthService);
   userService = inject(UserService);
   alertService = inject(AlertService);
   faLibrary = inject(FaIconLibrary);
@@ -103,18 +103,27 @@ export class TicketFormComponent implements OnInit {
         this.store.dispatch(addTicket({ticket: response}));
         this.store.dispatch(updateOpenCount({count: 1}));
         this.store.dispatch(updateTicketCount({count: 1}));
-        this.alertService.alert = `Ticket created`;
+
+        const alert: Alert = {
+          title: 'Ticket Created',
+          message: `A new ticket created with id #${response.id}`,
+          type: 'INFO'
+        }
+
+        this.alertService.alert = alert;
         this.cancel.emit(true);
       },
       error: (err) => {
         this.processing.set(false);
         this.form.reset();
-        this.alertService.alert = err.error.error;
+
+        const alert: Alert = {
+          title: 'Fail to Create Ticket',
+          message: err.error.error,
+          type: 'FAIL'
+        }
+        this.alertService.alert = alert;
       }
     })
-  }
-
-  assignOps() {
-    return this.authService.assignTicket();
   }
 }

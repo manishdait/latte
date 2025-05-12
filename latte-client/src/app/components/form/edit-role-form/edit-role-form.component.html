@@ -1,99 +1,99 @@
 <div class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-neutral-900/15 p-4 z-50">
-  <div class="w-[min(100%,650px)] flex flex-col p-4 gap-4 rounded-sm bg-neutral-50">
-    <h1 class="text-2xl text-neutral-800 font-medium">Edit Role</h1>
+  <div class="w-[min(100%,650px)] flex flex-col p-4 rounded-md bg-primary-100">
+    <h1 class="text-2xl text-secondary-400 font-medium">Edit Role</h1>
 
     <form class="w-full" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="flex flex-col gap-1 my-4">
-        <label class="text-sm text-neutral-800" for="role">Title</label>
-        <input class="text-base text-neutral-800 px-2 py-1 border-[.1em] border-gray-200 rounded-sm outline-none focus:border-green-600" id="role" placeholder="Enter title for role..." formControlName="role">
+        <label class="text-sm text-secondary-400" for="role">Title</label>
+        <input class="text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" id="role" placeholder="Enter title for role..." formControlName="role">
         @if (formError() && formControl['role'].errors) {
-          <span class="text-sm text-red-600">*Required title for role</span>
+          <span class="text-sm text-red-700">*Required title for role</span>
         }
       </div>
 
-      <span class="text-2xl text-neutral-500">Permissions</span>
+      <span class="text-2xl text-secondary-200">Permissions</span>
 
       <div class="mb-4 flex flex-col gap-2 my-4">
-        <label class="text-[1rem] font-medium text-neutral-800">User Management</label>
+        <label class="text-[1rem] font-medium text-secondary-400">User Management</label>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="flex items-center gap-1">
             <input id="user:create" type="checkbox" formControlName="user::create">
-            <label class="text-neutral-500" for="user:create">user::create</label>
+            <label class="text-secondary-200" for="user:create">user::create</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="user:edit" formControlName="user::edit">
-            <label class="text-neutral-500" for="user:edit">user::edit</label>
+            <label class="text-secondary-200" for="user:edit">user::edit</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="user:delete" formControlName="user::delete">
-            <label class="text-neutral-500" for="user:delete">user::delete</label>
+            <label class="text-secondary-200" for="user:delete">user::delete</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="reset:pass" formControlName="user::reset-password">
-            <label class="text-neutral-500" for="reset:pass">user::reset-password</label>
+            <label class="text-secondary-200" for="reset:pass">user::reset-password</label>
           </div>
         </div>
       </div>
 
       <div class="mb-4 flex flex-col gap-2 my-4">
-        <label class="text-[1rem] font-medium text-neutral-800">Ticket Management</label>
+        <label class="text-[1rem] font-medium text-secondary-400">Ticket Management</label>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="flex items-center gap-1">
             <input type="checkbox" id="ticket:create" formControlName="ticket::create">
-            <label class="text-neutral-500" for="ticket:create">ticket::create</label>
+            <label class="text-secondary-200" for="ticket:create">ticket::create</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="ticket:edit" formControlName="ticket::edit">
-            <label class="text-neutral-500" for="ticket:edit">ticket::edit</label>
+            <label class="text-secondary-200" for="ticket:edit">ticket::edit</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="ticket:assign" formControlName="ticket::assign">
-            <label class="text-neutral-500" for="ticket:assign">ticket::assign</label>
+            <label class="text-secondary-200" for="ticket:assign">ticket::assign</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="ticket:delete" formControlName="ticket::delete">
-            <label class="text-neutral-500" for="ticket:delete">ticket::delete</label>
+            <label class="text-secondary-200" for="ticket:delete">ticket::delete</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="ticket:lock" formControlName="ticket::lock-unlock">
-            <label class="text-neutral-500" for="ticket:lock">ticket::lock-unlock</label>
+            <label class="text-secondary-200" for="ticket:lock">ticket::lock-unlock</label>
           </div>
         </div>
       </div>
       
       <div class="mb-4 flex flex-col gap-2 my-4">
-        <label class="text-[1rem] font-medium text-neutral-800">Role Management</label>
+        <label class="text-[1rem] font-medium text-secondary-400">Role Management</label>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="flex items-center gap-1">
             <input type="checkbox" id="role:create" formControlName="role::create">
-            <label class="text-neutral-500" for="role:create">role::create</label>
+            <label class="text-secondary-200" for="role:create">role::create</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="role:edit" formControlName="role::edit">
-            <label class="text-neutral-500" for="role:edit">role::edit</label>
+            <label class="text-secondary-200" for="role:edit">role::edit</label>
           </div>
 
           <div class="flex items-center gap-1">
             <input type="checkbox" id="role:delete" formControlName="role::delete">
-            <label class="text-neutral-500" for="role:delete">role::delete</label>
+            <label class="text-secondary-200" for="role:delete">role::delete</label>
           </div>
         </div>
       </div>
 
       <div class="flex gap-4 mt-10">
-        <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="submit">Submit</button>
-        <button class="text-[.9rem] font-medium px-2 py-1 border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
+        <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
+        <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200"  type="submit">Submit</button>
       </div>
     </form>
   </div>

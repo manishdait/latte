@@ -1,8 +1,7 @@
 import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { RoleService } from '../../../service/role.service';
-import { Authority } from '../../../model/authority.type';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Role, RoleRequest } from '../../../model/role.type';
+import { Role, RoleRequest, Authority } from '../../../model/role.type';
 
 @Component({
   selector: 'app-edit-role-form',
@@ -17,7 +16,7 @@ export class EditRoleFormComponent implements OnInit {
   cancel = output<boolean>();
 
   permissions: Authority[] = [
-    'user::create', 'user::delete',  'user::delete', 'user::reset-password', 'ticket::create', 'ticket::edit', 
+    'user::create', 'user::edit', 'user::delete', 'user::reset-password', 'ticket::create', 'ticket::edit', 
     'ticket::delete', 'ticket::lock-unlock', 'ticket::assign', 'role::create', 'role::edit', 'role::delete'
   ];
   formError = signal(false);
@@ -85,7 +84,7 @@ export class EditRoleFormComponent implements OnInit {
     if (updatedAuhtorities.length > 0) {
       request.authorities = updatedAuhtorities;
     }
-
+    
     this.roleService.updateRole(this.id(), request).subscribe({
       next: (res) => {
         this.cancel.emit(true);

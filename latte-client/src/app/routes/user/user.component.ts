@@ -16,10 +16,12 @@ import { PasswordFormComponent } from '../../components/form/password-form/passw
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { AuthService } from '../../service/auth.service';
+import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
+import { Alert } from '../../model/alert.type';
 
 @Component({
   selector: 'app-user',
-  imports: [PaginationComponent, UserFormComponent, EditUserComponent, PasswordFormComponent, CommonModule, DialogComponent, FontAwesomeModule],
+  imports: [PaginationComponent, UserFormComponent, EditUserComponent, PasswordFormComponent, CommonModule, DialogComponent, FontAwesomeModule, HasAuthorityDirective],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
@@ -94,22 +96,6 @@ export class UserComponent implements OnInit {
     this.confirm.update(toggle => !toggle);
   } 
 
-  createUserOps() {
-    return this.authService.createUser();
-  }
-
-  editUserOps() {
-    return this.authService.editUser();
-  }
-
-  deleteUserOps() {
-    return this.authService.deleteUser();
-  }
-
-  resetPasswordOps() {
-    return this.authService.resetUserPassword();
-  }
-
   deleteUser(user: UserResponse) {
     this.buffer.set(user);
     this.toggleConfirm();
@@ -120,10 +106,15 @@ export class UserComponent implements OnInit {
 
     if (event) {
       this.userService.deleteUser(this.buffer().email).subscribe({
-        next: (response) => {
+        next: () => {
           this.store.dispatch(removeUser({email: this.buffer().email}));
           this.store.dispatch(updateUserCount({count: -1}));
-          this.alertService.alert = `User with name ${this.buffer().firstname} deleted`;
+          const alert: Alert = {
+            title: 'Delete User',
+            message: `User with name ${this.buffer().firstname} deleted`,
+            type: 'INFO'
+          }
+          this.alertService.alert = alert;
         }
       })
     }

@@ -3,20 +3,20 @@
     <div class="flex flex-col items-start">
       @if(getType(activity.type) === 'EDIT') {
         <div class="flex items-center gap-1">
-          <div class="w-6 h-6 rounded-full bg-neutral-200"></div>
-          <span class="text-[.9rem] text-neutral-800">{{ activity.message + ' on ' + getDate(activity.createdAt) }}</span>
+          <div class="w-4 h-4 bg-primary-400 rounded-full ml-1"></div>
+          <span class="text-[.9rem] text-secondary-300">{{ activity.message + ' on ' + getDate(activity.createdAt) }}</span>
         </div>
       } @else {
         <app-comment-box class="w-full" [activity]="activity" (refresh)="refresh()"/>
       }
-      <div class="min-h-8 h-fit ml-[.68em] w-[.1em] bg-neutral-200"></div>
+      <div class="bg-primary-400 min-h-8 w-[.1em] ml-[.68em]"></div>
     </div>
   }
 
   @if(hasMore()) {
-    <div class="w-full p-2 flex flex-col gap-1">
-      <button class="mx-auto text-base border-[.1em] border-neutral-200 px-2 py-1 cursor-pointer rounded-sm text-neutral-500 hover:bg-neutral-900/5" type="button" (click)="loadPrevious()">Load Previous</button>
-      <div class="mx-auto w-[.05rem] h-[1rem] bg-neutral-200"></div>
+    <div class="w-full flex flex-col gap-1 p-2">
+      <button class="text-[.9rem] text-secondary-300 border-[.1em] border-neutral-200 rounded-md px-2 py-1 mx-auto cursor-pointer hover:bg-neutral-900/5" type="button" (click)="loadPrevious()">Load Previous</button>
+      <div class="w-[.1em] h-[1rem] mx-auto"></div>
     </div>
   }
 </div>

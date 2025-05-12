@@ -13,10 +13,13 @@ import { ActivityComponent } from '../../components/activity/activity.component'
 import { CommentDto } from '../../model/comment.type';
 import { CommentService } from '../../service/comment.service';
 import { DescriptionBoxComponent } from '../../components/description-box/description-box.component';
+import { Priorities } from '../../model/priority.type';
+import { Authority } from '../../model/role.type';
+import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
 
 @Component({
   selector: 'app-ticket-details',
-  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent],
+  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent, HasAuthorityDirective],
   templateUrl: './ticket-details.component.html',
   styleUrl: './ticket-details.component.css'
 })
@@ -56,11 +59,15 @@ export class TicketDetailsComponent implements OnInit {
   editPriority = signal(false);
   util = signal(false);
 
+  priority = Priorities;
+
+  status = Status;
+
   ngOnInit(): void {
     this.ticketService.fetchTicket(this.ticketId()).subscribe({
       next: (res) => {
         this.ticket.set(res);
-        this.owner.set(this.ticket().createdBy.firstname === this.authService.getFirstname());
+        this.owner.set(this.ticket().createdBy.firstname === this.authService.user.firstname);
       }
     });
 
@@ -85,16 +92,6 @@ export class TicketDetailsComponent implements OnInit {
       return this.ticket().assignedTo?.firstname;
     }
     return '';
-  }
-
-  getPriority() {
-    if (this.ticket().priority === 'LOW') {
-      return 'Low';
-    } else if (this.ticket().priority === 'MEDIUM') {
-      return 'Medium';
-    } else {
-      return 'High';
-    }
   }
 
   refresh() {
@@ -140,7 +137,7 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   updateTitle() {
-    let title = (this.titleField.nativeElement as HTMLInputElement).value;
+    const title = (this.titleField.nativeElement as HTMLInputElement).value;
 
     if (title === '' || title === this.ticket().title) {return;}
     const request: PatchTicketRequest = {
@@ -169,7 +166,7 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleEditPriority() {
-    if (this.ticket().lock || !this.editTicketOps()) {return;}
+    if (this.ticket().lock || !this.isOwnerOrHasAuthority('ticket::edit')) {return;}
     this.editPriority.update(toggle => !toggle);
   }
 
@@ -201,19 +198,11 @@ export class TicketDetailsComponent implements OnInit {
     }
   }
 
-  deleteTicketOps() {
-    return this.authService.getFirstname() === this.ticket().createdBy.firstname || this.authService.deleteTicket();
+  hasAuthority(authority: Authority) {
+    return this.authService.user.role.authorities.includes(authority);
   }
 
-  assignTicketOps() {
-    return this.authService.assignTicket();
-  }
-
-  lockTicketOps() {
-    return this.authService.lockTicket();
-  }
-
-  editTicketOps() {
-    return this.authService.getFirstname() === this.ticket().createdBy.firstname || this.authService.editTicket();
+  isOwnerOrHasAuthority(authority: Authority) {
+    return this.owner() || this.hasAuthority(authority);
   }
 }

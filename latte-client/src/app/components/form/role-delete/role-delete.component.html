@@ -1,12 +1,12 @@
 <div class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-neutral-900/15 p-4 z-50">
-  <div class="w-[min(100%,400px)] flex flex-col p-4 gap-4 rounded-sm bg-neutral-50">
-    <h1 class="text-1xl text-neutral-800 font-medium">Select new user to replace delete user</h1>
+  <div class="w-[min(100%,400px)] flex flex-col p-4 gap-4 rounded-sm bg-primary-100">
+    <h1 class="text-1xl text-secondary-400 font-medium">Select new user to replace delete user</h1>
 
     <app-dropdown [dropdownItems]="list()" [hasMore]="hasNext()" (onNext)="getNext()" [formControl]="role"/>
     
-    <div class="flex gap-4">
-      <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" (click)="onSubmit()">Submit</button>
-      <button class="text-[.9rem] font-medium px-2 py-1 border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
+    <div class="flex gap-2">
+      <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
+      <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200"  (click)="onSubmit()">Submit</button>
     </div>
   </div>
 </div>

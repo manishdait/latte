@@ -10,10 +10,9 @@ import { DashboardComponent } from './routes/dashboard/dashboard.component';
 import { RoleComponent } from './routes/role/role.component';
 
 export const routes: Routes = [
-  {path: '', pathMatch: 'full', redirectTo: 'home'},
   {path: 'sign-in', component: AuthComponent},
   {
-    path: 'home', 
+    path: '', 
     component: HomeComponent,
     children: [
       {path: 'dashboard', component: DashboardComponent},

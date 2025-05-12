@@ -9,6 +9,7 @@ import { UserService } from '../../service/user.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PasswordComponent } from '../../components/password/password.component';
+import { Alert } from '../../model/alert.type';
 
 @Component({
   selector: 'app-profile',
@@ -187,11 +188,17 @@ export class ProfileComponent implements OnInit {
     }
     
     this.userService.updateUser(request).subscribe({
-      next: (response) => {
+      next: () => {
         this.router.navigate(['sign-in'], {replaceUrl: true});
       },
       error: (err) => {
-        this.alertService.alert = 'Error creating user';
+        this.passwordResetForm.reset();
+        const alert: Alert = {
+          title: 'Update Profile',
+          message: 'Fail to update your profile',
+          type: 'FAIL'
+        }
+        this.alertService.alert = alert;
       }
     });
   }
@@ -210,13 +217,30 @@ export class ProfileComponent implements OnInit {
     }
 
     this.userService.resetPassword(request).subscribe({
-      next: (response) => {
+      next: () => {
         this.passwordReset.set(false);
-        this.alertService.alert = 'Password reset succesfully';
+        const alert: Alert = {
+          title: 'Password Reset',
+          message: 'Your password has been reset',
+          type: 'INFO'
+        }
+        this.alertService.alert = alert;
       },
       error: (err) => {
         this.passwordResetForm.reset();
-        this.alertService.alert = 'Error reseting password';
+        const alert: Alert = {
+          title: 'Password Reset',
+          message: '',
+          type: 'WARN'
+        }
+
+        if (err.error.status === 400) {
+          alert.message = err.error.error;
+        } else {
+          alert.message = 'Fail to reset your password';
+        }
+        
+        this.alertService.alert = alert;
       }
     })
   }

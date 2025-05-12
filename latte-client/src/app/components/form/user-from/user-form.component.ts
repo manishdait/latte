@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, output, Output, signal } from '@angular/core';
+import { Component, inject, OnInit, output, Output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistrationRequest } from '../../../model/auth.type';
 import { AuthService } from '../../../service/auth.service';
@@ -10,6 +10,7 @@ import { AlertService } from '../../../service/alert.service';
 import { PasswordComponent } from '../../password/password.component';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { RoleService } from '../../../service/role.service';
+import { Alert } from '../../../model/alert.type';
 
 @Component({
   selector: 'app-user-form',
@@ -58,7 +59,7 @@ export class UserFormComponent implements OnInit {
     this.page.update(count => count+1);
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
-        this.roles.set(res.content.map(r => r.role));
+        this.roles.update(roles => roles = [...roles, ...res.content.map(r => r.role)]);
         this.hasNext.set(res.next);
       }
     })
@@ -90,13 +91,37 @@ export class UserFormComponent implements OnInit {
         }
         this.store.dispatch(addUser({user: user}));
         this.store.dispatch(updateUserCount({count: 1}));
-        this.alertService.alert = `User created with name ${user.firstname}`;
+        
+        const alert: Alert = {
+          title: 'User Created',
+          message: `User created with username ${res.firstname}`,
+          type: 'INFO'
+        }
+
+        this.alertService.alert = alert;
         this.cancel.emit(true);
       },
       error: (err) => {
         this.form.reset();
         this.form.controls['role'].setValue('User');
-        this.alertService.alert = err.error.error
+        
+        const alert: Alert = {
+          title: '',
+          message: ``,
+          type: 'INFO'
+        }
+
+        if (err.error.status === 400) {
+          alert.title = 'Create User';
+          alert.message = err.error.error;
+          alert.type = 'WARN';
+        } else {
+          alert.title = 'Create User';
+          alert.message = 'Fail to create new user';
+          alert.type = 'FAIL';
+        }
+
+        this.alertService.alert = alert;
       }
     })
   }

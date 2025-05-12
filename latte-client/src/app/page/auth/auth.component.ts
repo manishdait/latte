@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { AlertService } from '../../service/alert.service';
 import { PasswordComponent } from '../../components/password/password.component';
 import { SpinnerComponent } from '../../components/spinner/spinner.component';
+import { Alert } from '../../model/alert.type';
 
 @Component({
   selector: 'app-auth',
@@ -51,12 +52,17 @@ export class AuthComponent implements OnInit {
 
     this.authService.authenticateUser(request).subscribe({
       next: () => {
-        this.router.navigate(['home'], {replaceUrl: true});
+        this.router.navigate(['dashboard'], {replaceUrl: true});
       },
       error: (err) => {
         this.processing.set(false);
         this.form.reset();
-        this.alertService.alert = err.error.error;
+        const alert: Alert = {
+          title: 'Fail to Login',
+          message: err.error.error,
+          type: 'FAIL'
+        }
+        this.alertService.alert = alert;
       }
     });
   }

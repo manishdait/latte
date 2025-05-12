@@ -1,10 +1,10 @@
 <div class="flex items-center justify-center py-1">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full flex flex-col gap-2">
+  <form class="w-full flex flex-col gap-2" [formGroup]="form" (ngSubmit)="onSubmit()">
     <app-dropdown [id]="'priority'" [placeholder]="'Please select priority...'" [dropdownItems]="list" formControlName="priority" />
 
-    <div class="flex gap-4">
-      <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="submit">Save</button>
-      <button class="text-[.9rem] font-medium px-2 py-1 bg-transparent border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCancel()">Cancel</button>
+    <div class="flex gap-2">
+      <button class="bg-ogreen-100 text-[.9rem] text-white font-medium  border-[.1em] border-ogreen-100 px-2 py-1 rounded-md cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" type="submit">Save</button>
+      <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCancel()">Cancel</button>
     </div>
   </form>
 </div>

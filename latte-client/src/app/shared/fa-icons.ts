@@ -22,7 +22,11 @@ import {
   faXmark,
   faSliders,
   faRightFromBracket,
-  faUpRightFromSquare
+  faUpRightFromSquare,
+  faTrash,
+  faPen,
+  faRotateRight,
+  faRotate
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
@@ -48,5 +52,8 @@ export const fontawsomeIcons: IconDefinition[] = [
   faXmark,
   faSliders,
   faRightFromBracket,
-  faUpRightFromSquare
+  faUpRightFromSquare,
+  faTrash,
+  faPen,
+  faRotate
 ];

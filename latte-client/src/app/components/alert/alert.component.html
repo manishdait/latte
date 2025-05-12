@@ -1,7 +1,10 @@
-@if(message() !== '') {
-  <div class="fixed w-screen flex items-center justify-center p-2 z-50">
-    <div class="bg-neutral-50 p-4 rounded-sm border-[.1em] border-neutral-200 w-[min(100%,500px)]">
-      <span class=" text-base font-semibold text-center block">{{ message() }}</span>
+@if(alert) {
+  <div class="fixed w-screen flex items-center justify-end p-2 z-50">
+    <div class="w-[min(100%,300px)] bg-primary-100 border-[.1em] border-primary-400 rounded-md overflow-hidden">
+      <div class="flex flex-col gap-0.5 py-2 px-4 border-l-[.5rem]" [class]="{'border-blue-600':alert.type === 'INFO', 'border-amber-600':alert.type === 'WARN', 'border-red-700':alert.type === 'FAIL'}">
+        <span class=" text-base text-secondary-light-300 font-medium">{{ alert.title }}</span>
+        <span class=" text-[.8rem] text-secondary-light-200 font-medium">{{ alert.message }}</span>
+      </div>
     </div>
   </div>
 }

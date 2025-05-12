@@ -6,30 +6,23 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { CommonModule } from '@angular/common';
 import { Status } from '../../model/status.type';
-import { Priority } from '../../model/priority.type';
+import { Priorities } from '../../model/priority.type';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-list-item',
-  imports: [FontAwesomeModule, CommonModule, RouterLink],
-  templateUrl: './list-item.component.html',
-  styleUrl: './list-item.component.css'
+  selector: 'app-table-item',
+  imports: [CommonModule, RouterLink, FontAwesomeModule],
+  templateUrl: './table-item.component.html',
+  styleUrl: './table-item.component.css'
 })
-export class ListItemComponent implements OnInit {
+export class TableItemComponent implements OnInit {
   tickets$ = input.required<Observable<TicketResponse[]>>();
   
   faLibrary = inject(FaIconLibrary);
 
-  priority: Record<Priority, string> = {
-    'LOW': 'Low',
-    'MEDIUM': 'Medium',
-    'HIGH': 'High'
-  }
+  priority = Priorities;
 
-  status: Record<Status, string> = {
-    'OPEN': 'Open',
-    'CLOSE': 'Close'
-  }
+  status = Status;
 
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);

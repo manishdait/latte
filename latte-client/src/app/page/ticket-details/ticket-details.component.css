@@ -1,14 +1,24 @@
 .low {
-  background-color: #b9f8cf;
-  color: oklch(0.627 0.194 149.214);
+  background-color: #00a63d21;
+  color: #00a63e;
 }
 
 .medium {
-  background-color: #fee685;
-  color: oklch(0.666 0.179 58.318);
+  background-color: #e1710021;
+  color: #e17100;
 }
 
 .high {
-  background-color: oklch(0.885 0.062 18.334);
-  color: oklch(0.577 0.245 27.325);
+  background-color: #e7000b21;
+  color: #e7000b;
+}
+
+.open {
+  background-color: #155dfc21;
+  color: #155dfc;
+}
+
+.close {
+  background-color: #9810fa21;
+  color: #9810fa;
 }

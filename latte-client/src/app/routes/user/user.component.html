@@ -14,54 +14,69 @@
   <app-dialog [message]="'Do you want to delete ' + buffer().firstname " (trigger)="confirmTrigger($event)"/>
 }
 
-<div class="h-full w-full p-4">
-  <div class="flex py-2 gap-5 items-center">
-    <h1 class="text-2xl font-medium text-neutral-800">Users</h1>
-    @if (createUserOps()) {
-      <button class="bg-green-500 text-[.9rem] text-white font-medium py-1 px-2 rounded-sm cursor-pointer hover:bg-green-600" type="button" (click)="toggleCreateUser()">Add user</button>
-    }
-  </div>
+<div class="w-full h-full flex flex-col gap-4">
+  <section class="flex items-center gap-5 pb-2">
+    <h1 class="text-2xl text-secondary-400 font-medium">Users</h1>
+    
+    <button class="flex gap-1 text-[.9rem] text-secondary-400 font-medium border-[.1em] rounded-md border-primary-400 py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCreateUser()" *hasAuthority="['user::create']">
+      <fa-icon class="text-secondary-200" [icon]="'plus'"/>
+      <span>Add user</span> 
+    </button>
+    
+  </section>
 
-  <div class="border-[.1em] border-neutral-200 rounded-sm">
-    <div class="flex gap-4 bg-neutral-50 py-2 px-4">
-      <span class="text-base font-semibold text-neutral-800">
-        Users <span class="text-[.7rem] text-neutral-600 bg-neutral-200 py-0.5 px-1 rounded-sm">{{ (userCount$ | async) }}</span>
+  <div class="border-[.1em] border-primary-400 rounded-md">
+    <section class="flex gap-4 border-b-[.1em] border-primary-400 py-2 px-4">
+      <span class="text-base text-secondary-400 font-medium">
+        Users <span class="bg-primary-300 text-[.7rem] text-secondary-400 rounded-sm py-0.5 px-1">{{ (userCount$ | async) }}</span>
       </span>
-    </div>
+    </section>
 
-    @if (loading()) {
-      <div class="flex gap-4 py-3 px-4 border-t-[.1em] border-neutral-200 cursor-pointer">
-        <span class="text-base text-neutral-500">Fetching Users...</span>
-      </div>
-    } @else {
-      @for(user of (users$ | async)?.slice(0, size()); track user.firstname) {
-        <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4 border-t-[.1em] border-gray-200 cursor-pointer">
-          <div class="flex flex-col gap-0.5">
-            <span class="text-[1rem] font-semibold">{{ user.firstname }}</span>
-            <span class="text-[.9rem] font-medium text-gray-500">{{ user.email}}</span>
-          </div>
-  
-          <div class="flex gap-2 flex-wrap">
-            @if (user.editable) {
-              @if (editUserOps()) {
-                <button class="text-[.9rem] font-medium px-2 py-1 bg-green-500 border-[.1em] border-green-500 text-white rounded-sm cursor-pointer hover:bg-green-600 hover:border-green-600" type="button" (click)="toggleEditUser(user)">Edit</button>
-              }
-              @if (resetPasswordOps()) {
-                <button class="text-[.9rem] font-medium px-2 py-1 border-[.1em] border-neutral-200 text-neutral-500 rounded-sm cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleResetPassword(user)">Reset Password</button>
-              }
-            }
-            @if (deleteUserOps() && user.deletable) {
-              <button class="text-[.9rem] font-medium px-2 py-1 disabled:bg-neutral-200 disabled:border-neutral-200 bg-red-600 border-[.1em] disabled:cursor-auto border-red-600 text-white rounded-sm cursor-pointer hover:bg-red-700 hover:border-red-700" [disabled]="!user.deletable" type="button" (click)="deleteUser(user)">Delete</button>
-            }
-          </div>
-        </div>
+    <section>
+      @if (loading()) {
+        <!-- <div class="flex gap-4 py-3 px-4 border-t-[.1em] border-primary-light-300 cursor-pointer">
+          <span class="text-base text-neutral-500">Fetching Users...</span>
+        </div> -->
+      } @else {
+        <ul>
+          @for(user of (users$ | async)?.slice(0, size()); track user.firstname) { 
+            <li class="not-last:border-b-[.1em] border-primary-400">
+              <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4 cursor-pointer card">
+                <div class="flex flex-col gap-0.5 text-secondary-400">
+                  <span class="text-[1rem] font-semibold">{{ user.firstname }}</span>
+                  <span class="text-[.9rem] font-medium text-secondary-300">{{ user.email}}</span>
+                </div>
+        
+                <div class="flex gap-2 flex-wrap">
+                  @if (user.editable) {
+                    <button class="flex items-center gap-1 bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" type="button" (click)="toggleEditUser(user)" *hasAuthority="['user::edit']">
+                      <fa-icon class="text-[.7rem]" [icon]="'pen'"/>
+                      <span>Edit</span>
+                    </button>
+
+                    <button class="flex items-center gap-1 text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleResetPassword(user)" *hasAuthority="['user::reset-password']">
+                      <fa-icon class="text-[.7rem]" [icon]="'rotate'"/>
+                      <span>Reset Password</span>
+                    </button>
+                  }
+                  @if (user.deletable) {
+                    <button class="flex items-center gap-1 text-[.9rem] font-medium text-red-700 border-[.1em] rounded-md border-red-700 px-2 py-1 cursor-pointer hover:bg-neutral-900/5" [disabled]="!user.deletable" type="button" (click)="deleteUser(user)" *hasAuthority="['user::delete']">
+                      <fa-icon class="text-[.7rem]" [icon]="'trash'"/>
+                      <span>Delete</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
       }
-    }
+    </section>
 
-    @if(userPage()['prev'] || userPage()['next']) {
-      <div class="flex gap-4 p-2 border-t-[.1em] border-neutral-200 justify-end">
+    <!-- @if(userPage()['prev'] || userPage()['next']) { -->
+      <section class="flex gap-4 p-2 border-t-[.1em] border-primary-400 justify-end">
         <app-pagination [hasNext]="userPage()['next']" [hasPrev]="userPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
-      </div>
-    }
+      </section>
+    <!-- } -->
   </div>
 </div>

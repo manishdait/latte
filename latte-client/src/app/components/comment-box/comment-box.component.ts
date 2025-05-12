@@ -29,7 +29,7 @@ export class CommentBoxComponent implements OnInit {
   
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);
-    this.owner.set(this.activity().author === this.authService.getFirstname());
+    this.owner.set(this.activity().author === this.authService.user.firstname);
   }
 
   toggleUtil() {
@@ -38,6 +38,7 @@ export class CommentBoxComponent implements OnInit {
 
   toggleEdit() {
     this.edit.update(toggle => !toggle);
+    this.toggleUtil();    
   }
 
   delete() {
@@ -48,7 +49,8 @@ export class CommentBoxComponent implements OnInit {
       error: (err) => {
         console.error(err);
       }
-    })
+    });
+    this.toggleUtil();
   }
 
   updateComment() {

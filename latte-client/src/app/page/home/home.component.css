@@ -1,14 +1,9 @@
-.active {
-  background-color: #00c950;
-  color: #fff;
-}
-
-.window {
+.main {
   padding: 2em;
 }
 
 @media screen and (max-width: 800px) {
-  .window {
+  .main {
     flex-direction: column;
   }
   .menubar {
@@ -17,7 +12,7 @@
 }
 
 @media screen and (max-width: 500px) {
-  .window {
+  .main {
     padding: 1em;
   }
 }

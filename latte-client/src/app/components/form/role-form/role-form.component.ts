@@ -1,8 +1,7 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { RoleService } from '../../../service/role.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RoleRequest } from '../../../model/role.type';
-import { Authority } from '../../../model/authority.type';
+import { RoleRequest, Authority } from '../../../model/role.type';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
 import { addRole, updateRoleCount } from '../../../state/role/role.action';

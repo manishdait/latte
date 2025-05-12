@@ -4,19 +4,18 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { TicketService } from '../../service/ticket.service';
-import { generateColor, getDate } from '../../shared/utils';
+import { getDate, greet } from '../../shared/utils';
 import { AppState } from '../../state/app.state';
 import { setCloseCount, setOpenCount, setTicketCount } from '../../state/ticket/ticket.action';
 import { closeTickets, openTickets, totalTickets } from '../../state/ticket/ticket.selector';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TicketResponse } from '../../model/ticket.type';
-import { ListItemComponent } from '../../components/list-item/list-item.component';
-import { Priority } from '../../model/priority.type';
-import { Status } from '../../model/status.type';
+import { CardItemComponent } from '../../components/card-item/card-item.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, FontAwesomeModule, ListItemComponent],
+  imports: [CommonModule, RouterLink, FontAwesomeModule, CardItemComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -24,22 +23,12 @@ export class DashboardComponent implements OnInit {
   authService = inject(AuthService);
   ticketService = inject(TicketService);
 
-  username = signal(this.authService.getFirstname());
+  user = signal(this.authService.user);
+  greet = signal(greet());
 
   openTickets$: Observable<number>;
   closedTickets$: Observable<number>;
   totalTickets$: Observable<number>;
-
-  priority: Record<Priority, string> = {
-    'LOW': 'Low',
-    'MEDIUM': 'Medium',
-    'HIGH': 'High'
-  }
-
-  status: Record<Status, string> = {
-    'OPEN': 'Open',
-    'CLOSE': 'Close'
-  }
 
   tickets = signal<TicketResponse[]>([]);
 
@@ -65,23 +54,7 @@ export class DashboardComponent implements OnInit {
     });    
   }
 
-  getColor(username: any): string {
-    if (!username) {return '#ddd'}
-    return generateColor(username);
-  }
-
   getDate(date: any) {
     return getDate(date);
-  }
-
-  greet(): string {
-    const hours: number = new Date().getHours();
-    if (hours >= 5 && hours <= 11) {
-      return "Good Morning";
-    } else if (hours >= 12 && hours <= 16) {
-      return "Good Afternoon";
-    } else {
-      return "Good Evening";
-    }
   }
 }

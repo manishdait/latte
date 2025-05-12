@@ -5,6 +5,7 @@ import { UserService } from '../../../service/user.service';
 import { AlertService } from '../../../service/alert.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { RoleService } from '../../../service/role.service';
+import { Alert } from '../../../model/alert.type';
 
 @Component({
   selector: 'app-edit-user',
@@ -86,14 +87,26 @@ export class EditUserComponent implements OnInit {
 
     if (this._user) {
       this.userService.editUser(request, this._user()).subscribe({
-        next: (response) => {
-          this.alertService.alert = 'Updated user info';
+        next: () => {
+          const alert: Alert = {
+          title: 'User Update',
+          message: 'Updated user information',
+          type: 'INFO'
+        }
+        this.alertService.alert = alert;
+        
+        this.cancel.emit(true);
           this.cancel.emit(true);
         },
         error: (err) => {
           this.form.reset();
           this.form.controls['role'].setValue(this.user().role.role);
-          this.alertService.alert = err.error.error;
+          const alert: Alert = {
+            title: 'User Update',
+            message: 'Fail updated user information',
+            type: 'FAIL'
+          }
+          this.alertService.alert = alert;
         }
       })
     }

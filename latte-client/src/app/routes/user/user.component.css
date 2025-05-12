@@ -1,0 +1,7 @@
+@media screen and (max-width: 360px) {
+  .card {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+

@@ -61,3 +61,14 @@ function getMonth(month: number) {
 
   return months[month];
 }
+
+export function greet(): string {
+  const hours: number = new Date().getHours();
+  if (hours >= 5 && hours <= 11) {
+    return "Good Morning";
+  } else if (hours >= 12 && hours <= 16) {
+    return "Good Afternoon";
+  } else {
+    return "Good Evening";
+  }
+}

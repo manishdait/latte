@@ -1,41 +1,33 @@
 <div class="flex flex-col gap-8 mx-auto">
-  <div class="flex flex-col gap-1">
-    <h1 class="text-[2.5rem] text-neutral-800 font-bold">{{ greet() + ', ' + username() }}</h1>
-  </div>
+  <h1 class="text-[2.5rem] text-secondary-400 font-medium">{{ greet() + ', ' + user().firstname }}</h1>
 
-  <div class="flex flex-wrap gap-8">
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">
+  <section class="flex flex-wrap gap-8">
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-200 text-secondary-400 rounded-md p-4">
       <span class="text-base">Total Tickets</span>
       <span class="text-[2.5rem] font-medium">{{ totalTickets$ | async }}</span>
     </div>
 
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">  
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-200 text-secondary-400 rounded-md p-4">  
       <span class="text-base">Open Tickets</span>
       <span class="text-[2.5rem] font-medium">{{ (openTickets$ | async) }}</span>
     </div>
 
-    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-light-200 text-neutral-800 rounded-md p-4">
+    <div class="min-w-[min(300px,100%)] grow flex flex-col gap-4 bg-primary-200 text-secondary-400 rounded-md p-4">
       <span class="text-base">Closed Tickets</span>
       <span class="text-[2.5rem] font-medium">{{ (closedTickets$ | async) }}</span>
     </div>
-  </div>
+  </section>
 
-  @if (tickets().length > 0) {
-    <div>
-      <h1 class="text-2xl font-medium text-neutral-800 mb-4">Recent Tickets</h1>
-  
-      <ul class="card flex flex-col list-none border-[.1em] border-primary-light-300 rounded-md">
+  <section>
+    <h1 class="text-2xl font-medium text-secondary-400 mb-4">Recent Tickets</h1>
+    @if (tickets().length > 0) {
+      <ul class="flex flex-col list-none border-[.1em] border-primary-400 rounded-md">
         @for(ticket of tickets(); track ticket.id) {
-          <li class="flex flex-col gap-1 py-2 px-4 not-last:border-b-[.1em] border-primary-light-300">
-            <div class="flex flex-wrap gap-2 items-center">
-              <span class="text-[1rem] text-secondary-light-200 font-semibold">{{ ticket.title.length > 100 ? ticket.title.substring(100) + '...' : ticket.title  }}</span>
-              <span class="px-2 py-1 rounded-md text-[.8rem]" [class]="{'low': ticket.priority === 'LOW', 'medium': ticket.priority === 'MEDIUM' , 'high': ticket.priority === 'HIGH' }">{{ priority[ticket.priority] }}</span>
-              <span class="px-2 py-1 rounded-md text-[.8rem]" [class]="{'open': ticket.status === 'OPEN', 'close': ticket.status === 'CLOSE'}">{{ status[ticket.status] }}</span>
-            </div>
-            <span class="text-[.9rem] font-normal text-secondary-light-200">{{ '#' + ticket.id + ' ' + ticket.createdBy.firstname + ' create on ' +  getDate(ticket.createdAt)}}</span>
+          <li class="not-last:border-b-[.1em] border-primary-400 cursor-pointer" routerLink="{{ '/tickets/'+ticket.id }}">
+            <app-card-item [ticket]="ticket"/>
           </li>
         }
       </ul>
-    </div>
-  }
+    }
+  </section>
 </div>

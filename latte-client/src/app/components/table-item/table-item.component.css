@@ -29,11 +29,9 @@ table {
 }
 
 td, th {
-  border-top: .1em solid #ebebeb;
-  border-bottom: .1em solid #ebebeb;
   padding: .8em .6em;
   text-align: left;
-  color: #444444;
+  color: #333333;
 }
 
 td {
@@ -41,19 +39,7 @@ td {
 }
 
 th {
-  font-size: .85rem;
+  font-size: .8rem;
+  border-bottom: .1em solid #d4d4d4;
   background: #f5f5f5;
-}
-
-.card {
-  display: none;
-}
-
-@media screen and (max-width: 1155px) {
-  .card {
-    display: flex;
-  }
-  table {
-    display: none;
-  }
 }
