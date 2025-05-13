@@ -5,6 +5,7 @@ import { fontawsomeIcons } from '../../shared/fa-icons';
 import { getDate } from '../../shared/utils';
 import { TicketService } from '../../service/ticket.service';
 import { PatchTicketRequest, TicketResponse } from '../../model/ticket.type';
+import { Authority } from '../../model/role.type';
 
 @Component({
   selector: 'app-description-box',
@@ -62,6 +63,10 @@ export class DescriptionBoxComponent {
         console.error(err);
       }
     })
+  }
+
+  hasAuthority(authority: Authority) {
+    return this.authService.user.role.authorities.includes(authority);
   }
 
   getDate(date: any) {

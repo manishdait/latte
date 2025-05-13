@@ -22,3 +22,19 @@
   background-color: #9810fa21;
   color: #9810fa;
 }
+
+.animate {
+  animation: shimmer 3s;
+  animation-iteration-count: infinite;
+  background: linear-gradient(to right, #ebebeb 5%, #d4d4d4 25%, #ebebeb 35%);
+  background-size: 1000px 100%;
+}
+@keyframes shimmer {
+  from {
+    background-position: -1000px 0;
+  }
+  to {
+    background-position: 1000px 0;
+  }
+}
+

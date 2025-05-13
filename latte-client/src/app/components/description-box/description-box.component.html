@@ -5,22 +5,27 @@
       <span class="text-[.9rem] text-secondary-200">{{ 'opened at ' + getDate(ticket().createdAt) }}</span>
     </div>
 
-    @if (owner()) {
+    @if (owner() || hasAuthority('ticket::edit')) {
       <div class="relative flex gap-2">
-        <span class="text-[.8rem] text-blue-500 border-[.1em] border-blue-400 rounded-md px-2">owner</span>
-        <div class="w-[1rem] h-[1rem] flex items-center justify-center rounded-[100%] p-3 cursor-pointer hover:bg-primary-300" (click)="toggleUtil()">
-          <fa-icon class="text-[.9rem] text-secondary-300" [icon]="util()? 'close' :'ellipsis-vertical'"/>
-        </div>
+        @if (owner()) {
+          <span class="text-[.8rem] text-blue-500 border-[.1em] border-blue-400 rounded-md px-2">owner</span>
+        }
 
-        @if (util()) {
-          <div class="absolute right-8 border-[.1em] border-primary-400 rounded-md overflow-hidden">
-            <ul>
-              <li class="flex items-center gap-2 bg-primary-100 text-[.9rem] text-secondary-400 px-2 py-1 cursor-pointer hover:bg-primary-200" (click)="toggleEdit()" (click)="toggleUtil()">
-                <fa-icon class="text-[.7rem] text-secondary-200" [icon]="'pen'"/>
-                <span>Edit</span>
-              </li>
-            </ul>
+        @if (!ticket().lock) {
+          <div class="w-[1rem] h-[1rem] flex items-center justify-center rounded-[100%] p-3 cursor-pointer hover:bg-primary-300" (click)="toggleUtil()">
+            <fa-icon class="text-[.9rem] text-secondary-300" [icon]="util()? 'close' :'ellipsis-vertical'"/>
           </div>
+
+          @if (util()) {
+            <div class="absolute right-8 border-[.1em] border-primary-400 rounded-md overflow-hidden">
+              <ul>
+                <li class="flex items-center gap-2 bg-primary-100 text-[.9rem] text-secondary-400 px-2 py-1 cursor-pointer hover:bg-primary-200" (click)="toggleEdit()" (click)="toggleUtil()">
+                  <fa-icon class="text-[.7rem] text-secondary-200" [icon]="'pen'"/>
+                  <span>Edit</span>
+                </li>
+              </ul>
+            </div>
+          }
         }
       </div>
 

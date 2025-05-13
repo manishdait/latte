@@ -3,17 +3,21 @@
     <div class="flex flex-col gap-4 grow">
       <div class="w-full flex items-start justify-between gap-2">
         <div class="w-[min(100%,1000px)]">
-          @if(!editTitle()) {
-            <h1 class="text-[2rem] text-secondary-400 font-medium leading-none">{{ ticket().title }}</h1>
+          @if (loading()) {
+            <div class="w-full h-6 bg-primary-200 animate"></div>
           } @else {
-            <input class="w-full text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" type="text" placeholder="Edit title" #title>
+            @if(!editTitle()) {
+              <h1 class="text-[2rem] text-secondary-400 font-medium leading-none">{{ ticket().title }}</h1>
+            } @else {
+              <input class="w-full text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" type="text" placeholder="Edit title" #title>
+            }
           }
         </div>
 
         @if (isOwnerOrHasAuthority('ticket::edit')) {
           <div class="flex gap-4">
             @if (!editTitle()) {
-              <button class="h-fit text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleEditTitle()">Edit</button>
+              <button class="h-fit text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="toggleEditTitle()">Edit</button>
             } @else {
               <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleEditTitle()">Cancel</button>
               <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100 rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" type="button" (click)="updateTitle()">Save</button>
@@ -23,12 +27,19 @@
       </div>
 
       <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-4">
-          <fa-icon class="text-secondary-200" [icon]="ticket().lock? 'lock' : 'lock-open'"/>
-          <span class="w-fit text-[.9rem] font-medium rounded-md px-2 py-1" [class]="ticket().status === 'OPEN'? 'open' : 'close'">
-            {{ status[ticket().status] }}
-          </span>
-        </div>
+        @if (loading()){
+          <div class="w-[min(100%,120px)] flex items-center gap-4">
+            <div class="w-[1.8rem] h-[1.8rem] rounded-[100%] bg-primary-200 animate"></div>
+            <div class="w-[60px] h-6 bg-primary-200 animate"></div>
+          </div>
+        } @else {
+          <div class="flex items-center gap-4">
+            <fa-icon class="text-secondary-200" [icon]="ticket().lock? 'lock' : 'lock-open'"/>
+            <span class="w-fit text-[.9rem] font-medium rounded-md px-2 py-1" [class]="ticket().status === 'OPEN'? 'open' : 'close'">
+              {{ status[ticket().status] }}
+            </span>
+          </div>
+        }
 
         @if (hasAuthority('ticket::delete') || hasAuthority('ticket::lock-unlock')) {
           <div class="relative">
@@ -39,7 +50,7 @@
             @if (util()) {
               <div class="absolute right-8 bg-primary-100 border-[.1em] border-primary-400 rounded-sm">
                 <ul>
-                  @if (isOwnerOrHasAuthority('ticket::delete')) {
+                  @if (isOwnerOrHasAuthority('ticket::delete') && !ticket().lock) {
                     <li class="flex gap-2 items-center text-[.9rem] text-red-700 border-b-[.1em] border-primary-400 px-2 py-1 cursor-pointer hover:bg-primary-200" (click)="delete()" (click)="toggleUtil()">
                       <fa-icon class="text-[.7rem]" [icon]="'trash'"/>
                       <span>Delete</span>
@@ -79,11 +90,11 @@
         
         <div class="flex flex-wrap justify-end gap-2">
           @if(ticket().status == 'OPEN') {
-            <button class="text-[.9rem] text-purple-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
+            <button class="text-[.9rem] text-purple-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
           } @else {
-            <button class="text-[.9rem] text-blue-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
+            <button class="text-[.9rem] text-blue-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
           }
-          <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100  rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" [disabled]="ticket().lock" type="button" (click)="comment(message)">Comment</button>
+          <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100  rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200 disabled:border-primary-400 disabled:bg-primary-400 disabled:hover:bg-primary-400 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="comment(message)">Comment</button>
         </div>
       </div>
     </div>
@@ -91,32 +102,44 @@
     <div class="h-fit grow">
       <div class="w-full flex flex-col gap-1 text-base border-b-[.1em] border-primary-400 py-2">
         <span class="text-[.9rem] text-secondary-400 font-medium mb-1">Assigned To</span>
-        @if (!editAssignee()) {
-          @if (ticket().assignedTo) {
-            <div class="flex items-center gap-2">
-              <div class="w-[1.8rem] h-[1.8rem] flex items-center justify-center rounded-[100%] " [style.background-color]="getColor(ticket().assignedTo?.firstname)">
-                <span class="text-[.8rem] text-white text-center font-medium">{{ ticket().assignedTo?.firstname?.charAt(0) }}</span>
-              </div>
-
-              <span class="text-[.9rem] text-secondary-300">{{ ticket().assignedTo?.firstname }}</span>
-            </div>
-          }   @else {
-            <span class="text-[.9rem] text-secondary-200">None</span>
-          }
-            <span class="text-[.8rem] text-secondary-200 mt-2 cursor-pointer" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditAssignee()" *hasAuthority="['ticket::assign']">Edit</span>
+        @if (loading()) {
+          <div class="w-full flex items-center gap-2">
+            <div class="w-[1.8rem] h-[1.8rem] bg-primary-200 animate rounded-[100%]"></div>
+            <div class="h-4 w-[min(100%,80px)] bg-primary-200 animate"></div>
+          </div>
         } @else {
-          <app-edit-assign [ticketId]="ticketId()" [value]="getAssignee() ?? ''" (cancel)="toggleEditAssignee()" (changes)="refresh()"/>
+          @if (!editAssignee()) {
+            @if (ticket().assignedTo) {
+              <div class="flex items-center gap-2">
+                <div class="w-[1.8rem] h-[1.8rem] flex items-center justify-center rounded-[100%] " [style.background-color]="getColor(ticket().assignedTo?.firstname)">
+                  <span class="text-[.8rem] text-white text-center font-medium">{{ ticket().assignedTo?.firstname?.charAt(0) }}</span>
+                </div>
+
+                <span class="text-[.9rem] text-secondary-300">{{ ticket().assignedTo?.firstname }}</span>
+              </div>
+            } @else {
+              <span class="text-[.9rem] text-secondary-200">None</span>
+            }
+            <span class="text-[.8rem] text-secondary-200 mt-2 cursor-pointer" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditAssignee()" *hasAuthority="['ticket::assign']">Edit</span>
+          } @else {
+            <app-edit-assign [ticketId]="ticketId()" [value]="getAssignee() ?? ''" (cancel)="toggleEditAssignee()" (changes)="refresh()"/>
+          }
         }
+        
       </div>
 
       <div class="w-full flex text-base flex-col gap-1 py-2">
         <span class="text-[.9rem] text-secondary-400 font-medium mb-1">Priority</span>
-        @if (!editPriority()) {
-          <span class=" w-fit text-[.9rem] rounded-md px-4 py-1 cursor-pointer" [class]="{'low': ticket().priority === 'LOW', 'medium': ticket().priority === 'MEDIUM' , 'high': ticket().priority === 'HIGH' }" (click)="toggleEditPriority()">
-            {{ priority[ticket().priority] }}
-          </span>
+        @if (loading()) {
+          <div class="h-5 w-[min(100%,80px)] bg-primary-200 animate"></div>
         } @else {
-          <app-edit-priority [ticketId]="ticketId()" [value]="priority[ticket().priority]" (cancel)="toggleEditPriority()" (changes)="refresh()"/>
+          @if (!editPriority()) {
+            <span class=" w-fit text-[.9rem] rounded-md px-4 py-1 cursor-pointer" [class]="{'low': ticket().priority === 'LOW', 'medium': ticket().priority === 'MEDIUM' , 'high': ticket().priority === 'HIGH' }" (click)="toggleEditPriority()">
+              {{ priority[ticket().priority] }}
+            </span>
+          } @else {
+            <app-edit-priority [ticketId]="ticketId()" [value]="priority[ticket().priority]" (cancel)="toggleEditPriority()" (changes)="refresh()"/>
+          }
         }
       </div>
     </div>

@@ -60,14 +60,17 @@ export class TicketDetailsComponent implements OnInit {
   util = signal(false);
 
   priority = Priorities;
-
   status = Status;
 
+  loading = signal(true);
+
   ngOnInit(): void {
+    this.loading.set(true);
     this.ticketService.fetchTicket(this.ticketId()).subscribe({
       next: (res) => {
         this.ticket.set(res);
         this.owner.set(this.ticket().createdBy.firstname === this.authService.user.firstname);
+        this.loading.set(false);
       }
     });
 
@@ -158,10 +161,16 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleEditTitle() {
+    if (this.loading()) {
+      return;
+    }
     this.editTitle.update(toggle => !toggle);
   }
 
   toggleEditAssignee() {
+    if (this.loading() || this.ticket().lock) {
+      return;
+    }
     this.editAssignee.update(toggle => !toggle);
   }
 
@@ -171,6 +180,9 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleUtil() {
+    if (this.loading()) {
+      return;
+    }
     this.util.update(toggle => !toggle);
   }
 
