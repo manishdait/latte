@@ -13,7 +13,7 @@ import { AlertService } from '../../../service/alert.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { SpinnerComponent } from '../../spinner/spinner.component';
 import { Alert } from '../../../model/alert.type';
-import { HasAuthorityDirective } from '../../../shared/directives/has-autority.directive';
+import { HasAuthorityDirective } from '../../../directives/has-autority.directive';
 
 @Component({
   selector: 'app-ticket-form',

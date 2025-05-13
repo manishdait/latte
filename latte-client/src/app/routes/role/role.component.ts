@@ -14,7 +14,7 @@ import { setRoleCount, setRoles } from '../../state/role/role.action';
 import { CommonModule } from '@angular/common';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
-import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
+import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 
 @Component({
   selector: 'app-role',

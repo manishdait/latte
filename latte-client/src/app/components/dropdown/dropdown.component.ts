@@ -1,7 +1,7 @@
 import { Component, forwardRef, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { CustomControlDirective } from '../../shared/directives/custom-control.directive';
+import { CustomControlDirective } from '../../directives/custom-control.directive';
 
 @Component({
   selector: 'app-dropdown',

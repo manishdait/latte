@@ -2,7 +2,7 @@ import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
+import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 import { AuthService } from '../../service/auth.service';
 
 @Component({

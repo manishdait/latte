@@ -15,7 +15,7 @@ import { CommentService } from '../../service/comment.service';
 import { DescriptionBoxComponent } from '../../components/description-box/description-box.component';
 import { Priorities } from '../../model/priority.type';
 import { Authority } from '../../model/role.type';
-import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
+import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 
 @Component({
   selector: 'app-ticket-details',

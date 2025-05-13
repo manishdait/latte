@@ -1,6 +1,6 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { Authority } from '../../model/role.type';
-import { AuthService } from '../../service/auth.service';
+import { Authority } from '../model/role.type';
+import { AuthService } from '../service/auth.service';
 
 @Directive({
   selector: '[hasAuthority],[hasAnyAuthority]'

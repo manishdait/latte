@@ -16,7 +16,7 @@ import { PasswordFormComponent } from '../../components/form/password-form/passw
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { AuthService } from '../../service/auth.service';
-import { HasAuthorityDirective } from '../../shared/directives/has-autority.directive';
+import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 import { Alert } from '../../model/alert.type';
 
 @Component({

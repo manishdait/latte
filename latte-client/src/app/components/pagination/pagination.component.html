@@ -1,14 +1,14 @@
 <div class="flex gap-2 flex-wrap">
-  <button class="text-[.8rem] text-secondary-200 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 disabled:cursor-auto disabled:hover:bg-transparent cursor-pointer" [disabled]="!hasPrev" (click)="getPrev()">Previous</button>
+  <button class="text-[.8rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 hover:bg-neutral-900/5 disabled:cursor-auto disabled:text-secondary-100 disabled:hover:bg-transparent cursor-pointer" [disabled]="!hasPrev()" (click)="getPrev()">Previous</button>
 
   @if(hasPrev()) {
     <span class="text-[.8rem] text-secondary-200 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2">{{ page() }}</span>
   }
 
-  <span class="bg-primary-200 text-[.8rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2">{{ page() + 1 }}</span>
+  <span class="bg-primary-200 text-[.8rem] text-secondary-500 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2">{{ page() + 1 }}</span>
 
   @if(hasNext()) {
     <span class="text-[.8rem] text-secondary-200 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2">{{ page() + 2 }}</span>
   }
-  <button class="text-[.8rem] text-secondary-200 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 disabled:cursor-auto disabled:hover:bg-transparent cursor-pointer" [disabled]="!hasNext()" (click)="getNext()">Next</button>
+  <button class="text-[.8rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2  hover:bg-neutral-900/5 disabled:cursor-auto disabled:text-secondary-100 disabled:hover:bg-transparent cursor-pointer" [disabled]="!hasNext()" (click)="getNext()">Next</button>
 </div>

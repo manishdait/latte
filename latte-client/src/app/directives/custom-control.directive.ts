@@ -2,7 +2,7 @@ import { Directive, Inject, Injector, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormControlDirective, FormControlName, FormGroupDirective, NgControl } from '@angular/forms';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { Subject, takeUntil, startWith, distinctUntilChanged, tap } from 'rxjs';
-import { fontawsomeIcons } from '../fa-icons';
+import { fontawsomeIcons } from '../shared/fa-icons';
 
 @Directive({
   selector: '[appCustomControl]'

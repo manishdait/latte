@@ -34,7 +34,7 @@ export class TicketComponent implements OnInit {
   status = signal<string>('All Tickets');
 
   page = signal(0);
-  size = signal(10);
+  size = signal(3);
   
   ticketPage = signal<Record<string, boolean>>({
     'prev': false,
