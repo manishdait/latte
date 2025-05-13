@@ -24,19 +24,7 @@ export class ProfileComponent implements OnInit {
   faLibrary = inject(FaIconLibrary);
   router = inject(Router);
 
-  userDetails = signal<UserResponse>({
-    firstname: '',
-    email: '',
-    role: {
-      id: 0,
-      role: '',
-      authorities: [],
-      editable: false,
-      deletable: false
-    },
-    editable: false,
-    deletable: false
-  });
+  userDetails = signal<UserResponse>(this.authService.user);
 
   buffer = signal<UserResponse>({
     firstname: '',

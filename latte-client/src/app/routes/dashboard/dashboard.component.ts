@@ -12,10 +12,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TicketResponse } from '../../model/ticket.type';
 import { CardItemComponent } from '../../components/card-item/card-item.component';
 import { RouterLink } from '@angular/router';
+import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink, FontAwesomeModule, CardItemComponent],
+  imports: [CommonModule, RouterLink, FontAwesomeModule, CardItemComponent, ShimmerComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -32,16 +33,20 @@ export class DashboardComponent implements OnInit {
 
   tickets = signal<TicketResponse[]>([]);
 
+  loading = signal(false);
+
   constructor (private store: Store<AppState>) {
     this.totalTickets$ = store.select(totalTickets);
     this.openTickets$ = store.select(openTickets);
     this.closedTickets$ = store.select(closeTickets);
 
+    this.loading.set(true);
     this.ticketService.fetchPagedTickets(0, 5).subscribe({
       next: (res) => {
         this.tickets.set(res.content);
+        this.loading.set(false);
       }
-    })
+    });
   }
 
   ngOnInit(): void {

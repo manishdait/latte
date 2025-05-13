@@ -34,9 +34,7 @@
 
     <section>
       @if (loading()) {
-        <!-- <div class="flex gap-4 py-3 px-4 border-t-[.1em] border-primary-light-300 cursor-pointer">
-          <span class="text-base text-neutral-500">Fetching Users...</span>
-        </div> -->
+        <app-shimmer [times]="5" [type]="'USER_LIST'"/>
       } @else {
         <ul>
           @for(user of (users$ | async)?.slice(0, size()); track user.firstname) { 
@@ -73,10 +71,10 @@
       }
     </section>
 
-    <!-- @if(userPage()['prev'] || userPage()['next']) { -->
+    @if(userPage()['prev'] || userPage()['next']) {
       <section class="flex gap-4 p-2 border-t-[.1em] border-primary-400 justify-end">
         <app-pagination [hasNext]="userPage()['next']" [hasPrev]="userPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </section>
-    <!-- } -->
+    }
   </div>
 </div>

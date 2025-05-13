@@ -18,10 +18,11 @@ import { PaginationComponent } from '../../components/pagination/pagination.comp
 import { AuthService } from '../../service/auth.service';
 import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 import { Alert } from '../../model/alert.type';
+import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
 
 @Component({
   selector: 'app-user',
-  imports: [PaginationComponent, UserFormComponent, EditUserComponent, PasswordFormComponent, CommonModule, DialogComponent, FontAwesomeModule, HasAuthorityDirective],
+  imports: [CommonModule, FontAwesomeModule, PaginationComponent, UserFormComponent, EditUserComponent, PasswordFormComponent, DialogComponent, ShimmerComponent, HasAuthorityDirective],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })

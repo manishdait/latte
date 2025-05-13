@@ -20,7 +20,10 @@
 
   <section>
     <h1 class="text-2xl font-medium text-secondary-400 mb-4">Recent Tickets</h1>
-    @if (tickets().length > 0) {
+    @if (loading()) {
+      <app-shimmer [times]="5" [type]="'CARD_VIEW'"/>
+    } @else {
+      @if (tickets().length > 0) {
       <ul class="flex flex-col list-none border-[.1em] border-primary-400 rounded-md">
         @for(ticket of tickets(); track ticket.id) {
           <li class="not-last:border-b-[.1em] border-primary-400 cursor-pointer" routerLink="{{ '/tickets/'+ticket.id }}">
@@ -28,6 +31,12 @@
           </li>
         }
       </ul>
+      } @else {
+        <div class="flex flex-col items-center justify-center border-[.1em] border-primary-400 rounded-md p-4">
+          <span class="text-[1.2rem] text-secondary-400 font-medium">No Recent Tickets</span>
+          <span class="text-[.9rem] text-secondary-300">Try creating a new ticket</span>
+        </div>
+      } 
     }
   </section>
 </div>

@@ -1,0 +1,40 @@
+<ul>
+  @for(n of getSequence(); track $index) {
+    <li class="not-last:border-b-[.1em] border-primary-400">
+      @switch(type()) {
+        @case('CARD_VIEW') {
+          <div class="flex text-base flex-col gap-1 py-2 px-4">
+            <div class="w-[min(100%,800px)] h-5 bg-primary-200 animate"></div>
+            <div class="w-[min(100%,400px)] h-4 bg-primary-200 animate"></div>
+          </div>
+        }
+        @case('USER_LIST') {
+          <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4">
+            <div class="w-[min(100%,300px)] h-8 flex flex-col gap-0.5 text-secondary-400">
+              <div class="w-[min(100%,150px)] h-5 bg-primary-200 animate"></div>
+              <div class="w-[min(100%,200px)] h-4 bg-primary-200 animate"></div>
+            </div>
+        
+            <div class="w-[min(100%,280px)] justify-start flex gap-2 flex-wrap">
+              <div class="w-[min(100%,80px)] h-6 bg-primary-200 animate"></div>
+              <div class="w-[min(100%,100px)] h-6 bg-primary-200 animate"></div>
+              <div class="w-[min(100%,80px)] h-6 bg-primary-200 animate"></div>
+            </div>
+          </div>
+        }
+        @case('ROLE_LIST') {
+          <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4">
+            <div class="w-[min(100%,300px)] h-8 flex flex-col gap-0.5 text-secondary-400">
+              <div class="w-[min(100%,150px)] h-5 bg-primary-200 animate"></div>
+            </div>
+        
+            <div class="w-[min(100%,200px)] justify-start flex gap-2 flex-wrap">
+              <div class="w-[min(100%,80px)] h-6 bg-primary-200 animate"></div>
+              <div class="w-[min(100%,100px)] h-6 bg-primary-200 animate"></div>
+            </div>
+          </div>
+        }
+      }
+    </li>
+  }
+</ul>

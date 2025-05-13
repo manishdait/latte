@@ -14,10 +14,11 @@ import { closeTickets, openTickets, tickets } from '../../state/ticket/ticket.se
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { TableItemComponent } from '../../components/table-item/table-item.component';
 import { CardItemComponent } from '../../components/card-item/card-item.component';
+import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
 
 @Component({
   selector: 'app-ticket',
-  imports: [PaginationComponent, TableItemComponent, CardItemComponent, RouterLink, CommonModule, FontAwesomeModule],
+  imports: [RouterLink, CommonModule, FontAwesomeModule, PaginationComponent, TableItemComponent, CardItemComponent, ShimmerComponent],
   templateUrl: './ticket.component.html',
   styleUrl: './ticket.component.css'
 })
@@ -34,7 +35,7 @@ export class TicketComponent implements OnInit {
   status = signal<string>('All Tickets');
 
   page = signal(0);
-  size = signal(3);
+  size = signal(10);
   
   ticketPage = signal<Record<string, boolean>>({
     'prev': false,

@@ -24,26 +24,32 @@
     </section>
 
     <section>
-      @if ((tickets$ | async)?.length !=  0) {
-        <app-table-item class="table-view" [tickets$]="tickets$" />
-        
-        <ul class="card-view flex flex-col list-none">
-          @for (ticket of (tickets$ | async); track ticket.id) {
-            <li class="not-last:border-b-[.1em] border-primary-400" routerLink="{{ ticket.id }}">
-              <app-card-item [ticket]="ticket"/>
-            </li>
-          }
-        </ul>
+      @if (loading()) {
+        <app-shimmer [times]="5" [type]="'CARD_VIEW'"/>
       } @else {
-        <div class="flex flex-col items-center justify-center p-4">
-          <span class="text-[1.5rem] text-secondary-400 font-medium">No Tickets</span>
-          <span class="text-[1rem] text-secondary-300">Try adjusting your filter</span>
-        </div>
+        @if ((tickets$ | async)?.length !=  0) {
+          <app-table-item class="table-view" [tickets$]="tickets$" />
+        
+          <ul class="card-view flex flex-col list-none">
+            @for (ticket of (tickets$ | async); track ticket.id) {
+              <li class="not-last:border-b-[.1em] border-primary-400" routerLink="{{ ticket.id }}">
+                <app-card-item [ticket]="ticket"/>
+              </li>
+            }
+          </ul>
+          } @else {
+          <div class="flex flex-col items-center justify-center p-4">
+            <span class="text-[1.5rem] text-secondary-400 font-medium">No Tickets</span>
+            <span class="text-[1rem] text-secondary-300">Try adjusting your filter</span>
+          </div>
+        } 
       }
     </section>
     
-    <section class="flex items-center justify-end border-t-[.1em] border-primary-400 p-2">
-      <app-pagination [hasNext]="ticketPage()['next']" [hasPrev]="ticketPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
-    </section>
+    @if (ticketPage()['next'] || ticketPage()['prev']) {
+      <section class="flex items-center justify-end border-t-[.1em] border-primary-400 p-2">
+        <app-pagination [hasNext]="ticketPage()['next']" [hasPrev]="ticketPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+      </section>
+    }
   </div>
 </div>

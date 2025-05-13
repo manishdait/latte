@@ -15,10 +15,11 @@ import { CommonModule } from '@angular/common';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { HasAuthorityDirective } from '../../directives/has-autority.directive';
+import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
 
 @Component({
   selector: 'app-role',
-  imports: [CommonModule, FontAwesomeModule, RoleFormComponent, EditRoleFormComponent, RoleDeleteComponent, PaginationComponent, HasAuthorityDirective],
+  imports: [CommonModule, FontAwesomeModule, RoleFormComponent, EditRoleFormComponent, RoleDeleteComponent, PaginationComponent, ShimmerComponent, HasAuthorityDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.css'
 })
