@@ -1,0 +1,35 @@
+<div class="flex flex-col gap-4 mx-auto">
+  <h1 class="text-2xl text-secondary-400 font-medium">Notifications</h1>
+
+  <div class="text-secondary-400 border-[.1em] border-primary-400 rounded-md">
+    @if (loading()) {
+      <app-shimmer [times]="5" [type]="'NOTIFICATION_LIST'"/>
+    } @else {
+      <ul>
+      @if ((notifications$ | async)?.length == 0) {
+        <li class="not-last:border-b-[.1em] border-primary-400">
+          <div class="flex flex-col items-center justify-center p-2">
+            <span class="block text-[1.2rem] text-center text-secondary-400">No notifications</span>
+            <span class="block text-[.9rem] text-center text-secondary-200">There are no notifications</span>
+          </div>
+        </li>
+      }
+      @for(notification of (notifications$ | async); track $index) {
+        <li class="not-last:border-b-[.1em] border-primary-400">
+          <div class="flex flex-wrap gap-4 items-center justify-between p-2">
+            <div class="flex flex-col">
+              <span class="text-[.8rem] text-secondary-200">{{ getDate(notification.timestamp) }}</span>
+              <span class="text-base text-secondary-400">{{ notification.message }}</span>
+            </div>
+
+            <button class="flex gap-1 items-center text-[.9rem] font-medium text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" (click)="delete(notification.id)">
+              <fa-icon class="text-[.8rem]" [icon]="'check'"/>
+              <span>Done</span>
+            </button>
+          </div>
+        </li>
+      }
+      </ul>
+    }
+  </div>
+</div>

@@ -34,6 +34,18 @@
             </div>
           </div>
         }
+        @case('NOTIFICATION_LIST') {
+          <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4">
+            <div class="w-[min(100%,300px)] h-8 flex flex-col gap-0.5 text-secondary-400">
+              <div class="w-[min(100%,150px)] h-4 bg-primary-200 animate"></div>
+              <div class="w-[min(100%,250px)] h-5 bg-primary-200 animate"></div>
+            </div>
+        
+            <div class="w-[min(100%,90px)] justify-start flex gap-2 flex-wrap">
+              <div class="w-[min(100%,80px)] h-6 bg-primary-200 animate"></div>
+            </div>
+          </div>
+        }
       }
     </li>
   }

@@ -78,7 +78,7 @@ export class EditAssignComponent implements OnInit {
   }
 
   toggleCancel() {
-    this.cancel.emit(false);
+    this.cancel.emit(true);
   }
 }
 

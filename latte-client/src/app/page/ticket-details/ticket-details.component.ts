@@ -168,7 +168,7 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   toggleEditAssignee() {
-    if (this.loading() || this.ticket().lock) {
+    if (this.ticket().lock) {
       return;
     }
     this.editAssignee.update(toggle => !toggle);
@@ -189,7 +189,7 @@ export class TicketDetailsComponent implements OnInit {
   delete() {
     this.ticketService.deleteTicket(this.ticketId()).subscribe({
       next: (res) => {
-        this.router.navigate(['home/tickets'], {replaceUrl: true})
+        this.router.navigate(['/tickets'], {replaceUrl: true})
       }
     })
   }

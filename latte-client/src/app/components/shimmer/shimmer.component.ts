@@ -15,4 +15,4 @@ export class ShimmerComponent {
   }
 }
 
-export type Shimmer = 'CARD_VIEW' | 'USER_LIST' | 'ROLE_LIST';
+export type Shimmer = 'CARD_VIEW' | 'USER_LIST' | 'ROLE_LIST' | 'NOTIFICATION_LIST';

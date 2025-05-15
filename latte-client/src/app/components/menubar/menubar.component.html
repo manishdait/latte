@@ -40,9 +40,15 @@
           <fa-icon class="text-secondary-200" [icon]="'home'"/>
           <span>Dashboard</span>
         </li>
+
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/tickets" routerLinkActive="active">
           <fa-icon class="text-secondary-200" [icon]="'note-sticky'"/>
           <span>Tickets</span>
+        </li>
+
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/notifications" routerLinkActive="active">
+          <fa-icon class="text-secondary-200" [icon]="'inbox'"/>
+          <span>Notifications</span>
         </li>
   
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" (click)="toggleCreateTicket()" *hasAuthority="['ticket::create']">
