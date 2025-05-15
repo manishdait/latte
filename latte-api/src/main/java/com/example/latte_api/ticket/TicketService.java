@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,7 @@ import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
 import com.example.latte_api.error.OperationNotPermittedException;
+import com.example.latte_api.notification.NotificationService;
 import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.dto.TicketPatchRequest;
@@ -30,6 +30,7 @@ import com.example.latte_api.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -42,6 +43,8 @@ public class TicketService {
 
   private final ActivityGenerator activityGenerator;
   private final ActivityService activityService;
+
+  private final NotificationService notificationService;
 
   @Transactional
   public TicketResponse createTicket(TicketRequest request, Authentication authentication) {
@@ -72,6 +75,13 @@ public class TicketService {
     }
     ticketRepository.save(ticket);
     activityService.createActivity(activityGenerator.ticketCreated(user, ticket));
+
+    if (assignTo != null && !assignTo.getUsername().equals(user.getUsername())) {
+      notificationService.sendNotification(
+        assignTo, 
+        String.format("%s assignee a #%d ticket to you", user.getFirstname(), ticket.getId())
+      );
+    }
     return ticketMapper.mapToTicketResponse(ticket);
   }
 
@@ -175,7 +185,8 @@ public class TicketService {
   }
 
   private void assignTicket(Ticket ticket, TicketPatchRequest request, User user, List<Activity> activities) {
-    String old = ticket.getAssignedTo() == null? "" : ticket.getAssignedTo().getFirstname();
+    User previous = ticket.getAssignedTo();
+    String old = previous == null? "" : previous.getFirstname();
     String curr = request.assignedTo();
 
     if (!old.equals(curr)) {
@@ -187,7 +198,22 @@ public class TicketService {
           () -> new EntityNotFoundException("User not found")
         );
       }
+
       ticket.setAssignedTo(assignedTo);
+      
+      if (previous != null) {
+        notificationService.sendNotification(
+          previous,
+          String.format("You are uassignee from ticket #%d", ticket.getId())
+        );
+      }
+
+      if (assignedTo != null && !user.getUsername().equals(assignedTo.getUsername())) {
+        notificationService.sendNotification(
+          assignedTo, 
+          String.format("%s assignee a #%d ticket to you", user.getFirstname(), ticket.getId())
+        );
+      }
     }
   }
 

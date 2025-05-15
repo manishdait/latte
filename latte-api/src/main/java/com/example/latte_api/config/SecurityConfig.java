@@ -45,7 +45,8 @@ public class SecurityConfig {
         "/error",
         "/favicon.ico",
         "/latte-api/v1/auth/login",
-        "/latte-api/v1/auth/refresh"
+        "/latte-api/v1/auth/refresh",
+        "/ws/**"
       ).permitAll();
 
       request.requestMatchers(
@@ -130,8 +131,9 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource configurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("*"));
+    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT, HttpHeaders.ORIGIN));
     
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

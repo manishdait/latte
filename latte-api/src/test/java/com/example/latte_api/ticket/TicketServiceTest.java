@@ -2,6 +2,7 @@ package com.example.latte_api.ticket;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,6 +30,7 @@ import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
 import com.example.latte_api.error.OperationNotPermittedException;
+import com.example.latte_api.notification.NotificationService;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.role.authority.IAuthority;
@@ -63,12 +65,15 @@ public class TicketServiceTest {
   @Mock
   private ActivityService activityService;
 
+  @Mock
+  private NotificationService notificationService;
+
   @Captor
   ArgumentCaptor<Ticket> ticketCaptor;
 
   @BeforeEach
   void setup() {
-    ticketService = new TicketService(ticketRepository, userRepository, ticketMapper, activityGenerator, activityService);
+    ticketService = new TicketService(ticketRepository, userRepository, ticketMapper, activityGenerator, activityService, notificationService);
   }
 
   @AfterEach
@@ -156,6 +161,7 @@ public class TicketServiceTest {
     verify(activityGenerator, times(1)).ticketCreated(eq(user), any(Ticket.class));
     verify(activityService, times(1)).createActivity(activity);
     verify(ticketRepository).save(ticketCaptor.capture());
+    verify(notificationService, times(1)).sendNotification(eq(assignee), anyString());
     verify(ticketMapper, times(1)).mapToTicketResponse(any(Ticket.class));
 
     final Ticket saved = ticketCaptor.getValue();
@@ -428,6 +434,7 @@ public class TicketServiceTest {
     final User user = Mockito.mock(User.class);
     final User assignedTo = Mockito.mock(User.class);
     final Ticket ticket = Ticket.builder()
+      .id(101l)
       .title("Title")
       .description("description")
       .priority(Priority.LOW)
@@ -448,7 +455,10 @@ public class TicketServiceTest {
     when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
     when(activityGenerator.assignedToChanged(eq(user), eq(ticket), eq(""), eq(request.assignedTo()))).thenReturn(activity);
     when(userRepository.findByFirstname(request.assignedTo())).thenReturn(Optional.of(assignedTo));
+    when(user.getFirstname()).thenReturn("Joma");
+    when(user.getUsername()).thenReturn("joma@test.in");
     when(ticketMapper.mapToTicketResponse(ticket)).thenReturn(ticketResponse);
+    when(assignedTo.getUsername()).thenReturn("louis@dev.in");
     when(user.hasAuthority(IAuthority.ASSIGN_TICKET)).thenReturn(true);
 
     final TicketResponse result = ticketService.editTicket(id, request, authentication);
@@ -459,6 +469,7 @@ public class TicketServiceTest {
     verify(activityGenerator, times(1)).assignedToChanged(eq(user), eq(ticket), eq(""), eq(request.assignedTo()));
     verify(ticketRepository, times(1)).save(ticketCaptor.capture());
     verify(activityService, times(1)).saveActivities(anyList());
+    verify(notificationService, times(1)).sendNotification(eq(assignedTo), eq("Joma assignee a #101 ticket to you"));
     verify(ticketMapper, times(1)).mapToTicketResponse(ticket);
 
     final Ticket updated = ticketCaptor.getValue();
