@@ -6,6 +6,7 @@ import { Observable, Subject } from "rxjs";
 import { Notification } from "../model/notification.type";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { Page } from "../model/page.type";
 
 const URL: string = `${environment.API_ENDPOINT}/notifications`;
 
@@ -32,8 +33,8 @@ export class NotificationService {
     return this.message$.asObservable();
   }
 
-  fetchNotification(): Observable<Notification[]> {
-    return this.client.get<Notification[]>(URL);
+  fetchNotification(page: number, size: number): Observable<Page<Notification>> {
+    return this.client.get<Page<Notification>>(`${URL}?page=${page}&size=${size}`);
   }
 
   deleteNotification(id: number): Observable<{[key: string]: boolean}> {

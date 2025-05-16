@@ -32,4 +32,10 @@
       </ul>
     }
   </div>
+
+  @if (notificationPage().hasNext || notificationPage().hasPrevious) {
+    <div class="flex items-center justify-end">
+      <app-pagination [hasNext]="notificationPage().hasNext" [hasPrev]="notificationPage().hasPrevious" [page]="page()" (onNext)="getNext()" (onPrev)="getPrevious()"/>
+    </div>
+  }
 </div>
