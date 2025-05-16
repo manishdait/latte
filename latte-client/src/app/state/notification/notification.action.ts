@@ -3,4 +3,5 @@ import { Notification } from "../../model/notification.type";
 
 export const setNotification = createAction('[Notification] Set notification', props<{notifications: Notification[]}>());
 export const addNotification = createAction('[Notification] Add notification', props<{notification: Notification}>());
-export const removeNotification = createAction('[Notification] Remove notification');
+
+export const setRecentNotification = createAction('[Notification] Set recent notification', props<{status: boolean}>());

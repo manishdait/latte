@@ -1,13 +1,15 @@
 import { createReducer, on } from "@ngrx/store"
-import { addNotification, setNotification } from "./notification.action";
+import { addNotification, setNotification, setRecentNotification } from "./notification.action";
 import { Notification } from "../../model/notification.type";
 
 export interface NotificationState {
-  notifications: Notification[]
+  notifications: Notification[],
+  recentNotification: boolean
 }
 
 const initialState: NotificationState = {
-  notifications: []
+  notifications: [],
+  recentNotification: false
 }
 
 export const notificationReducer = createReducer(
@@ -21,5 +23,10 @@ export const notificationReducer = createReducer(
   on(addNotification, (state, {notification}) => ({
     ...state,
     notifications: [...state.notifications, notification]
+  })),
+
+  on(setRecentNotification, (state, {status}) => ({
+    ...state,
+    recentNotification: status
   }))
 );

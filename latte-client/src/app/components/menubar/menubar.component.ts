@@ -4,10 +4,16 @@ import { fontawsomeIcons } from '../../shared/fa-icons';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 import { AuthService } from '../../service/auth.service';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../state/app.state';
+import { Observable } from 'rxjs';
+import { recentNotification } from '../../state/notification/notification.selector';
+import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-menubar',
-  imports: [FontAwesomeModule, RouterLinkActive, RouterLink, HasAuthorityDirective],
+  imports: [CommonModule, FontAwesomeModule, RouterLinkActive, RouterLink, HasAuthorityDirective],
   templateUrl: './menubar.component.html',
   styleUrl: './menubar.component.css'
 })
@@ -19,6 +25,13 @@ export class MenubarComponent implements OnInit {
   faLibrary = inject(FaIconLibrary);
 
   sidenav = signal(false);
+
+  version = signal(environment.VERSION);
+  hasRecentNotification$: Observable<boolean>;
+
+  constructor(private store: Store<AppState>) {
+    this.hasRecentNotification$ = store.select(recentNotification);
+  }
 
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);

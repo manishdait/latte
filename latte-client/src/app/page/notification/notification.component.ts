@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Notification } from '../../model/notification.type';
 import { getDate } from '../../shared/utils';
 import { NotificationService } from '../../service/notification.service';
-import { setNotification } from '../../state/notification/notification.action';
+import { setNotification, setRecentNotification } from '../../state/notification/notification.action';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
@@ -32,6 +32,7 @@ export class NotificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);
+
     this.loading.set(true);
     this.notificationService.fetchNotification().subscribe({
       next: (res) => {
@@ -39,6 +40,8 @@ export class NotificationComponent implements OnInit {
         this.loading.set(false);
       }
     });
+
+    this.store.dispatch(setRecentNotification({status: false}));
   }
 
   delete(id: number) {

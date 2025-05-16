@@ -13,7 +13,7 @@ const URL: string = `${environment.API_ENDPOINT}/notifications`;
   providedIn: 'root'
 })
 export class NotificationService {
-  private ws = new SockJS('http://localhost:8080/ws')
+  private ws = new SockJS(environment.WEBSOCKET_ENDPONT)
   private socketClient = Stomp.over(this.ws);
 
   private message$ = new Subject<Notification>();

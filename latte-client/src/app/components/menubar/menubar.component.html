@@ -7,7 +7,7 @@
         <img class="w-full h-full object-contain" src="asset/icon.svg">
       </div>
 
-      <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">v0.0.3</span>
+      <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">{{ version() }}</span>
     </a>
   </section>
 
@@ -28,7 +28,7 @@
           <img class="w-full h-full object-contain" src="asset/icon.svg">
         </div>
   
-        <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">v0.0.3</span>
+        <span class="bg-green-600/10 text-[.8rem] text-green-600 font-bold border-[.1em] border-green-600 rounded-[.2em] py-[.1em] px-[.6em]">{{ version() }}</span>
       </a>
     </section>
   
@@ -47,7 +47,12 @@
         </li>
 
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/notifications" routerLinkActive="active">
-          <fa-icon class="text-secondary-200" [icon]="'inbox'"/>
+          <div class="relative">
+            <fa-icon class="text-secondary-200" [icon]="'inbox'"/>
+            @if (hasRecentNotification$ | async) {
+              <div class="absolute top-0.5 left-2.5 w-[.5rem] h-[.5rem] bg-ogreen-100 rounded-full"></div>
+            }
+          </div>
           <span>Notifications</span>
         </li>
   

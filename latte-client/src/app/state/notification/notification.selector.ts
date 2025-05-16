@@ -7,3 +7,8 @@ export const notifications = createSelector(
   notificationStateSelector,
   (state) => state.notifications
 )
+
+export const recentNotification = createSelector(
+  notificationStateSelector,
+  (state) => state.recentNotification
+)

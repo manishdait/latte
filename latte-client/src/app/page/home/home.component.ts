@@ -5,7 +5,7 @@ import { MenubarComponent } from '../../components/menubar/menubar.component';
 import { NotificationService } from '../../service/notification.service';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
-import { addNotification } from '../../state/notification/notification.action';
+import { addNotification, setRecentNotification } from '../../state/notification/notification.action';
 import { AlertService } from '../../service/alert.service';
 import { Alert } from '../../model/alert.type';
 
@@ -31,6 +31,8 @@ export class HomeComponent implements OnInit {
           type: 'INFO'
         }
         this.alertService.alert = alert;
+        
+        this.store.dispatch(setRecentNotification({status: true}));
       }
     })
   }
