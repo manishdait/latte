@@ -2,6 +2,7 @@ package com.example.latte_api.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
@@ -19,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+  @Value("${latte.client-url}")
+  private String clientUrl;
+
   @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {
     registry.enableSimpleBroker("/user");
@@ -33,7 +37,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:4200").withSockJS();
+    registry.addEndpoint("/ws").setAllowedOrigins(clientUrl).withSockJS();
   }
 
   @Override

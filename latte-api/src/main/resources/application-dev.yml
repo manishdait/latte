@@ -12,3 +12,6 @@ security:
   jwt:
     secret-key: ${JWT_SECRETKEY:815F1298534CA2989B84C1C2F48D4609E7A05811E0700653661466A6}
     expiration: 7200
+
+latte:
+  client-url: ${CLIENT_URL:http://localhost:4200}

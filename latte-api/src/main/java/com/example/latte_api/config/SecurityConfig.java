@@ -3,6 +3,7 @@ package com.example.latte_api.config;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,9 @@ import com.example.latte_api.user.UserService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+  @Value("${latte.client-url}")
+  private String clientUrl;
+
   @Autowired
   private UserService userService;
 
@@ -131,7 +135,7 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource configurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    configuration.setAllowedOrigins(List.of(clientUrl));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT, HttpHeaders.ORIGIN));

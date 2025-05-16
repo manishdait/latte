@@ -12,4 +12,7 @@ security:
   jwt:
     secret-key: ${JWT_SECRETKEY}
     expiration: 7200
+
+latte:
+  client-url: ${CLIENT_URL}
     

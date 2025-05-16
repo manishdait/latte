@@ -1,14 +1,17 @@
-{
-  "properties": [
-    {
-      "name": "security.jwt.secret-key",
-      "type": "java.lang.String",
-      "description": "Secret key for json web token"
-    },
-    {
-      "name": "security.jwt.expiration",
-      "type": "java.lang.Integer",
-      "description": "Expiration time in seconds for json web token"
-    }
-  ]
-}
+{"properties": [
+  {
+    "name": "security.jwt.secret-key",
+    "type": "java.lang.String",
+    "description": "Secret key for json web token"
+  },
+  {
+    "name": "security.jwt.expiration",
+    "type": "java.lang.Integer",
+    "description": "Expiration time in seconds for json web token"
+  },
+  {
+    "name": "latte.client-url",
+    "type": "java.lang.String",
+    "description": "Latte client url"
+  }
+]}
