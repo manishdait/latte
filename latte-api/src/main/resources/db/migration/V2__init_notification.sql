@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS notification(
   timestamp TIMESTAMP,
   user_id BIGINT REFERENCES _user(id) NOT NULL
 );
+
+
