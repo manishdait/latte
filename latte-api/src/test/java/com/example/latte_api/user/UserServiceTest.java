@@ -25,10 +25,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.example.latte_api.activity.ActivityRepository;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.shared.PagedEntity;
+import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.dto.UserRequest;
 import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
@@ -48,12 +50,18 @@ public class UserServiceTest {
   @Mock
   private UserMapper userMapper;
 
+  @Mock
+  private TicketRepository ticketRepository;
+
+  @Mock
+  private ActivityRepository activityRepository;
+
   @Captor
   private ArgumentCaptor<User> userCaptor;
 
   @BeforeEach
   void setup() {
-    userService = new UserService(userRepository, roleRepository, userMapper);
+    userService = new UserService(userRepository, roleRepository, ticketRepository, activityRepository, userMapper);
   }
 
   @AfterEach
@@ -376,6 +384,7 @@ public class UserServiceTest {
   void shouldDelete_user_forValidEmail() {
     // mock
     final User user = Mockito.mock(User.class);
+    final User admin = Mockito.mock(User.class);
 
     // given
     final String email = "peter@test.in";
@@ -383,10 +392,19 @@ public class UserServiceTest {
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(user.isDeletable()).thenReturn(true);
+    when(userRepository.findByDeletable(false)).thenReturn(List.of(admin));
+    when(ticketRepository.findByAssignedTo(user)).thenReturn(List.of());
+    when(ticketRepository.findByCreatedBy(user)).thenReturn(List.of());
+    when(activityRepository.findByAuthor(user)).thenReturn(List.of());
+
     userService.deleteUser(email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
+    verify(userRepository, times(1)).findByDeletable(false);
+    verify(ticketRepository, times(1)).findByAssignedTo(user);
+    verify(ticketRepository, times(1)).findByCreatedBy(user);
+    verify(activityRepository, times(1)).findByAuthor(user);
     verify(userRepository, times(1)).delete(user);
   }
 

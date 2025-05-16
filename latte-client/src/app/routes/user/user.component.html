@@ -11,7 +11,7 @@
 }
 
 @if(confirm()) {
-  <app-dialog [message]="'Do you want to delete ' + buffer().firstname " (trigger)="confirmTrigger($event)"/>
+  <app-dialog [message]="'<span>Are you sure you want to delete ' + buffer().firstname + '?</span>' + '<span>This action will unassign the user from any tickets and transfer ownership of their created tickets to the admin user.</span>'" (trigger)="confirmTrigger($event)"/>
 }
 
 <div class="w-full h-full flex flex-col gap-4">

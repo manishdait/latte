@@ -1,5 +1,6 @@
 package com.example.latte_api.user;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -13,9 +14,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.latte_api.activity.Activity;
+import com.example.latte_api.activity.ActivityRepository;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
 import com.example.latte_api.shared.PagedEntity;
+import com.example.latte_api.ticket.Ticket;
+import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.dto.UserRequest;
 import com.example.latte_api.user.dto.UserResponse;
 import com.example.latte_api.user.mapper.UserMapper;
@@ -29,6 +34,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService implements UserDetailsService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
+  private final TicketRepository ticketRepository;
+  private final ActivityRepository activityRepository;
 
   private final UserMapper userMapper;
 
@@ -117,13 +124,36 @@ public class UserService implements UserDetailsService {
     return userMapper.mapToUserDto(user);
   }
 
+  @Transactional
   public void deleteUser(String _user) {
     User user = userRepository.findByEmail(_user).orElseThrow(
       () -> new EntityNotFoundException("User not found")
     );
+
     if (!user.isDeletable()) {
       throw new IllegalStateException("User cannot be deleted");
     }
+
+    User admin = userRepository.findByDeletable(false).get(0);
+
+    List<Ticket> createdTickets = ticketRepository.findByCreatedBy(user);
+    for (Ticket ticket : createdTickets) {
+      ticket.setCreatedBy(admin);
+    }
+    ticketRepository.saveAll(createdTickets);
+
+    List<Activity> activities = activityRepository.findByAuthor(user);
+    for (Activity activity: activities) {
+      activity.setAuthor(admin);
+    }
+    activityRepository.saveAll(activities);
+
+    List<Ticket> assignedTickets = ticketRepository.findByAssignedTo(user);
+    for (Ticket ticket : assignedTickets) {
+      ticket.setAssignedTo(null);
+    }
+    
+    ticketRepository.saveAll(assignedTickets);
     userRepository.delete(user);
   }
 }

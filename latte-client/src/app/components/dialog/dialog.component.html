@@ -2,7 +2,7 @@
   <div class="w-[min(100%,400px)] flex flex-col p-4 gap-8 rounded-md  bg-primary-100">
     <div class="flex flex-col gap-1">
       <h1 class="text-2xl text-secondary-400 font-medium">Confirm</h1>
-      <span class="text-base text-secondary-300">{{ message() }}</span>
+      <div class="text-base text-secondary-300 flex flex-col gap-1" [innerHTML]="message()"></div>
     </div>
 
     <div class="flex gap-2">
