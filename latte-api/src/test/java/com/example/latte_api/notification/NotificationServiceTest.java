@@ -20,9 +20,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 
+import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,23 +79,31 @@ public class NotificationServiceTest {
   @Test
   void shouldGet_notificationoF_user() {
     final User user = Mockito.mock(User.class);
+    @SuppressWarnings("unchecked")
+    final Page<Notification> page = Mockito.mock(Page.class);
     final List<Notification> notifications = List.of(
       new Notification(101L, "message1", Instant.now(), user),
       new Notification(102L, "message2", Instant.now(), user)
     );
+    final Pageable pageable = PageRequest.of(0, 2);
 
     final Authentication authentication = Mockito.mock(Authentication.class);
+    final int pageNumber = 0;
+    final int size = 2;
 
     when(authentication.getPrincipal()).thenReturn(user);
-    when(notificationRepository.findByUser(user)).thenReturn(notifications);
+    when(notificationRepository.findByUser(user, pageable)).thenReturn(page);
+    when(page.hasNext()).thenReturn(false);
+    when(page.hasPrevious()).thenReturn(false);
+    when(page.getContent()).thenReturn(notifications);
 
-    final List<NotificationDto> result = notificationService.getUserNotification(authentication);
+    final PagedEntity<NotificationDto> result = notificationService.getUserNotification(pageNumber, size, authentication);
 
     verify(authentication, times(1)).getPrincipal();
-    verify(notificationRepository, times(1)).findByUser(user);
+    verify(notificationRepository, times(1)).findByUser(user, pageable);
     
     Assertions.assertThat(result).isNotNull();
-    Assertions.assertThat(result).hasSize(2);
+    Assertions.assertThat(result.getContent()).hasSize(2);
   }
 
   @Test

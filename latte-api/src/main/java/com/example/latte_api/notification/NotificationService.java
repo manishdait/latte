@@ -1,13 +1,16 @@
 package com.example.latte_api.notification;
 
 import java.time.Instant;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import com.example.latte_api.error.OperationNotPermittedException;
+import com.example.latte_api.exception.OperationNotPermittedException;
+import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.User;
 
 import jakarta.transaction.Transactional;
@@ -44,11 +47,22 @@ public class NotificationService {
     );
   }
 
-  public List<NotificationDto> getUserNotification(Authentication authentication) {
+  public PagedEntity<NotificationDto> getUserNotification(int page, int size, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return notificationRepository.findByUser(user).stream()
-      .map(n -> new NotificationDto(n.getId(), n.getMessage(), n.getTimestamp()))
-      .toList();
+
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Notification> notifications = notificationRepository.findByUser(user, pageable);
+
+    PagedEntity<NotificationDto> response = new PagedEntity<>();
+    response.setNext(notifications.hasNext());
+    response.setPrev(notifications.hasPrevious());
+    response.setContent(
+      notifications.getContent().stream()
+        .map(n -> new NotificationDto(n.getId(), n.getMessage(), n.getTimestamp()))
+        .toList()
+    );
+
+    return response;
   }
 
   public void deleteNotification(Long id, Authentication authentication) {

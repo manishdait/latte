@@ -1,7 +1,6 @@
 package com.example.latte_api.notification;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -71,10 +73,11 @@ public class NotificationRepositoryTest {
   }
 
   @Test
-  void shouldReturn_listOfNotification_whenFindByUser() {
-    final List<Notification> result = notificationRepository.findByUser(user);
+  void shouldReturn_pageOfNotification_whenFindByUser() {
+    final Pageable pageable = PageRequest.of(0, 2);
+    final Page<Notification> result = notificationRepository.findByUser(user, pageable);
     Assertions.assertThat(result).isNotNull();
-    Assertions.assertThat(result).isNotEmpty();
+    Assertions.assertThat(result.getContent()).isNotEmpty();
   }
 
   @Test
@@ -86,8 +89,9 @@ public class NotificationRepositoryTest {
       .password("password")
       .role(Role.builder().id(101L).role("ROLE_USER").build())
       .build();
-    final List<Notification> result = notificationRepository.findByUser(newUser);
+    final Pageable pageable = PageRequest.of(0, 2);
+    final Page<Notification> result = notificationRepository.findByUser(newUser, pageable);
     Assertions.assertThat(result).isNotNull();
-    Assertions.assertThat(result).isEmpty();
+    Assertions.assertThat(result.getContent()).isEmpty();
   }
 }

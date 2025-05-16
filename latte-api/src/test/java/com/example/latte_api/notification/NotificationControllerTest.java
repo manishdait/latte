@@ -30,6 +30,7 @@ import com.example.latte_api.auth.dto.AuthRequest;
 import com.example.latte_api.auth.dto.AuthResponse;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
+import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 
@@ -94,21 +95,21 @@ public class NotificationControllerTest {
   }
 
   @Test
-  void shouldReturn_listOfNotification_forUser() {
+  void shouldReturn_pageOfNotification_forUser() {
     AuthResponse cred = u1Cred();
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final ResponseEntity<List<NotificationDto>> response = testRestTemplate.exchange(
-      BASE_URI,
+    final ResponseEntity<PagedEntity<NotificationDto>> response = testRestTemplate.exchange(
+      BASE_URI + "?page=0&size=1",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<List<NotificationDto>>(){}
+      new ParameterizedTypeReference<PagedEntity<NotificationDto>>(){}
     );
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).hasSize(1);
+    Assertions.assertThat(response.getBody().getContent()).hasSize(1);
   }
 
   @Test

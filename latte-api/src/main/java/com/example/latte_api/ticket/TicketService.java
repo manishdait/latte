@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
-import com.example.latte_api.error.OperationNotPermittedException;
+import com.example.latte_api.exception.OperationNotPermittedException;
 import com.example.latte_api.notification.NotificationService;
 import com.example.latte_api.role.authority.IAuthority;
 import com.example.latte_api.shared.PagedEntity;
