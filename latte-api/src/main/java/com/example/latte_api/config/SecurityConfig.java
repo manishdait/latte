@@ -111,6 +111,21 @@ public class SecurityConfig {
         "/latte-api/v1/roles/**"
       ).hasAuthority(IAuthority.DELETE_ROLE.getAuthority());
 
+      request.requestMatchers(
+        HttpMethod.POST,
+        "/latte-api/v1/clients"
+      ).hasAuthority(IAuthority.CREATE_CLIENT.getAuthority());
+
+      request.requestMatchers(
+        HttpMethod.PUT,
+        "/latte-api/v1/clients/**"
+      ).hasAuthority(IAuthority.EDIT_CLIENT.getAuthority());
+
+      request.requestMatchers(
+        HttpMethod.DELETE,
+        "/latte-api/v1/clients/**"
+      ).hasAuthority(IAuthority.DELETE_CLIENT.getAuthority());
+
       request.anyRequest().authenticated();
     });
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

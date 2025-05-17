@@ -14,7 +14,11 @@ public enum IAuthority {
   ASSIGN_TICKET("ticket::assign"),
   CREATE_ROLE("role::create"),
   EDIT_ROLE("role::edit"),
-  DELETE_ROLE("role::delete");
+  DELETE_ROLE("role::delete"),
+  CREATE_CLIENT("client::create"),
+  EDIT_CLIENT("client::edit"),
+  DELETE_CLIENT("client::delete");
+
 
   @Getter
   private String authority;

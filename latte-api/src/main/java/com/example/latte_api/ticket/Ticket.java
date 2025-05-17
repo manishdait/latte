@@ -3,6 +3,7 @@ package com.example.latte_api.ticket;
 import java.util.List;
 
 import com.example.latte_api.activity.Activity;
+import com.example.latte_api.client.Client;
 import com.example.latte_api.shared.AbstractAuditingEntity;
 import com.example.latte_api.ticket.enums.Priority;
 import com.example.latte_api.ticket.enums.Status;
@@ -65,6 +66,10 @@ public class Ticket extends AbstractAuditingEntity {
   @ManyToOne
   @JoinColumn(name = "assigned_to")
   private User assignedTo;
+
+  @ManyToOne
+  @JoinColumn(name = "client_id")
+  private Client client;
 
   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
   List<Activity> activities;
