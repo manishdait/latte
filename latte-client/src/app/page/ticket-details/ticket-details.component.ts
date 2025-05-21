@@ -16,10 +16,11 @@ import { DescriptionBoxComponent } from '../../components/description-box/descri
 import { Priorities } from '../../model/priority.type';
 import { Authority } from '../../model/role.type';
 import { HasAuthorityDirective } from '../../directives/has-autority.directive';
+import { EditClientComponent } from './components/edit-client/edit-client.component';
 
 @Component({
   selector: 'app-ticket-details',
-  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent, HasAuthorityDirective],
+  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent, EditClientComponent, HasAuthorityDirective],
   templateUrl: './ticket-details.component.html',
   styleUrl: './ticket-details.component.css'
 })
@@ -49,7 +50,9 @@ export class TicketDetailsComponent implements OnInit {
     },
     assignedTo: null,
     createdAt: new Date(),
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
+    clientName: null,
+    clientEmail: null
   });
 
   ticketId = signal(this.route.snapshot.params['id']);
@@ -57,6 +60,7 @@ export class TicketDetailsComponent implements OnInit {
   editTitle = signal(false);
   editAssignee = signal(false);
   editPriority = signal(false);
+  editClient = signal(false);
   util = signal(false);
 
   priority = Priorities;
@@ -109,7 +113,8 @@ export class TicketDetailsComponent implements OnInit {
         description: null,
         priority: null,
         status: this.ticket().status == 'OPEN' ? 'CLOSE' : 'OPEN',
-        assignedTo: null
+        assignedTo: null,
+        clientId: null
       }
 
       this.ticketService.updateTicket(this.ticketId(), request).subscribe({
@@ -148,7 +153,8 @@ export class TicketDetailsComponent implements OnInit {
       description: null,
       priority: null,
       status: null,
-      assignedTo: null
+      assignedTo: null,
+      clientId: null
     }
 
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
@@ -172,6 +178,13 @@ export class TicketDetailsComponent implements OnInit {
       return;
     }
     this.editAssignee.update(toggle => !toggle);
+  }
+
+  toggleEditClient() {
+    if (this.ticket().lock) {
+      return;
+    }
+    this.editClient.update(toggle => !toggle);
   }
 
   toggleEditPriority() {

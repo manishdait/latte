@@ -18,9 +18,13 @@
 
       <div class="flex flex-col gap-1 my-4" *hasAuthority="['ticket::assign']">
         <label class="text-sm text-secondary-400" for="assigneto">Assigned To</label>
-        <app-dropdown [id]="'assigneto'" [placeholder]="'Please select an engineer...'" [dropdownItems]="engineers()" [hasMore]="hasMore()" [hasUnassign]="true" (onNext)="showMore()" formControlName="assignedTo" />
+        <app-dropdown [id]="'assigneto'" [placeholder]="'Please select an engineer...'" [dropdownItems]="engineers()" [hasMore]="hasMoreEngineers()" [hasUnassign]="true" (onNext)="showMoreEngineers()" formControlName="assignedTo" />
       </div>
 
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-secondary-400" for="client">Client</label>
+        <app-dropdown [id]="'client'" [placeholder]="'Please select an client...'" [dropdownItems]="getClients()" [hasMore]="hasMoreClients()" (onNext)="showMoreClients()" formControlName="client" />
+      </div>
 
       <div class="flex flex-col gap-1 my-4">
         <label class="text-sm text-secondary-400" for="priority">Priority</label>

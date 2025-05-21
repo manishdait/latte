@@ -1,0 +1,73 @@
+@if (createClient()) {
+  <app-client-form (cancel)="toggleCreateClinet()"/>
+}
+@if (editClient()) {
+  <app-edit-client-form [client]="bufferClient()" (cancel)="editClient.set(false)"/>
+}
+@if (deleteClient()) {
+  <app-dialog [message]="'Deleting client will also delete all tickets associated with client'" (trigger)="confirmTrigger($event)"/>
+}
+<div class="flex flex-col gap-4 mx-auto">
+  <section class="flex items-center gap-5 pb-2">
+    <h1 class="text-2xl text-secondary-400 font-medium">Clients</h1>
+    
+    <button class="flex gap-1 text-[.9rem] text-secondary-400 font-medium border-[.1em] rounded-md border-primary-400 py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCreateClinet()" *hasAuthority="['client::create']">
+      <fa-icon class="text-secondary-200" [icon]="'plus'"/>
+      <span>Add Client</span> 
+    </button>
+  </section>
+
+  <div class="border-[.1em] border-primary-400 rounded-md">
+    <section class="flex gap-4 border-b-[.1em] border-primary-400 py-2 px-4">
+      <span class="text-base text-secondary-400 font-medium">
+        Clients
+      </span>
+    </section>
+
+    <section>
+      @if (loading()) {
+        <app-shimmer [times]="5" [type]="'USER_LIST'"/>
+      } @else {
+        @if ((clients$ | async)?.length == 0) {
+          <div class="flex flex-col items-center justify-center p-4">
+            <span class="block text-[1.2rem] text-center text-secondary-400 font-medium">No Clients</span>
+            <span class="block text-[.9rem] text-center text-secondary-300">You don't have any clients</span>
+          </div>
+        } @else {
+          <ul>
+            @for(client of (clients$ | async)?.slice(0, size()); track client.id) { 
+              <li class="not-last:border-b-[.1em] border-primary-400">
+                <div class="flex items-center justify-between flex-wrap gap-4 py-3 px-4 cursor-pointer card">
+                  <div class="flex flex-col gap-0.5 text-secondary-400">
+                    <span class="text-[1rem] font-semibold">{{ client.name }}</span>
+                    <span class="text-[.9rem] font-medium text-secondary-300">{{ client.email}}</span>
+                  </div>
+        
+                  <div class="flex gap-2 flex-wrap">
+                    <button class="flex items-center gap-1 bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" type="button" (click)="toggleEditClient(client)" *hasAuthority="['client::edit']">
+                      <fa-icon class="text-[.7rem]" [icon]="'pen'"/>
+                      <span>Edit</span>
+                    </button>
+
+                    @if (client.deletable) {
+                      <button class="flex items-center gap-1 text-[.9rem] font-medium text-red-700 border-[.1em] rounded-md border-red-700 px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleDeleteClinet(client)" *hasAuthority="['client::delete']">
+                        <fa-icon class="text-[.7rem]" [icon]="'trash'"/>
+                        <span>Delete</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+
+    @if(clientPage()['prev'] || clientPage()['next']) {
+      <section class="flex gap-4 p-2 border-t-[.1em] border-primary-400 justify-end">
+        <app-pagination [hasNext]="clientPage().next" [hasPrev]="clientPage().prev" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+      </section>
+    }
+  </div>
+</div>

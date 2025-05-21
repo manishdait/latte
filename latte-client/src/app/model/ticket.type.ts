@@ -12,7 +12,9 @@ export interface TicketResponse {
   createdBy: UserDto,
   assignedTo: UserDto | null,
   createdAt: Date,
-  lastUpdated: Date
+  lastUpdated: Date,
+  clientName: string | null,
+  clientEmail: string | null
 }
 
 export interface TicketRequest {
@@ -20,7 +22,8 @@ export interface TicketRequest {
   description: string,
   priority: Priority,
   status: Status,
-  assignedTo: string
+  assignedTo: string,
+  clientId: number
 }
 
 export interface PatchTicketRequest {
@@ -28,5 +31,6 @@ export interface PatchTicketRequest {
   description: string | null,
   priority: Priority | null,
   status: Status | null,
-  assignedTo: string | null
+  assignedTo: string | null,
+  clientId: number | null
 }

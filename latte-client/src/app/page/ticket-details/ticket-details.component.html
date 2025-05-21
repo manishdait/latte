@@ -99,7 +99,28 @@
       </div>
     </div>
 
-    <div class="h-fit grow">
+    <div class="min-w-[240px] h-fit grow">
+      <div class="w-full flex flex-col gap-1 text-base border-b-[.1em] border-primary-400 py-2">
+        <span class="text-[.9rem] text-secondary-400 font-medium mb-1">Client</span>
+        @if (loading()) {
+          <div class="w-full flex items-center gap-2">
+            <div class="h-4 w-[min(100%,90px)] bg-primary-200 animate"></div>
+            <div class="h-4 w-[min(100%,90px)] bg-primary-200 animate"></div>
+          </div>
+        } @else {
+          @if (!editClient()) {
+            <span class="text-[.9rem] text-secondary-300">{{ 'Name:  ' + ticket().clientName }}</span>
+            <span class="text-[.9rem] text-secondary-300">{{ 'Email: ' + ticket().clientEmail }}</span>
+            @if(isOwnerOrHasAuthority('ticket::edit')){
+              <span class="text-[.8rem] text-secondary-200 mt-2 cursor-pointer" [style.display]="ticket().lock? 'none' : 'block'" (click)="toggleEditClient()">Edit</span>
+            }
+          } @else {
+            <app-edit-client [ticketId]="ticketId()" [value]="ticket().clientName ?? 'Internal'" (cancel)="toggleEditClient()" (changes)="refresh()"/>
+          }
+        }
+        
+      </div>
+
       <div class="w-full flex flex-col gap-1 text-base border-b-[.1em] border-primary-400 py-2">
         <span class="text-[.9rem] text-secondary-400 font-medium mb-1">Assigned To</span>
         @if (loading()) {
@@ -138,7 +159,9 @@
               {{ priority[ticket().priority] }}
             </span>
           } @else {
-            <app-edit-priority [ticketId]="ticketId()" [value]="priority[ticket().priority]" (cancel)="toggleEditPriority()" (changes)="refresh()"/>
+            @if(isOwnerOrHasAuthority('ticket::edit')){
+              <app-edit-priority [ticketId]="ticketId()" [value]="priority[ticket().priority]" (cancel)="toggleEditPriority()" (changes)="refresh()"/>
+            }
           }
         }
       </div>

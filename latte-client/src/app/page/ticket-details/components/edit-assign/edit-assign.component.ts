@@ -9,7 +9,7 @@ import { DropdownComponent } from '../../../../components/dropdown/dropdown.comp
 
 @Component({
   selector: 'app-edit-assign',
-  imports: [ReactiveFormsModule, FontAwesomeModule, DropdownComponent],
+  imports: [ReactiveFormsModule, DropdownComponent],
   templateUrl: './edit-assign.component.html',
   styleUrl: './edit-assign.component.css'
 })
@@ -43,7 +43,7 @@ export class EditAssignComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form.controls['assignedTo'].setValue(this.value())
+    this.form.controls['assignedToi'].setValue(this.value())
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
@@ -66,7 +66,8 @@ export class EditAssignComponent implements OnInit {
       description: null,
       priority: null,
       status: null,
-      assignedTo: this.form.get('assignedTo')?.value
+      assignedTo: this.form.get('assignedTo')?.value,
+      clientId: null
     }
 
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({

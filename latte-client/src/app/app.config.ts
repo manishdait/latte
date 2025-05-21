@@ -11,6 +11,7 @@ import { userReducer } from './state/user/user.reducer';
 import { provideNgxWebstorage, withLocalStorage } from 'ngx-webstorage';
 import { roleReducer } from './state/role/role.reducer';
 import { notificationReducer } from './state/notification/notification.reducer';
+import { clientReducer } from './state/client/client.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideState({name: 'users', reducer: userReducer}),
     provideState({name: 'roles', reducer: roleReducer}),
     provideState({name: 'notifications', reducer: notificationReducer}),
+    provideState({name: 'clients', reducer: clientReducer}),
     provideNgxWebstorage(withLocalStorage()),
     provideHttpClient(withInterceptorsFromDi()),
     [

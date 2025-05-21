@@ -1,0 +1,36 @@
+<div class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-neutral-900/15 p-4 z-50">
+  <div class="w-[min(100%,650px)] flex flex-col p-4 rounded-md bg-primary-100">
+    <h1 class="text-2xl text-secondary-400 font-medium">Create Client</h1>
+
+    <form class="w-full" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-secondary-400" for="name">Client Name</label>
+        <input class="text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" placeholder="Enter name of the client..." id="name" formControlName="name">
+        @if(formErrors() && (formControls['name'].errors && formControls['name'].errors['required'])) {
+          <span class="text-sm text-red-700">*Required client name</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-secondary-400" for="email">Email</label>
+        <input class="text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" placeholder="Enter client email..." id="email" formControlName="email">
+        @if(formErrors() && (formControls['email'].errors && formControls['email'].errors['required'])) {
+          <span class="text-sm text-red-700">*Required email address</span>
+        }
+        @if(formErrors() && (formControls['email'].errors && formControls['email'].errors['email'])) {
+          <span class="text-sm text-red-700">*Enter valid email address</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1 my-4">
+        <label class="text-sm text-secondary-400" for="phone">Contact Number</label>
+        <input class="text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" placeholder="Enter client contact number..." id="phone" formControlName="phone">
+      </div>
+
+      <div class="flex gap-4">
+        <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
+        <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" type="submit">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>

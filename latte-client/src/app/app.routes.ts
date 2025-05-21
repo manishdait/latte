@@ -31,6 +31,10 @@ export const routes: Routes = [
         loadComponent: () => import('./routes/role/role.component').then(c => c.RoleComponent)
       },
       {
+        path: 'clients',
+        loadComponent: () => import('./routes/client/client.component').then(c => c.ClientComponent)
+      },
+      {
         path: 'profile', 
         loadComponent: () => import('./routes/profile/profile.component').then(c => c.ProfileComponent)
       },

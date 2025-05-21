@@ -1,3 +1,4 @@
+import { ClientState } from "./client/client.reducer";
 import { NotificationState } from "./notification/notification.reducer";
 import { RoleState } from "./role/role.reducer";
 import { TicketState } from "./ticket/ticket.reducer";
@@ -8,5 +9,6 @@ export interface AppState {
   users: UserState,
   roles: RoleState,
   notifications: NotificationState
+  clients: ClientState
 }
 

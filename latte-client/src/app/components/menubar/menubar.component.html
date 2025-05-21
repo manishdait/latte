@@ -63,7 +63,7 @@
       </ul>
     </section>
   
-    <section class="mt-[1em]" *hasAnyAuthority="['user::create','user::edit','user::delete','user::reset-password','role::create','role::edit','role::delete']">
+    <section class="mt-[1em]" *hasAnyAuthority="['user::create','user::edit','user::delete','user::reset-password','role::create','role::edit','role::delete', 'client::create', 'client::edit', 'client::delete']">
       <span class="text-[.8rem] text-secondary-300 font-bold">ADMIN</span>
   
       <ul class="list-none py-[.5em]">
@@ -71,9 +71,15 @@
           <fa-icon class="text-secondary-200" [icon]="'users'"/>
           <span>Users</span>
         </li>
+
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/roles" routerLinkActive="active" *hasAnyAuthority="['role::create','role::edit','role::delete']">
           <fa-icon class="text-secondary-200" [icon]="'gears'"/>
           <span>Roles</span>
+        </li>
+
+        <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/clients" routerLinkActive="active" *hasAnyAuthority="['client::create','client::edit','client::delete']">
+          <fa-icon class="text-secondary-200" [icon]="'user-tie'"/>
+          <span>Clients</span>
         </li>
       </ul>
     </section>

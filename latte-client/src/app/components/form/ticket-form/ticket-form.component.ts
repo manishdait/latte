@@ -14,6 +14,8 @@ import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { SpinnerComponent } from '../../spinner/spinner.component';
 import { Alert } from '../../../model/alert.type';
 import { HasAuthorityDirective } from '../../../directives/has-autority.directive';
+import { ClientService } from '../../../service/client.service';
+import { ClientResponse } from '../../../model/client.type';
 
 @Component({
   selector: 'app-ticket-form',
@@ -23,6 +25,7 @@ import { HasAuthorityDirective } from '../../../directives/has-autority.directiv
 })
 export class TicketFormComponent implements OnInit {
   ticketService = inject(TicketService);
+  clientService = inject(ClientService);
   userService = inject(UserService);
   alertService = inject(AlertService);
   faLibrary = inject(FaIconLibrary);
@@ -30,11 +33,18 @@ export class TicketFormComponent implements OnInit {
   cancel = output<boolean>();
 
   formErrors = signal(false);
-  hasMore = signal(false);
+  
+  hasMoreEngineers = signal(false);
   engineers = signal<string[]>([]);
   
-  pageCount = signal(0);
-  size = signal(5);
+  clients = signal<ClientResponse[]>([]);
+  hasMoreClients = signal(false);
+  
+  engineerPageCount = signal(0);
+  engineerPageSize = signal(5);
+
+  clientPageCount = signal(0);
+  clientPageSize = signal(5);
   
   list: string[] = ['Low', 'Medium', 'High'];
   priorities: Record<string, Priority> = {'Low': 'LOW', 'Medium': 'MEDIUM', 'High': 'HIGH'};
@@ -44,17 +54,23 @@ export class TicketFormComponent implements OnInit {
   processing = signal(false);
   
   constructor(private store: Store<AppState>) {
-    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+    this.userService.fetchUserList(this.engineerPageCount(), this.engineerPageSize()).subscribe((data) => {
       this.engineers.set(data.content);
-      this.hasMore.set(data.next);
-    })
+      this.hasMoreEngineers.set(data.next);
+    });
+
+    this.clientService.fetchClients(this.clientPageCount(), this.clientPageSize()).subscribe((data) => {
+      this.clients.set(data.content);
+      this.hasMoreClients.set(data.next);
+    });
 
     this.form = new FormGroup({
       title: new FormControl('', [Validators.required]),
       description: new FormControl(''),
       assignedTo: new FormControl(''),
       priority: new FormControl('', [Validators.required]),
-    })
+      client: new FormControl('')
+    });
   }
 
   get service() {
@@ -69,18 +85,29 @@ export class TicketFormComponent implements OnInit {
     return this.form.controls;
   }
 
-  showMore() {
-    this.pageCount.update(count => count + 1);
+  showMoreEngineers() {
+    this.engineerPageCount.update(count => count + 1);
 
-    this.userService.fetchUserList(this.pageCount(), this.size()).subscribe((data) => {
+    this.userService.fetchUserList(this.engineerPageCount(), this.engineerPageSize()).subscribe((data) => {
       this.engineers.update(arr => arr.concat(data.content));
-      this.hasMore.set(data.next);
-    })
+      this.hasMoreEngineers.set(data.next);
+    });
+  }
+
+  showMoreClients() {
+    this.clientPageCount.update(count => count + 1);
+
+    this.clientService.fetchClients(this.clientPageCount(), this.clientPageSize()).subscribe((data) => {
+      this.clients.update(arr => arr.concat(data.content));
+      this.hasMoreClients.set(data.next);
+    });
+  }
+
+  getClients() {
+    return this.clients().map(c => c.name);
   }
 
   onSubmit() {
-    console.log(this.form.controls);
-    
     if (this.form.invalid) {
       this.formErrors.set(true);
       return;
@@ -88,15 +115,18 @@ export class TicketFormComponent implements OnInit {
     
     this.formErrors.set(false);
 
+    const client = this.clients().filter(c => c.name === this.form.get('client')?.value);
+
     const request: TicketRequest = {
       title: this.form.get('title')!.value,
       description: this.form.get('description')!.value,
       priority: this.priorities[this.form.get('priority')?.value],
       status: 'OPEN',
-      assignedTo: this.form.get('assignedTo')!.value
+      assignedTo: this.form.get('assignedTo')!.value,
+      clientId: client.length === 0? 0 : client[0].id
     }
 
-    this.processing.set(true);    
+    this.processing.set(true);
 
     this.ticketService.createTicket(request).subscribe({
       next: (response) => {

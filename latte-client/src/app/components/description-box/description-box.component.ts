@@ -51,7 +51,8 @@ export class DescriptionBoxComponent {
       description: description,
       priority: null,
       status: null,
-      assignedTo: null
+      assignedTo: null,
+      clientId: null
     }
 
     this.ticketService.updateTicket(this.ticket().id, request).subscribe({

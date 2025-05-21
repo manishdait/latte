@@ -44,7 +44,8 @@ export class EditPriorityComponent {
       description: null,
       priority: this.priorities[this.form.get('priority')?.value],
       status: null,
-      assignedTo: null
+      assignedTo: null,
+      clientId: null
     }
 
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
