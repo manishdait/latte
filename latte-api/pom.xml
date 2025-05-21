@@ -12,7 +12,7 @@
 
   <groupId>com.example</groupId>
   <artifactId>latte-api</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <name>latte-api</name>
   <description>Rest API for Latte</description>
   

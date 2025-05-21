@@ -43,7 +43,7 @@ jobs:
           context: latte-api
           file: latte-api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/latte-api:0.0.2,${{ secrets.DOCKERHUB_USERNAME }}/latte-api:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/latte-api:0.0.3,${{ secrets.DOCKERHUB_USERNAME }}/latte-api:latest
           build-args: |
             PROFILE=dev
 
@@ -53,6 +53,6 @@ jobs:
           context: latte-client
           file: latte-client/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/latte-client:0.0.2,${{ secrets.DOCKERHUB_USERNAME }}/latte-client:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/latte-client:0.0.3,${{ secrets.DOCKERHUB_USERNAME }}/latte-client:latest
           build-args: |
             PROFILE=local
