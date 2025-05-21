@@ -21,7 +21,7 @@ ARG PROFILE=dev
 
 ENV DATASOURCE_USERNAME=postgres
 ENV DATASOURCE_PASSWORD=password
-ENV CLIENT_URL=http://latte-api:80
+ENV CLIENT_URL=http://latte-client:80
 ENV DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/latte_db
 ENV PROFILE=${PROFILE}
 

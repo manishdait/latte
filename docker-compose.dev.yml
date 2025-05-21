@@ -29,6 +29,8 @@ services:
     restart: always
     depends_on:
       - latte-api
+    environment:
+      - CLIENT_URL=http://latte-client:80
     ports:
       - 80:80
     networks:
