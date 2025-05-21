@@ -19,7 +19,9 @@ export class NotificationService {
 
   private message$ = new Subject<Notification>();
 
-  constructor(private client: HttpClient, private authService: AuthService) {}
+  constructor(private client: HttpClient, private authService: AuthService) {
+    this.socketClient.debug = () => {};
+  }
 
   connect() {
     this.socketClient.connect({'Authorization': `Bearer ${this.authService.getAccessToken()}`}, () => {

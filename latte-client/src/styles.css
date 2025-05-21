@@ -38,6 +38,9 @@
 *::-webkit-scrollbar-track {
   background-color: rgb(231, 231, 231);
 }
+input::placeholder, textarea::placeholder {
+  color: rgb(145, 145, 145);
+}
 
 html {
   font-size: 1rem;

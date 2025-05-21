@@ -4,5 +4,6 @@
     <span class="text-[.8rem] px-2 py-1 rounded-md" [class]="{'low': ticket().priority === 'LOW', 'medium': ticket().priority === 'MEDIUM' , 'high': ticket().priority === 'HIGH' }">{{ priority[ticket().priority] }}</span>
     <span class="text-[.8rem] px-2 py-1 rounded-md" [class]="{'open': ticket().status === 'OPEN', 'close': ticket().status === 'CLOSE'}">{{ status[ticket().status] }}</span>
   </div>
+  
   <span class="text-[.9rem] text-secondary-300">{{ '#' + ticket().id + ' ' + ticket().createdBy.firstname + ' create on ' +  getDate(ticket().createdAt)}}</span>
 </div>
