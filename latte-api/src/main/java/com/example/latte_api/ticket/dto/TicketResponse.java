@@ -16,7 +16,9 @@ public record TicketResponse(
   UserDto createdBy, 
   UserDto assignedTo,
   Instant createdAt,
-  Instant lastUpdated
+  Instant lastUpdated,
+  String clientName,
+  String clientEmail
 ) {
   
 }

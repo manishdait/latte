@@ -72,7 +72,7 @@ public class ClientServiceTest {
 
   @Test
   void shouldReturnClientResponse_forGivenId() {
-    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989");
+    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true);
 
     final Long id = 101L;
 
@@ -115,7 +115,7 @@ public class ClientServiceTest {
   @Test
   void shouldUpdateClient() {
     final Client updatedClient = Mockito.mock(Client.class);
-    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989");
+    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true);
     
     final ClientRequest request = new ClientRequest("NewBob", "newbob@test.in", "+912323232323");
     final Long id = 101L;
@@ -153,6 +153,7 @@ public class ClientServiceTest {
     final Long id = 101L;
 
     when(clientRepository.findById(id)).thenReturn(Optional.of(client));
+    when(client.isDeletable()).thenReturn(true);
     
     clientService.deleteClient(id);
 

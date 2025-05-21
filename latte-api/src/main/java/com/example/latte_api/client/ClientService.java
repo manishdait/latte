@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.latte_api.client.dto.ClientRequest;
 import com.example.latte_api.client.dto.ClientResponse;
+import com.example.latte_api.exception.OperationNotPermittedException;
 import com.example.latte_api.shared.PagedEntity;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -24,11 +25,12 @@ public class ClientService {
       .name(request.name())
       .email(request.email())
       .phone(request.phone())
+      .deletable(true)
       .build();
     
     clientRepository.save(client);
 
-    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone());
+    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone(), client.isDeletable());
   }
 
   public PagedEntity<ClientResponse> getClients(int page, int size) {
@@ -40,7 +42,7 @@ public class ClientService {
     response.setPrev(clients.hasPrevious());
     response.setContent(
       clients.getContent().stream()
-        .map(c -> new ClientResponse(c.getId(), c.getName(), c.getEmail(), c.getPhone()))
+        .map(c -> new ClientResponse(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.isDeletable()))
         .toList()
     );
 
@@ -52,7 +54,7 @@ public class ClientService {
       () -> new EntityNotFoundException("Client do not exists")
     );
 
-    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone());
+    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone(), client.isDeletable());
   }
 
   @Transactional
@@ -73,13 +75,17 @@ public class ClientService {
 
     clientRepository.save(client);
 
-    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone());
+    return new ClientResponse(client.getId(), client.getName(), client.getEmail(), client.getPhone(), client.isDeletable());
   }
 
   public void deleteClient(Long id) {
     Client client = clientRepository.findById(id).orElseThrow(
       () -> new EntityNotFoundException("Client do not exists")
     );
+
+    if (!client.isDeletable()) {
+      throw new OperationNotPermittedException();
+    }
 
     clientRepository.delete(client);
   }

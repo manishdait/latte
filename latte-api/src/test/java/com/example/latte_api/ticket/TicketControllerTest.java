@@ -133,7 +133,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -158,7 +158,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin");
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin", null);
 
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -182,7 +182,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin");
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin", null);
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
             BASE_URI,
@@ -200,7 +200,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Bob");
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Bob",null);
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -213,7 +213,7 @@ public class TicketControllerTest {
 
   @Test
   void shouldGiveForbidden_onCreateTicket_forRequestMissingAuthorizationHeader() {
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin");
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "Admin", null);
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -323,7 +323,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -389,7 +389,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -398,7 +398,7 @@ public class TicketControllerTest {
       TicketResponse.class
     );
 
-    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -425,7 +425,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
             BASE_URI,
@@ -438,7 +438,7 @@ public class TicketControllerTest {
     final HttpHeaders _headers = new HttpHeaders();
     _headers.add("Authorization", "Bearer " + newCred.accessToken());
 
-    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
             BASE_URI + "/" + id,
@@ -464,7 +464,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
             BASE_URI,
@@ -501,7 +501,7 @@ public class TicketControllerTest {
     final HttpHeaders _headers = new HttpHeaders();
     _headers.add("Authorization", "Bearer " + newCred.accessToken());
 
-    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
             BASE_URI + "/" + id,
@@ -520,7 +520,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -529,7 +529,7 @@ public class TicketControllerTest {
       TicketResponse.class
     );
 
-    final TicketPatchRequest request = new TicketPatchRequest(null, "new-descr", null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, "new-descr", null, null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -556,7 +556,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -570,7 +570,7 @@ public class TicketControllerTest {
     final HttpHeaders _headers = new HttpHeaders();
     _headers.add("Authorization", "Bearer " + _cred.accessToken());
 
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Admin", null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Admin", null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -596,7 +596,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
             BASE_URI,
@@ -605,7 +605,7 @@ public class TicketControllerTest {
             TicketResponse.class
     );
 
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Admin", null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Admin", null, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
             BASE_URI + "/" + id,
@@ -624,7 +624,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "", null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -633,7 +633,7 @@ public class TicketControllerTest {
       TicketResponse.class
     );
 
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -659,7 +659,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "");
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, "", null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -668,7 +668,7 @@ public class TicketControllerTest {
       TicketResponse.class
     );
 
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE, null);
     final Long id = ticket.getBody().id();
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -694,7 +694,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null, null);
     final long id = 300L;
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -708,7 +708,7 @@ public class TicketControllerTest {
 
   @Test
   void shouldGiveForbidden_onUpdateTicket_whenRequestMissingAuthorizationHeader() {
-    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Test", null, null, null, null, null);
     final long id = 300L;
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
@@ -728,7 +728,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -758,7 +758,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -785,7 +785,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -831,7 +831,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -861,7 +861,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -888,7 +888,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -933,7 +933,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
             BASE_URI,
@@ -964,7 +964,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -1018,7 +1018,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,
@@ -1051,7 +1051,7 @@ public class TicketControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest ticketRequest = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> ticket = testRestTemplate.exchange(
       BASE_URI,

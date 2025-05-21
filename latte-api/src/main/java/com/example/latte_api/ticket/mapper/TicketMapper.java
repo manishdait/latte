@@ -16,5 +16,7 @@ public interface TicketMapper {
   @Mapping(target = "createdBy.email", source = "createdBy.email")
   @Mapping(target = "assignedTo.firstname", source = "assignedTo.firstname")
   @Mapping(target = "assignedTo.email", source = "assignedTo.email")
+  @Mapping(target = "clientName", expression = "java(ticket.getClient() == null? null : ticket.getClient().getName())")
+  @Mapping(target = "clientEmail", expression = "java(ticket.getClient() == null? null : ticket.getClient().getEmail())")
   TicketResponse mapToTicketResponse(Ticket ticket);
 }

@@ -29,7 +29,7 @@ public class Client extends AbstractAuditingEntity {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "name")
+  @Column(name = "name", unique = true)
   private String name;
 
   @Column(name = "email", unique = true)
@@ -37,4 +37,6 @@ public class Client extends AbstractAuditingEntity {
 
   @Column(name = "phone")
   private String phone;
+
+  private boolean deletable;
 }

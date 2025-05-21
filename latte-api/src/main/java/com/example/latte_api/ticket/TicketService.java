@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
+import com.example.latte_api.client.Client;
+import com.example.latte_api.client.ClientRepository;
 import com.example.latte_api.exception.OperationNotPermittedException;
 import com.example.latte_api.notification.NotificationService;
 import com.example.latte_api.role.authority.IAuthority;
@@ -38,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketService {
   private final TicketRepository ticketRepository;
   private final UserRepository userRepository;
+  private final ClientRepository clientRepository;
 
   private final TicketMapper ticketMapper;
 
@@ -50,6 +53,7 @@ public class TicketService {
   public TicketResponse createTicket(TicketRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     User assignTo = null;
+    Client client = null;
 
     if (request.assignedTo() != null && !request.assignedTo().isEmpty()) {
       if(!user.hasAuthority(IAuthority.ASSIGN_TICKET)) {
@@ -61,6 +65,12 @@ public class TicketService {
       );
     }
 
+    if (request.clientId() != null) {
+      client = clientRepository.findById(request.clientId()).orElseThrow(
+        () -> new EntityNotFoundException("Client does not exist")
+      );
+    }
+
     Ticket ticket = Ticket.builder()
       .title(request.title())
       .description(request.description())
@@ -68,6 +78,7 @@ public class TicketService {
       .status(request.status())
       .lock(false)
       .createdBy(user)
+      .client(client)
       .build();
 
     if (assignTo != null) {
@@ -175,6 +186,19 @@ public class TicketService {
     if (request.assignedTo() != null) {
       if (!user.hasAuthority(IAuthority.ASSIGN_TICKET)) {throw new OperationNotPermittedException();}
       assignTicket(ticket, request, user, activities);
+    }
+
+    if (request.clientId() != null && ticket.getClient().getId() != request.clientId()) {
+      if (!canEditTicket(user, ticket)) {throw new OperationNotPermittedException();}
+      Client client = null;
+
+      if (request.clientId() != 0L) {
+        client = clientRepository.findById(request.clientId()).orElseThrow(
+          () -> new EntityNotFoundException("Client not exists")
+        );
+      }
+
+      ticket.setClient(client);
     }
 
     ticketRepository.save(ticket);

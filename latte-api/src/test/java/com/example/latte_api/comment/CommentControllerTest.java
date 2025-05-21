@@ -332,7 +332,7 @@ public class CommentControllerTest {
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + cred.accessToken());
 
-    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null);
+    final TicketRequest request = new TicketRequest("Test", "description", Priority.LOW, Status.OPEN, null, null);
 
     final ResponseEntity<TicketResponse> response = testRestTemplate.exchange(
       "/latte-api/v1/tickets",

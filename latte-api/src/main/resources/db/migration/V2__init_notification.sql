@@ -21,12 +21,16 @@ NO CYCLE;
 
 CREATE TABLE IF NOT EXISTS client(
   id BIGINT PRIMARY KEY NOT NULL DEFAULT NEXTVAL('client_seq'),
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(255),
+  deletable BOOLEAN NOT NULL,
   created_at TIMESTAMP,
   last_modified_at TIMESTAMP
 );
+
+INSERT INTO client (name, email, phone, deletable, created_at) 
+VALUES ('Internal', 'admin@admin.com', '+000000000000', FALSE, NOW());
 
 ALTER TABLE ticket ADD COLUMN client_id BIGINT REFERENCES client(id);
 

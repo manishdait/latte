@@ -29,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import com.example.latte_api.activity.Activity;
 import com.example.latte_api.activity.ActivityService;
 import com.example.latte_api.activity.utils.ActivityGenerator;
+import com.example.latte_api.client.ClientRepository;
 import com.example.latte_api.exception.OperationNotPermittedException;
 import com.example.latte_api.notification.NotificationService;
 import com.example.latte_api.role.Role;
@@ -57,6 +58,9 @@ public class TicketServiceTest {
   private UserRepository userRepository;
 
   @Mock
+  private ClientRepository clientRepository;
+
+  @Mock
   private TicketMapper ticketMapper;
 
   @Mock
@@ -73,7 +77,7 @@ public class TicketServiceTest {
 
   @BeforeEach
   void setup() {
-    ticketService = new TicketService(ticketRepository, userRepository, ticketMapper, activityGenerator, activityService, notificationService);
+    ticketService = new TicketService(ticketRepository, userRepository, clientRepository, ticketMapper, activityGenerator, activityService, notificationService);
   }
 
   @AfterEach
@@ -95,7 +99,7 @@ public class TicketServiceTest {
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
   
     // given
-    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "");
+    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "", null);
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
@@ -145,7 +149,7 @@ public class TicketServiceTest {
     final TicketResponse ticketResponse = Mockito.mock(TicketResponse.class);
   
     // given
-    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis");
+    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis", null);
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
@@ -187,7 +191,7 @@ public class TicketServiceTest {
       .build();
   
     // given
-    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis");
+    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis", null);
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
@@ -213,7 +217,7 @@ public class TicketServiceTest {
       .build();
   
     // given
-    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis");
+    final TicketRequest request = new TicketRequest("Test 1", "Test ticket", Priority.LOW, Status.OPEN, "Louis", null);
     final Authentication authentication = Mockito.mock(Authentication.class);
 
     // when
@@ -357,7 +361,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest("New Title", null, null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest("New Title", null, null, null, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -402,7 +406,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, "New description", null, null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, "New description", null, null, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -448,7 +452,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -494,7 +498,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -523,7 +527,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, "Louis", null, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -555,7 +559,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -598,7 +602,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -643,7 +647,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -685,7 +689,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -711,7 +715,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 101L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, null, Status.CLOSE, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
@@ -729,7 +733,7 @@ public class TicketServiceTest {
     // given
     final Authentication authentication = Mockito.mock(Authentication.class);
     final Long id = 102L;
-    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null);
+    final TicketPatchRequest request = new TicketPatchRequest(null, null, null, Priority.MEDIUM, null, null);
 
     // when
     when(authentication.getPrincipal()).thenReturn(user);
