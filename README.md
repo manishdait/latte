@@ -99,7 +99,7 @@ To retrieve the default password, open your terminal and run this command:
 You can explore a live instance of Latte in action before installing
 
 <p align="center">
-  <a href="https://latte-gamma.vercel.app">
+  <a href="https://latte-zeta.vercel.app">
     <img src="https://img.shields.io/badge/Live%20Demo-Visit%20Now-green?style=for-the-badge" alt="Live Demo">
   </a>
 </p>
