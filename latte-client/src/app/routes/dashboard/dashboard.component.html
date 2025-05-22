@@ -21,7 +21,9 @@
   <section>
     <h1 class="text-2xl font-medium text-secondary-400 mb-4">Recent Tickets</h1>
     @if (loading()) {
-      <app-shimmer [times]="5" [type]="'CARD_VIEW'"/>
+      <div class="border-[.1em] border-primary-400 rounded-md">
+        <app-shimmer [times]="5" [type]="'CARD_VIEW'"/>
+      </div>
     } @else {
       @if (tickets().length > 0) {
       <ul class="flex flex-col list-none border-[.1em] border-primary-400 rounded-md">
