@@ -5,6 +5,8 @@ import java.time.Instant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class NotificationService {
   public PagedEntity<NotificationDto> getUserNotification(int page, int size, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
 
-    Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageRequest.of(page, size,  Sort.by(Direction.DESC, "timestamp"));
     Page<Notification> notifications = notificationRepository.findByUser(user, pageable);
 
     PagedEntity<NotificationDto> response = new PagedEntity<>();

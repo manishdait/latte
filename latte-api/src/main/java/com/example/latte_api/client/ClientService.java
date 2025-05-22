@@ -3,6 +3,8 @@ package com.example.latte_api.client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.example.latte_api.client.dto.ClientRequest;
@@ -34,7 +36,7 @@ public class ClientService {
   }
 
   public PagedEntity<ClientResponse> getClients(int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
     Page<Client> clients = clientRepository.findAll(pageable);
 
     PagedEntity<ClientResponse> response = new PagedEntity<>();
