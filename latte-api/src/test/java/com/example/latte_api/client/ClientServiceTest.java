@@ -21,6 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 import com.example.latte_api.client.dto.ClientRequest;
 import com.example.latte_api.client.dto.ClientResponse;
@@ -53,7 +55,7 @@ public class ClientServiceTest {
     final List<Client> clients = List.of(Client.builder().id(101L).name("Bob").email("bob@test.in").build());
     @SuppressWarnings("unchecked")
     final Page<Client> response = Mockito.mock(Page.class);
-    final Pageable pageable = PageRequest.of(0, 1);
+    final Pageable pageable = PageRequest.of(0, 1, Sort.by(Direction.DESC, "createdAt"));
     
     final int page = 0;
     final int size = 1;

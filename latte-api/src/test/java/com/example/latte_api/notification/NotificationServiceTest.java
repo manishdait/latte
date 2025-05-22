@@ -23,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 
@@ -85,7 +87,7 @@ public class NotificationServiceTest {
       new Notification(101L, "message1", Instant.now(), user),
       new Notification(102L, "message2", Instant.now(), user)
     );
-    final Pageable pageable = PageRequest.of(0, 2);
+    final Pageable pageable = PageRequest.of(0, 2, Sort.by(Direction.DESC, "timestamp"));
 
     final Authentication authentication = Mockito.mock(Authentication.class);
     final int pageNumber = 0;

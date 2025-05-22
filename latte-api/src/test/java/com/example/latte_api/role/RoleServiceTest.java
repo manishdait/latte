@@ -23,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.example.latte_api.role.authority.Authority;
@@ -72,7 +74,7 @@ public class RoleServiceTest {
     final Page<Role> page = Mockito.mock(Page.class);
 
     final Role role = new Role(101L, "User", true, true, List.of(), List.of());
-    Pageable pageable = PageRequest.of(0,1); 
+    Pageable pageable = PageRequest.of(0,1, Sort.by(Direction.ASC, "id")); 
     // when
     when(roleRepository.findAll(pageable)).thenReturn(page);
     when(page.hasNext()).thenReturn(false);
