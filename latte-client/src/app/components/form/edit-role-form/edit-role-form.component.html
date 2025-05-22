@@ -69,6 +69,27 @@
           </div>
         </div>
       </div>
+
+      <div class="mb-4 flex flex-col gap-2 my-4">
+        <label class="text-[1rem] font-medium text-secondary-400">Client Management</label>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center gap-1">
+            <input type="checkbox" id="client:create" formControlName="client::create">
+            <label class="text-secondary-200" for="client:create">client::create</label>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <input type="checkbox" id="client:edit" formControlName="client::edit">
+            <label class="text-secondary-200" for="client:edit">client::edit</label>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <input type="checkbox" id="client:delete" formControlName="client::delete">
+            <label class="text-secondary-200" for="client:delete">client::delete</label>
+          </div>
+        </div>
+      </div>
       
       <div class="mb-4 flex flex-col gap-2 my-4">
         <label class="text-[1rem] font-medium text-secondary-400">Role Management</label>

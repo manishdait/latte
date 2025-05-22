@@ -17,7 +17,8 @@ export class EditRoleFormComponent implements OnInit {
 
   permissions: Authority[] = [
     'user::create', 'user::edit', 'user::delete', 'user::reset-password', 'ticket::create', 'ticket::edit', 
-    'ticket::delete', 'ticket::lock-unlock', 'ticket::assign', 'role::create', 'role::edit', 'role::delete'
+    'ticket::delete', 'ticket::lock-unlock', 'ticket::assign', 'role::create', 'role::edit', 'role::delete', 
+    'client::create', 'client::edit', 'client::delete'
   ];
   formError = signal(false);
 
@@ -45,6 +46,9 @@ export class EditRoleFormComponent implements OnInit {
       'role::create': new FormControl(false),
       'role::edit': new FormControl(false),
       'role::delete': new FormControl(false),
+      'client::create': new FormControl(false),
+      'client::edit': new FormControl(false),
+      'client::delete': new FormControl(false)
     });
   }
 
