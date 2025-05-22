@@ -22,7 +22,7 @@ export const notificationReducer = createReducer(
 
   on(addNotification, (state, {notification}) => ({
     ...state,
-    notifications: [...state.notifications, notification]
+    notifications: [notification, ...state.notifications]
   })),
 
   on(setRecentNotification, (state, {status}) => ({

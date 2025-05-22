@@ -22,7 +22,7 @@ export const roleReducer = createReducer(
 
   on(addRole, (state, {role}) => ({
     ...state,
-    roles: [role, ...state.roles]
+    roles: [...state.roles, role]
   })),
 
   on(removeRole, (state, {roleId}) => ({
