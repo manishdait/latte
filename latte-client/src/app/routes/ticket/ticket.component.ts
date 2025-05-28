@@ -38,7 +38,7 @@ export class TicketComponent implements OnInit {
   size = signal(10);
   
   ticketPage = signal<Record<string, boolean>>({
-    'prev': false,
+    'previous': false,
     'next': false
   });
 
@@ -94,7 +94,7 @@ export class TicketComponent implements OnInit {
     if (this.status() === 'All Tickets') {
       this.ticketService.fetchPagedTickets(this.page(), this.size()).subscribe({
         next: (response) => {
-          this.ticketPage()['prev'] = response.prev;
+          this.ticketPage()['previous'] = response.previous;
           this.ticketPage()['next'] = response.next;
   
           this.store.dispatch(setTickets({tickets: response.content}));
@@ -105,7 +105,7 @@ export class TicketComponent implements OnInit {
       const status: Status = this.status() === 'Open Tickets'? 'OPEN' : 'CLOSE';
       this.ticketService.fetchPagedTicketsByStaus(status, this.page(), this.size()).subscribe({
         next: (response) => {
-          this.ticketPage()['prev'] = response.prev;
+          this.ticketPage()['previous'] = response.previous;
           this.ticketPage()['next'] = response.next;
   
           this.store.dispatch(setTickets({tickets: response.content}));

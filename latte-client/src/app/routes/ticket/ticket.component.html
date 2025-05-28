@@ -46,9 +46,9 @@
       }
     </section>
     
-    @if (ticketPage()['next'] || ticketPage()['prev']) {
+    @if (ticketPage()['next'] || ticketPage()['previous']) {
       <section class="flex items-center justify-end border-t-[.1em] border-primary-400 p-2">
-        <app-pagination [hasNext]="ticketPage()['next']" [hasPrev]="ticketPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+        <app-pagination [hasNext]="ticketPage()['next']" [hasPrev]="ticketPage()['previous']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </section>
     }
   </div>

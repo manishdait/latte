@@ -2,10 +2,11 @@ import { Component, forwardRef, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { CustomControlDirective } from '../../directives/custom-control.directive';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
   selector: 'app-dropdown',
-  imports: [FontAwesomeModule, ReactiveFormsModule],
+  imports: [FontAwesomeModule, ReactiveFormsModule, SpinnerComponent],
   templateUrl: './dropdown.component.html',
   styleUrl: './dropdown.component.css',
   providers: [
@@ -22,6 +23,7 @@ export class DropdownComponent extends CustomControlDirective {
   dropdownItems = input<string[]>();
   hasMore = input(false);
   hasUnassign = input(false);
+  loading = input(false);
 
   onNext = output<boolean>();
 

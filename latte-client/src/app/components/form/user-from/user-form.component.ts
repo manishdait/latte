@@ -11,10 +11,11 @@ import { PasswordComponent } from '../../password/password.component';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { RoleService } from '../../../service/role.service';
 import { Alert } from '../../../model/alert.type';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-user-form',
-  imports: [ReactiveFormsModule, PasswordComponent, DropdownComponent],
+  imports: [ReactiveFormsModule, PasswordComponent, DropdownComponent, SpinnerComponent],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
 })
@@ -25,6 +26,7 @@ export class UserFormComponent implements OnInit {
   cancel = output<boolean>();
 
   formErrors = signal(false);
+  loadingRoles = signal(false);
   roles = signal<string[]>([]);
   
   form: FormGroup;
@@ -32,6 +34,8 @@ export class UserFormComponent implements OnInit {
   page = signal(0);
   size = signal(5);
   hasNext = signal(false);
+
+  processing = signal(false);
 
   constructor(private alertService: AlertService, private store: Store<AppState>) {
     this.form = new FormGroup({
@@ -43,10 +47,12 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadingRoles.set(true);
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
         this.roles.set(res.content.map(r => r.role));
         this.hasNext.set(res.next);
+        this.loadingRoles.set(false);
       }
     })
   }
@@ -57,10 +63,12 @@ export class UserFormComponent implements OnInit {
 
   getNext() {
     this.page.update(count => count+1);
+    this.loadingRoles.set(true);
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
         this.roles.update(roles => roles = [...roles, ...res.content.map(r => r.role)]);
         this.hasNext.set(res.next);
+        this.loadingRoles.set(false);
       }
     })
   }
@@ -79,6 +87,9 @@ export class UserFormComponent implements OnInit {
       password: this.form.get('password')?.value,
       role: this.form.get('role')?.value
     }
+
+    this.processing.set(true);
+    this.form.disable();
     
     this.authService.registerUser(request).subscribe({
       next: (res) => {
@@ -104,6 +115,9 @@ export class UserFormComponent implements OnInit {
       error: (err) => {
         this.form.reset();
         this.form.controls['role'].setValue('User');
+
+        this.processing.set(false);
+        this.form.enable();
         
         const alert: Alert = {
           title: '',

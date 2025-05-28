@@ -2,7 +2,6 @@ package com.example.latte_api.role;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +38,8 @@ public class RoleService {
 
     PagedEntity<RoleResponse> respone = new PagedEntity<>();
     respone.setNext(rolePage.hasNext());
-    respone.setPrev(rolePage.hasPrevious());
+    respone.setPrevious(rolePage.hasPrevious());
+    respone.setTotalElement(rolePage.getTotalElements());
     respone.setContent(rolePage.getContent().stream().map(r -> roleMapper.mapToRoleResponse(r)).toList());
 
     return respone;
@@ -131,9 +131,5 @@ public class RoleService {
     userRepository.saveAll(users);
 
     roleRepository.delete(prevRole);
-  }
-
-  public Map<String, Long> getRoleCount() {
-    return Map.of("role_count", roleRepository.count());
   }
 }

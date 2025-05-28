@@ -36,13 +36,6 @@ public class RoleController {
   public ResponseEntity<RoleResponse> getRole(@PathVariable Long id) {
       return ResponseEntity.status(HttpStatus.OK).body(roleService.getRole(id));
   }
-  
-
-  @GetMapping("/count")
-  public ResponseEntity<Map<String, Long>> getRoleCount() {
-    return ResponseEntity.status(HttpStatus.OK).body(roleService.getRoleCount());
-  }
-  
 
   @PostMapping()
   public ResponseEntity<RoleResponse> createRole(@RequestBody RoleRequest request) {

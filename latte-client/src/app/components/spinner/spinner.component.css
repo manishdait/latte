@@ -1,6 +1,5 @@
 .loader {
-  border-top: .2em solid;
-  border-bottom-color: transparent;
+  border: .15em solid transparent;
   border-radius: 50%;
   display: inline-block;
   animation: rotation 1s linear infinite;

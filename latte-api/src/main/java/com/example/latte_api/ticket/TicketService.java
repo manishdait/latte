@@ -102,7 +102,8 @@ public class TicketService {
 
     PagedEntity<TicketResponse> response = new PagedEntity<>();
     response.setNext(page.hasNext());
-    response.setPrev(page.hasPrevious());
+    response.setPrevious(page.hasPrevious());
+    response.setTotalElement(page.getTotalElements());
     response.setContent(
       page.getContent()
       .stream()
@@ -119,7 +120,8 @@ public class TicketService {
 
     PagedEntity<TicketResponse> response = new PagedEntity<>();
     response.setNext(page.hasNext());
-    response.setPrev(page.hasPrevious());
+    response.setPrevious(page.hasPrevious());
+    response.setTotalElement(page.getTotalElements());
     response.setContent(
       page.getContent()
       .stream()

@@ -6,10 +6,11 @@ import { AlertService } from '../../../service/alert.service';
 import { DropdownComponent } from '../../dropdown/dropdown.component';
 import { RoleService } from '../../../service/role.service';
 import { Alert } from '../../../model/alert.type';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-edit-user',
-  imports: [ReactiveFormsModule, DropdownComponent],
+  imports: [ReactiveFormsModule, DropdownComponent, SpinnerComponent],
   templateUrl: './edit-user.component.html',
   styleUrl: './edit-user.component.css'
 })
@@ -25,12 +26,15 @@ export class EditUserComponent implements OnInit {
   
   _user = signal('');
   roles = signal<string[]>([]);
+  loadingRoles = signal(false);
   
   form: FormGroup;
 
   page = signal(0);
   size = signal(5);
   hasNext = signal(false);
+
+  processing = signal(false);
   
   constructor() {
     this.form = new FormGroup({
@@ -47,10 +51,12 @@ export class EditUserComponent implements OnInit {
     this.form.controls['email'].setValue(this.user().email);
     this.form.controls['role'].setValue(this.user().role.role);
 
+    this.loadingRoles.set(true);
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
         this.roles.set(res.content.map(r => r.role));
         this.hasNext.set(res.next);
+        this.loadingRoles.set(false);
       }
     })
   }
@@ -61,10 +67,12 @@ export class EditUserComponent implements OnInit {
 
   getNext() {
     this.page.update(count => count+1);
+    this.loadingRoles.set(true);
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
         this.roles.set(res.content.map(r => r.role));
         this.hasNext.set(res.next);
+        this.loadingRoles.set(false);
       }
     })
   }
@@ -86,6 +94,9 @@ export class EditUserComponent implements OnInit {
     }
 
     if (this._user) {
+      this.processing.set(true);
+      this.form.disable();
+
       this.userService.editUser(request, this._user()).subscribe({
         next: () => {
           const alert: Alert = {
@@ -100,6 +111,8 @@ export class EditUserComponent implements OnInit {
         },
         error: (err) => {
           this.form.reset();
+          this.processing.set(false);
+          this.form.enable();
           this.form.controls['role'].setValue(this.user().role.role);
           const alert: Alert = {
             title: 'User Update',

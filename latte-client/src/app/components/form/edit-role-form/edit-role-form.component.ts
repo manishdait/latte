@@ -2,10 +2,11 @@ import { Component, inject, input, OnInit, output, signal } from '@angular/core'
 import { RoleService } from '../../../service/role.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Role, RoleRequest, Authority } from '../../../model/role.type';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-edit-role-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SpinnerComponent],
   templateUrl: './edit-role-form.component.html',
   styleUrl: './edit-role-form.component.css'
 })
@@ -30,6 +31,8 @@ export class EditRoleFormComponent implements OnInit {
     authorities: []
   })
   form: FormGroup;
+
+  processing = signal(false);
 
   constructor() {
     this.form = new FormGroup({
@@ -89,9 +92,14 @@ export class EditRoleFormComponent implements OnInit {
       request.authorities = updatedAuhtorities;
     }
     
+    this.processing.set(true);
+    this.form.disable();
     this.roleService.updateRole(this.id(), request).subscribe({
       next: (res) => {
         this.cancel.emit(true);
+      }, error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
       }
     })
   }

@@ -1,7 +1,6 @@
 package com.example.latte_api.user;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,18 +45,14 @@ public class UserService implements UserDetailsService {
     );
   }
 
-  public Map<String, Long> getUserCount() {
-    long count = userRepository.count();
-    return Map.of("user_count", count);
-  }
-
   public PagedEntity<UserResponse> getUsers(int number, int size) {
     Pageable pageable = PageRequest.of(number, size, Sort.by(Direction.DESC, "createdAt"));
     Page<User> page = userRepository.findAll(pageable);
 
     PagedEntity<UserResponse> response = new PagedEntity<>();
     response.setNext(page.hasNext());
-    response.setPrev(page.hasPrevious());
+    response.setPrevious(page.hasPrevious());
+    response.setTotalElement(page.getTotalElements());
     response.setContent(page.getContent().stream().map(u -> userMapper.mapToUserDto(u)).toList());
     return response;
   }
@@ -68,7 +63,8 @@ public class UserService implements UserDetailsService {
 
     PagedEntity<String> response = new PagedEntity<>();
     response.setNext(page.hasNext());
-    response.setPrev(page.hasPrevious());
+    response.setPrevious(page.hasPrevious());
+    response.setTotalElement(page.getTotalElements());
     response.setContent(page.getContent().stream().map(u -> u.getFirstname()).toList());
     return response;
   }

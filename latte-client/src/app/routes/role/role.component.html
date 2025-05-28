@@ -62,9 +62,9 @@
     </section>
     
 
-    @if(rolePage()['prev'] || rolePage()['next']) {
+    @if(rolePage()['previous'] || rolePage()['next']) {
       <div class="flex gap-4 p-2 border-t-[.1em] border-neutral-200 justify-end">
-        <app-pagination [hasNext]="rolePage()['next']" [hasPrev]="rolePage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+        <app-pagination [hasNext]="rolePage()['next']" [hasPrev]="rolePage()['previous']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </div>
     }
   </div>

@@ -71,9 +71,9 @@
       }
     </section>
 
-    @if(userPage()['prev'] || userPage()['next']) {
+    @if(userPage()['previous'] || userPage()['next']) {
       <section class="flex gap-4 p-2 border-t-[.1em] border-primary-400 justify-end">
-        <app-pagination [hasNext]="userPage()['next']" [hasPrev]="userPage()['prev']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+        <app-pagination [hasNext]="userPage()['next']" [hasPrev]="userPage()['previous']" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </section>
     }
   </div>

@@ -6,10 +6,11 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
 import { removeRole, updateRoleCount } from '../../../state/role/role.action';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-role-delete',
-  imports: [ReactiveFormsModule, DropdownComponent],
+  imports: [ReactiveFormsModule, DropdownComponent, SpinnerComponent],
   templateUrl: './role-delete.component.html',
   styleUrl: './role-delete.component.css'
 })
@@ -26,6 +27,8 @@ export class RoleDeleteComponent implements OnInit {
   hasNext = signal(false);
 
   role = new FormControl('Admin', [Validators.required]);
+
+  processing = signal(false);
 
   constructor(private store: Store<AppState>) {}
 
@@ -51,6 +54,9 @@ export class RoleDeleteComponent implements OnInit {
   onSubmit() {
     const selectedRole = this.role.value;
     const roleId = this.roles().find(role => role.role === selectedRole)?.id;
+
+    this.processing.set(true);
+
     this.roleService.deleteRole(this.toDelete(), roleId ?? 0).subscribe({
       next: (res) => {
         this.store.dispatch(removeRole({roleId: this.toDelete()}));

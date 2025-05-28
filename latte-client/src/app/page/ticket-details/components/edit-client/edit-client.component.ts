@@ -7,10 +7,11 @@ import { DropdownComponent } from '../../../../components/dropdown/dropdown.comp
 import { client } from 'stompjs';
 import { PatchTicketRequest } from '../../../../model/ticket.type';
 import { ClientResponse } from '../../../../model/client.type';
+import { SpinnerComponent } from '../../../../components/spinner/spinner.component';
 
 @Component({
   selector: 'app-edit-client',
-  imports: [ReactiveFormsModule, DropdownComponent],
+  imports: [ReactiveFormsModule, DropdownComponent, SpinnerComponent],
   templateUrl: './edit-client.component.html',
   styleUrl: './edit-client.component.css'
 })
@@ -32,11 +33,16 @@ export class EditClientComponent implements OnInit {
 
   form: FormGroup;
 
+  loading = signal(false);
+  processing = signal(false);
+
   constructor() {
+    this.loading.set(true);
     this.clientService.fetchClients(this.page(), this.size()).subscribe({
       next: (res) => {
         this.clients.set(res.content);
         this.hasNext.set(res.next);
+        this.loading.set(false);
       }
     })
     this.form = new FormGroup({
@@ -54,12 +60,14 @@ export class EditClientComponent implements OnInit {
   }
 
   showMore() {
+    this.loading.set(true);
     this.page.update(count => count + 1);
 
     this.clientService.fetchClients(this.page(), this.size()).subscribe({
       next: (res) => {
         this.clients.update(arr => arr.concat(res.content));
         this.hasNext.set(res.next);
+        this.loading.set(false);
       }
     })
   }
@@ -80,10 +88,16 @@ export class EditClientComponent implements OnInit {
       clientId: client.length === 0? 0 : client[0].id
     }
 
+    this.processing.set(true);
+    this.form.disable();
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
       next: (response) => {
         this.changes.emit(true);
         this.toggleCancel();
+      },
+      error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
       }
     })
   }

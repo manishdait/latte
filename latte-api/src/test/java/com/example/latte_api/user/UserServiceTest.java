@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -435,15 +434,5 @@ public class UserServiceTest {
     // then
     Assertions.assertThatThrownBy(() -> userService.deleteUser(email))
       .isInstanceOf(EntityNotFoundException.class);
-  }
-
-  @Test
-  void shouldReturn_countOfUsers() {
-    when(userRepository.count()).thenReturn(1L);
-    final Map<String, Long> result = userService.getUserCount();
-    verify(userRepository, times(1)).count();
-
-    Assertions.assertThat(result).isNotNull();
-    Assertions.assertThat(result).isEqualTo(Map.of("user_count", 1L));
   }
 }

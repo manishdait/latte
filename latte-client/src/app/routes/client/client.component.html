@@ -1,5 +1,5 @@
 @if (createClient()) {
-  <app-client-form (cancel)="toggleCreateClinet()"/>
+  <app-client-form (cancel)="toggleCreateClient()"/>
 }
 @if (editClient()) {
   <app-edit-client-form [client]="bufferClient()" (cancel)="editClient.set(false)"/>
@@ -11,7 +11,7 @@
   <section class="flex items-center gap-5 pb-2">
     <h1 class="text-2xl text-secondary-400 font-medium">Clients</h1>
     
-    <button class="flex gap-1 text-[.9rem] text-secondary-400 font-medium border-[.1em] rounded-md border-primary-400 py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCreateClinet()" *hasAuthority="['client::create']">
+    <button class="flex gap-1 text-[.9rem] text-secondary-400 font-medium border-[.1em] rounded-md border-primary-400 py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleCreateClient()" *hasAuthority="['client::create']">
       <fa-icon class="text-secondary-200" [icon]="'plus'"/>
       <span>Add Client</span> 
     </button>
@@ -50,7 +50,7 @@
                     </button>
 
                     @if (client.deletable) {
-                      <button class="flex items-center gap-1 text-[.9rem] font-medium text-red-700 border-[.1em] rounded-md border-red-700 px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleDeleteClinet(client)" *hasAuthority="['client::delete']">
+                      <button class="flex items-center gap-1 text-[.9rem] font-medium text-red-700 border-[.1em] rounded-md border-red-700 px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleDeleteClient(client)" *hasAuthority="['client::delete']">
                         <fa-icon class="text-[.7rem]" [icon]="'trash'"/>
                         <span>Delete</span>
                       </button>
@@ -64,9 +64,9 @@
       }
     </section>
 
-    @if(clientPage()['prev'] || clientPage()['next']) {
+    @if(clientPage()['previous'] || clientPage()['next']) {
       <section class="flex gap-4 p-2 border-t-[.1em] border-primary-400 justify-end">
-        <app-pagination [hasNext]="clientPage().next" [hasPrev]="clientPage().prev" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
+        <app-pagination [hasNext]="clientPage().next" [hasPrev]="clientPage().previous" [page]="page()" (onNext)="getNext()" (onPrev)="getPrev()"/>
       </section>
     }
   </div>

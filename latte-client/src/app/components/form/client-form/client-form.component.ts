@@ -7,10 +7,11 @@ import { ClientService } from '../../../service/client.service';
 import { ClientRequest } from '../../../model/client.type';
 import { addClient } from '../../../state/client/client.action';
 import { Alert } from '../../../model/alert.type';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-client-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SpinnerComponent],
   templateUrl: './client-form.component.html',
   styleUrl: './client-form.component.css'
 })
@@ -21,6 +22,8 @@ export class ClientFormComponent {
 
   form: FormGroup;
   formErrors = signal(false);
+  
+  processing = signal(false);
 
   constructor(private alertService: AlertService, private store: Store<AppState>) {
     this.form = new FormGroup({
@@ -48,6 +51,9 @@ export class ClientFormComponent {
       phone: this.form.get('phone')?.value
     }
 
+    this.processing.set(true);
+    this.form.disable();
+
     this.clientService.createClient(request).subscribe({
       next: (res) => {
         this.store.dispatch(addClient({client: res}));
@@ -60,6 +66,8 @@ export class ClientFormComponent {
         this.cancel.emit(true);
       },
       error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
         const alert: Alert = {
           title: 'Create Client Fail',
           message: `Fail to create new client`,

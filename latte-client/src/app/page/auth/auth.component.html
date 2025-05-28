@@ -30,9 +30,9 @@
           }
         </div>
   
-        <button class="w-full bg-ogreen-100 text-base text-white font-medium border-[.1em] border-ogreen-100 rounded-md px-2 py-1 my-2 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" type="submit">
+        <button class="w-full bg-ogreen-100 text-base text-white font-medium border-[.1em] border-ogreen-100 rounded-md px-2 my-2 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" [disabled]="processing()" [class]="{'py-1': !processing()}" type="submit">
           @if(processing()) {
-            <app-spinner/>
+            <app-spinner [size]="'1.5rem'"/>
           } @else {
             <span>Sign in</span>
           }

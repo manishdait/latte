@@ -54,7 +54,7 @@ export class UserComponent implements OnInit {
   page = signal(0);
   size = signal(10);
   userPage = signal<Record<string, boolean>> ({
-    'prev': false,
+    'previous': false,
     'next': false
   });
   
@@ -136,7 +136,7 @@ export class UserComponent implements OnInit {
 
     this.userService.fetchPagedUsers(this.page(), this.size()).subscribe({
       next: (response) => {
-        this.userPage()['prev'] = response.prev;
+        this.userPage()['previous'] = response.previous;
         this.userPage()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
         this.loading.set(false);

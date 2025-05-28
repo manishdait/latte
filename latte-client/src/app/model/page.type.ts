@@ -1,5 +1,6 @@
 export interface Page <T> {
   content: T[],
   next: boolean,
-  prev: boolean
+  previous: boolean,
+  totalElement: number
 }

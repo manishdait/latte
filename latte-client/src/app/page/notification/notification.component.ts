@@ -70,7 +70,7 @@ export class NotificationComponent implements OnInit {
 
         this.notificationPage.update(page => {
           page.hasNext = res.next;
-          page.hasPrevious = res.prev;
+          page.hasPrevious = res.previous;
           return page;
         });
 

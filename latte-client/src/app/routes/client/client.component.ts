@@ -42,7 +42,7 @@ export class ClientComponent implements OnInit {
 
   clientPage = signal({
     next: false,
-    prev: false
+    previous: false
   });
 
   bufferClient = signal<ClientResponse>({
@@ -72,7 +72,7 @@ export class ClientComponent implements OnInit {
     this.getClients();
   }
 
-  toggleCreateClinet() {
+  toggleCreateClient() {
     this.createClient.update(toggle => !toggle);
   }
 
@@ -81,7 +81,7 @@ export class ClientComponent implements OnInit {
     this.editClient.set(true);
   }
 
-  toggleDeleteClinet(client: ClientResponse) {
+  toggleDeleteClient(client: ClientResponse) {
     this.bufferClient.set(client);
     this.deleteClient.set(true);
   }
@@ -111,7 +111,7 @@ export class ClientComponent implements OnInit {
         this.store.dispatch(setClients({clients: res.content}));
         this.clientPage.update(page => {
           page.next = res.next;
-          page.prev = res.prev;
+          page.previous = res.previous;
           return page;
         })
         this.loading.set(false);

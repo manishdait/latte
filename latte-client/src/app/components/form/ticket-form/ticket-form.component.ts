@@ -35,9 +35,11 @@ export class TicketFormComponent implements OnInit {
   formErrors = signal(false);
   
   hasMoreEngineers = signal(false);
+  loadingEngineers = signal(false);
   engineers = signal<string[]>([]);
   
   clients = signal<ClientResponse[]>([]);
+  loadingClient = signal(false);
   hasMoreClients = signal(false);
   
   engineerPageCount = signal(0);
@@ -54,14 +56,18 @@ export class TicketFormComponent implements OnInit {
   processing = signal(false);
   
   constructor(private store: Store<AppState>) {
+    this.loadingEngineers.set(true);
     this.userService.fetchUserList(this.engineerPageCount(), this.engineerPageSize()).subscribe((data) => {
       this.engineers.set(data.content);
       this.hasMoreEngineers.set(data.next);
+      this.loadingEngineers.set(false);
     });
 
+    this.loadingClient.set(true);
     this.clientService.fetchClients(this.clientPageCount(), this.clientPageSize()).subscribe((data) => {
       this.clients.set(data.content);
       this.hasMoreClients.set(data.next);
+      this.loadingClient.set(false);
     });
 
     this.form = new FormGroup({
@@ -69,7 +75,7 @@ export class TicketFormComponent implements OnInit {
       description: new FormControl(''),
       assignedTo: new FormControl(''),
       priority: new FormControl('', [Validators.required]),
-      client: new FormControl('')
+      client: new FormControl('', [Validators.required])
     });
   }
 
@@ -87,19 +93,23 @@ export class TicketFormComponent implements OnInit {
 
   showMoreEngineers() {
     this.engineerPageCount.update(count => count + 1);
+    this.loadingEngineers.set(true);
 
     this.userService.fetchUserList(this.engineerPageCount(), this.engineerPageSize()).subscribe((data) => {
       this.engineers.update(arr => arr.concat(data.content));
       this.hasMoreEngineers.set(data.next);
+      this.loadingEngineers.set(false);
     });
   }
 
   showMoreClients() {
     this.clientPageCount.update(count => count + 1);
+    this.loadingClient.set(true);
 
     this.clientService.fetchClients(this.clientPageCount(), this.clientPageSize()).subscribe((data) => {
       this.clients.update(arr => arr.concat(data.content));
       this.hasMoreClients.set(data.next);
+      this.loadingClient.set(false);
     });
   }
 
@@ -108,6 +118,8 @@ export class TicketFormComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log("SUbmit")
+    
     if (this.form.invalid) {
       this.formErrors.set(true);
       return;
@@ -123,10 +135,11 @@ export class TicketFormComponent implements OnInit {
       priority: this.priorities[this.form.get('priority')?.value],
       status: 'OPEN',
       assignedTo: this.form.get('assignedTo')!.value,
-      clientId: client.length === 0? 0 : client[0].id
+      clientId: client[0].id
     }
 
     this.processing.set(true);
+    this.form.disable();
 
     this.ticketService.createTicket(request).subscribe({
       next: (response) => {
@@ -146,6 +159,7 @@ export class TicketFormComponent implements OnInit {
       error: (err) => {
         this.processing.set(false);
         this.form.reset();
+        this.form.enable();
 
         const alert: Alert = {
           title: 'Fail to Create Ticket',

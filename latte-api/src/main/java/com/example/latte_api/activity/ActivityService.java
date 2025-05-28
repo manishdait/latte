@@ -40,7 +40,8 @@ public class ActivityService {
 
     PagedEntity<ActivityDto> response = new PagedEntity<>();
     response.setNext(activities.hasNext());
-    response.setPrev(activities.hasPrevious());
+    response.setPrevious(activities.hasPrevious());
+    response.setTotalElement(activities.getTotalElements());
     response.setContent(activities.getContent().stream().map(a -> activityMapper.mapToActivityDto(a)).toList());
     return response;
   }

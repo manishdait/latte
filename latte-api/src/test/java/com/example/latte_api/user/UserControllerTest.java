@@ -654,55 +654,6 @@ public class UserControllerTest {
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
   }
-
-  @Test
-  void shouldReturn_userCount_whenRequest_byUserHavingAuthority() {
-    // user::create || user::edit || user::delete || user::reset-password
-    final AuthResponse cred = adminCred();
-
-    final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
-
-    final ResponseEntity<Map<String, Long>> response = testRestTemplate.exchange(
-      BASE_URI + "/count",
-      HttpMethod.GET,
-      new HttpEntity<>(null, headers),
-      new ParameterizedTypeReference<Map<String, Long>>() {}
-    );
-
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertThat(response.getBody()).isEqualTo(Map.of("user_count", 3L));
-  }
-
-  @Test
-  void shouldGiveForbidden_whenGettingUserCount_whenRequested_byUserNotHavingAuhtorities() {
-    final AuthResponse cred = userCred();
-
-    final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
-
-    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/count",
-      HttpMethod.GET,
-      new HttpEntity<>(null, headers),
-      ErrorResponse.class
-    );
-
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-  }
-
-  @Test
-  void shouldGiveForbidden_whenGettingUserCount_whenRequestMissingAuthorizationHeader() {
-    final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/count",
-      HttpMethod.GET,
-      new HttpEntity<>(null),
-      ErrorResponse.class
-    );
-
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-  }
-
   // Helpers
 
   private AuthResponse superCred() {

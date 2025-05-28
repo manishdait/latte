@@ -4,10 +4,11 @@ import { Alert } from '../../../model/alert.type';
 import { ClientRequest, ClientResponse } from '../../../model/client.type';
 import { AlertService } from '../../../service/alert.service';
 import { ClientService } from '../../../service/client.service';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-edit-client-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SpinnerComponent],
   templateUrl: './edit-client-form.component.html',
   styleUrl: './edit-client-form.component.css'
 })
@@ -19,6 +20,8 @@ export class EditClientFormComponent implements OnInit {
 
   form: FormGroup;
   formErrors = signal(false);
+
+  processing = signal(true);
 
   constructor(private alertService: AlertService) {
     this.form = new FormGroup({
@@ -52,6 +55,8 @@ export class EditClientFormComponent implements OnInit {
       phone: this.form.get('phone')?.value
     }
 
+    this.processing.set(true);
+    this.form.disable();
     this.clientService.updateClient(this.client().id, request).subscribe({
       next: (res) => {
         const alert: Alert = {
@@ -63,6 +68,8 @@ export class EditClientFormComponent implements OnInit {
         this.cancel.emit(true);
       },
       error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
         const alert: Alert = {
           title: 'Update Client Fail',
           message: `Fail to update client`,

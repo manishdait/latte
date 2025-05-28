@@ -28,8 +28,12 @@
       </div>
 
       <div class="flex gap-4">
-        <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="cancel.emit(true)">Cancel</button>
-        <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" type="submit">Create User</button>
+        <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md px-2 py-1 cursor-pointer hover:bg-neutral-900/5" [disabled]="processing()" type="button" (click)="cancel.emit(true)">Cancel</button>
+        @if (!processing()) {
+          <button class="text-[.9rem] text-white font-medium bg-ogreen-100 border-[.1em] border-ogreen-100 rounded-md px-2 py-1 cursor-pointer hover:bg-ogreen-200 hover:border-ogreen-200" [disabled]="processing()" type="submit">Create User</button>
+        } @else {
+          <app-spinner [size]="'1.5rem'" [color]="'#44ab38'"/>
+        }
       </div>
     </form>
   </div>

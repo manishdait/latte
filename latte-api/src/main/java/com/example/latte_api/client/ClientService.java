@@ -41,7 +41,8 @@ public class ClientService {
 
     PagedEntity<ClientResponse> response = new PagedEntity<>();
     response.setNext(clients.hasNext());
-    response.setPrev(clients.hasPrevious());
+    response.setPrevious(clients.hasPrevious());
+    response.setTotalElement(clients.getTotalElements());
     response.setContent(
       clients.getContent().stream()
         .map(c -> new ClientResponse(c.getId(), c.getName(), c.getEmail(), c.getPhone(), c.isDeletable()))

@@ -6,20 +6,33 @@
     </div>
 
     @if (dropdown()) {
-      <div class="absolute w-full max-h-40 flex flex-col bg-primary-100 border-[.1em] border-primary-400 overflow-hidden overflow-y-scroll rounded-md z-10">
-        @if(hasUnassign() && control.value !== '') {
-          <span class="text-base text-secondary-200 not-last:border-b-[.1em] border-primary-400 px-2 py-1 cursor-pointer hover:bg-primary-200" (click)="select('')">Unassigned</span>
-        }
-  
-        @for(element of dropdownItems(); track element) {
-          @if (control.value !== element) {
-            <span class="text-base text-secondary-400 not-last:border-b-[.1em] border-primary-400 px-2 py-1 cursor-pointer hover:bg-primary-200" (click)="select(element)">{{ element }}</span>
+      <ul class="list-none absolute w-full max-h-40 flex flex-col bg-primary-100 border-[.1em] border-primary-400 overflow-hidden overflow-y-scroll rounded-md z-10">
+        @if (dropdownItems()!.length == 0) {
+          <li class="flex items-center justify-center p-1">
+            <span class="text-[1rem] text-secondary-400">No data available</span>
+          </li>
+        } @else {
+          @if(hasUnassign() && control.value !== '') {
+            <li class="text-base text-secondary-400 not-last:border-b-[.1em] border-primary-400 px-2 p-1 cursor-pointer hover:bg-primary-200" (click)="select('')">Unassigned</li>
+          }
+
+          @for(element of dropdownItems(); track element) {
+            @if (control.value !== element) {
+              <li class="text-base text-secondary-400 not-last:border-b-[.1em] border-primary-400 px-2 p-1 cursor-pointer hover:bg-primary-200" (click)="select(element)">{{ element }}</li>
+            }
+          }
+
+          @if(hasMore() && !loading()) {
+            <li class="text-base text-secondary-200 px-2 p-1 cursor-pointer hover:bg-neutral-200" (click)="onNext.emit(true)">Show more...</li>
           }
         }
-        @if(hasMore()) {
-          <span class="text-base text-secondary-200 px-2 py-1 cursor-pointer hover:bg-neutral-200" (click)="onNext.emit(true)">Show more...</span>
+
+        @if(loading()) {
+          <li class="flex items-center justify-center py-0.5">
+            <app-spinner [size]="'1.3rem'" [color]="'#333333'" />
+          </li>
         }
-      </div>
+      </ul>
     }
     
   </div>

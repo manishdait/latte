@@ -5,10 +5,11 @@ import { UserService } from '../../../service/user.service';
 import { AlertService } from '../../../service/alert.service';
 import { PasswordComponent } from '../../password/password.component';
 import { Alert } from '../../../model/alert.type';
+import { SpinnerComponent } from '../../spinner/spinner.component';
 
 @Component({
   selector: 'app-password-form',
-  imports: [ReactiveFormsModule, PasswordComponent],
+  imports: [ReactiveFormsModule, PasswordComponent, SpinnerComponent],
   templateUrl: './password-form.component.html',
   styleUrl: './password-form.component.css'
 })
@@ -22,6 +23,8 @@ export class PasswordFormComponent implements OnInit {
   formErrors = signal(false);
   
   form: FormGroup;
+
+  processing = signal(false);
 
   constructor() {
     this.form = new FormGroup({
@@ -48,6 +51,9 @@ export class PasswordFormComponent implements OnInit {
       confirmPassword: this.form.get('confirmPassword')?.value
     }
 
+    this.processing.set(true);
+    this.form.disable();
+
     this.userService.resetPasswordForUser(request, this.user().email).subscribe({
       next: () => {
         const alert: Alert = {
@@ -59,6 +65,9 @@ export class PasswordFormComponent implements OnInit {
         this.cancel.emit(true);
       },
       error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
+
         const alert: Alert = {
           title: 'User Update',
           message: 'Fail to updated user password',

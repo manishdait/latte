@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class PagedEntity<T> {
   private List<T> content;
-  private Boolean prev;
+  private Boolean previous;
   private Boolean next;
+  private long totalElement;
 }

@@ -31,7 +31,7 @@ export class RoleComponent implements OnInit {
   page = signal(0);
   size = signal(10);
   rolePage = signal<Record<string, boolean>> ({
-    'prev': false,
+    'previous': false,
     'next': false
   });
   
@@ -52,13 +52,6 @@ export class RoleComponent implements OnInit {
 
   ngOnInit(): void {
     this.faLibrary.addIcons(...fontawsomeIcons);
-    
-    this.roleService.getCount().subscribe({
-      next: (res) => {
-        this.store.dispatch(setRoleCount({count: res['role_count']}))
-      }
-    });
-    
     this.getRoles();
   }
 
@@ -91,8 +84,9 @@ export class RoleComponent implements OnInit {
     this.roleService.getRoles(this.page(), this.size()).subscribe({
       next: (res) => {
         this.store.dispatch(setRoles({roles: res.content}))
-        this.rolePage()['prev'] = res.prev;
+        this.rolePage()['previous'] = res.previous;
         this.rolePage()['next'] = res.next;
+        this.store.dispatch(setRoleCount({count: res.totalElement}))
         this.loading.set(false);
       }
     });

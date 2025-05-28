@@ -57,7 +57,8 @@ public class NotificationService {
 
     PagedEntity<NotificationDto> response = new PagedEntity<>();
     response.setNext(notifications.hasNext());
-    response.setPrev(notifications.hasPrevious());
+    response.setPrevious(notifications.hasPrevious());
+    response.setTotalElement(notifications.getTotalElements());
     response.setContent(
       notifications.getContent().stream()
         .map(n -> new NotificationDto(n.getId(), n.getMessage(), n.getTimestamp()))

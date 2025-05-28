@@ -50,6 +50,9 @@ export class AuthComponent implements OnInit {
     }
     this.processing.set(true);
 
+    this.form.controls['email'].disable();
+    this.form.controls['password'].disable();
+
     this.authService.authenticateUser(request).subscribe({
       next: () => {
         this.router.navigate(['dashboard'], {replaceUrl: true});
@@ -57,6 +60,10 @@ export class AuthComponent implements OnInit {
       error: (err) => {
         this.processing.set(false);
         this.form.reset();
+        
+        this.form.controls['email'].enable();
+        this.form.controls['password'].enable();
+
         const alert: Alert = {
           title: 'Fail to Login',
           message: err.error.error,
