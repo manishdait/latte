@@ -1,13 +1,15 @@
 import { createReducer, on } from "@ngrx/store";
 import { ClientResponse } from "../../model/client.type";
-import { addClient, removeClient, setClients } from "./client.action"
+import { addClient, removeClient, setClientCount, setClients, updateClientCount } from "./client.action"
 
 export interface ClientState {
-  clients: ClientResponse[]
+  clients: ClientResponse[],
+  count: number
 }
 
 export const initialState: ClientState = {
-  clients: []
+  clients: [],
+  count: 0
 }
 
 export const clientReducer = createReducer(
@@ -26,5 +28,15 @@ export const clientReducer = createReducer(
   on(removeClient, (state,{id}) => ({
     ...state,
     clients: [...state.clients.filter(client => client.id != id)]
+  })),
+
+  on(setClientCount, (state, {count}) => ({
+    ...state,
+    count: count
+  })),
+
+  on(updateClientCount, (state, {val}) => ({
+    ...state,
+    count: state.count + val
   }))
 )

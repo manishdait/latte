@@ -7,8 +7,8 @@ import { AppState } from '../../state/app.state';
 import { count, Observable } from 'rxjs';
 import { ClientResponse } from '../../model/client.type';
 import { ClientService } from '../../service/client.service';
-import { client } from '../../state/client/client.selector';
-import { removeClient, setClients } from '../../state/client/client.action';
+import { client, clientCount } from '../../state/client/client.selector';
+import { removeClient, setClientCount, setClients } from '../../state/client/client.action';
 import { ShimmerComponent } from '../../components/shimmer/shimmer.component';
 import { CommonModule } from '@angular/common';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
@@ -53,8 +53,11 @@ export class ClientComponent implements OnInit {
     deletable: false
   });
 
+  count$: Observable<number>;
+
   constructor(private store: Store<AppState>) {
     this.clients$ = store.select(client);
+    this.count$ = store.select(clientCount);
   }
   
   ngOnInit(): void {
@@ -112,6 +115,7 @@ export class ClientComponent implements OnInit {
         this.clientPage.update(page => {
           page.next = res.next;
           page.previous = res.previous;
+          this.store.dispatch(setClientCount({count: res.totalElement}));
           return page;
         })
         this.loading.set(false);

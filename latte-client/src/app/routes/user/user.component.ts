@@ -69,14 +69,8 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userService.fetchUserCount().subscribe({
-      next: (res) => {
-        this.store.dispatch(setUserCount({count: res['user_count']}))
-      }
-    })
-
-    this.getUsers();
     this.faLibrary.addIcons(...fontawsomeIcons);
+    this.getUsers();
   }
 
   toggleCreateUser() {
@@ -139,6 +133,7 @@ export class UserComponent implements OnInit {
         this.userPage()['previous'] = response.previous;
         this.userPage()['next'] = response.next;
         this.store.dispatch(setUsers({users: response.content}));
+        this.store.dispatch(setUserCount({count: response.totalElement}))
         this.loading.set(false);
       }
     });

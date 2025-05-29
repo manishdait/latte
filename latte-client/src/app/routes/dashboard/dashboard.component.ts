@@ -39,24 +39,17 @@ export class DashboardComponent implements OnInit {
     this.totalTickets$ = store.select(totalTickets);
     this.openTickets$ = store.select(openTickets);
     this.closedTickets$ = store.select(closeTickets);
+  }
 
+  ngOnInit(): void {
     this.loading.set(true);
     this.ticketService.fetchPagedTickets(0, 5).subscribe({
       next: (res) => {
         this.tickets.set(res.content);
+        this.store.dispatch(setTicketCount({count: res.totalElement}))
         this.loading.set(false);
       }
-    });
-  }
-
-  ngOnInit(): void {
-    this.ticketService.fetchTicktsInfo().subscribe({
-      next: (res) => {
-        this.store.dispatch(setOpenCount({count: res['open_tickets']}));
-        this.store.dispatch(setCloseCount({count: res['closed_tickets']}));
-        this.store.dispatch(setTicketCount({count: res['total_tickets']}));
-      }
-    });    
+    });  
   }
 
   getDate(date: any) {

@@ -7,3 +7,8 @@ export const client = createSelector(
   clientStateSelector,
   (state) => state.clients
 )
+
+export const clientCount = createSelector(
+  clientStateSelector,
+  (state) => state.count
+)

@@ -9,7 +9,7 @@
             @if(!editTitle()) {
               <h1 class="text-[2rem] text-secondary-400 font-medium leading-none">{{ ticket().title }}</h1>
             } @else {
-              <input class="w-full text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" type="text" placeholder="Edit title" #title>
+              <input class="w-full text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md px-2 py-1 focus:border-primary-600" type="text" placeholder="Edit title" [disabled]="processingTitle()" #title>
             }
           }
         </div>
@@ -19,8 +19,12 @@
             @if (!editTitle()) {
               <button class="h-fit text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="toggleEditTitle()">Edit</button>
             } @else {
-              <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleEditTitle()">Cancel</button>
-              <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100 rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" type="button" (click)="updateTitle()">Save</button>
+              <button class="text-[.9rem] text-secondary-400 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5" type="button" (click)="toggleEditTitle()" [disabled]="processingTitle()">Cancel</button>
+              @if (!processingTitle()) {
+                <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100 rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200" type="button" (click)="updateTitle()" [disabled]="processingTitle()">Save</button>
+              } @else {
+                <app-spinner [size]="'1.5rem'" [color]="'#44ab38'"/>
+              }
             }
           </div>
         }
@@ -86,15 +90,24 @@
       <app-activity [ticketId]="ticketId()" #activity/>
 
       <div class="min-w-[300px] flex flex-col justify-center gap-4 py-4">
-        <textarea class="w-full h-32 text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md p-2 focus:border-primary-600" placeholder="Enter a comment..."  #message></textarea>
+        <textarea class="w-full h-32 text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md p-2 focus:border-primary-600" placeholder="Enter a comment..." [disabled]="processingComment()"  #message></textarea>
         
         <div class="flex flex-wrap justify-end gap-2">
-          @if(ticket().status == 'OPEN') {
-            <button class="text-[.9rem] text-purple-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
+          @if (!processingStatus()) {
+            @if(ticket().status == 'OPEN') {
+              <button class="text-[.9rem] text-purple-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Close Ticket</button>
+            } @else {
+              <button class="text-[.9rem] text-blue-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
+            }
           } @else {
-            <button class="text-[.9rem] text-blue-600 font-medium border-[.1em] border-primary-400 rounded-md py-1 px-2 cursor-pointer hover:bg-neutral-900/5 disabled:text-secondary-200 disabled:hover:bg-transparent disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="updateStatus()">Reopen Ticket</button>
+            <app-spinner [size]="'1.5rem'" [color]="'#333333'"/>
           }
-          <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100  rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200 disabled:border-primary-400 disabled:bg-primary-400 disabled:hover:bg-primary-400 disabled:cursor-auto" [disabled]="ticket().lock" type="button" (click)="comment(message)">Comment</button>
+          
+          @if(!processingComment()) { 
+            <button class="bg-ogreen-100 text-[.9rem] text-white font-medium border-[.1em] border-ogreen-100  rounded-md py-1 px-2 cursor-pointer hover:border-ogreen-200 hover:bg-ogreen-200 disabled:border-primary-400 disabled:bg-primary-400 disabled:hover:bg-primary-400 disabled:cursor-auto" [disabled]="ticket().lock" type="button" [disabled]="processingComment()" (click)="comment(message)">Comment</button>
+          } @else {
+            <app-spinner [size]="'1.5rem'" [color]="'#44ab38'"/>
+          }
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@
 </div>
 
 <label class="w-full h-full z-20 menubar" for="toggle">
-  <div class="relative w-full h-full flex flex-col bg-primary-200 p-[1em] rounded-[.5em] sidenav">
+  <div class="relative w-full h-full flex flex-col bg-primary-200 p-[1em] rounded-[.5em] sidenav overflow-y-scroll">
     <label class="absolute top-4 right-4 cursor-pointer nav-toggle" for="toggle">
       <fa-icon class="text-secondary-300" [icon]="'xmark'"/>
     </label>
@@ -43,7 +43,10 @@
 
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/tickets" routerLinkActive="active">
           <fa-icon class="text-secondary-200" [icon]="'note-sticky'"/>
-          <span>Tickets</span>
+          <div class="w-full flex items-center justify-between gap-1">
+            <span>Tickets</span>
+            <span class="bg-primary-300 text-[.7rem] font-bold text-secondary-300 rounded-sm py-0.5 px-1.5 badge">{{ ticketCount$ | async }}</span>
+          </div>
         </li>
 
         <li class="flex items-center gap-[.8em] text-[1rem] text-secondary-300 rounded-[.2em] px-[.5em] py-[.4rem] cursor-pointer hover:bg-primary-300" routerLink="/notifications" routerLinkActive="active">

@@ -17,10 +17,11 @@ import { Priorities } from '../../model/priority.type';
 import { Authority } from '../../model/role.type';
 import { HasAuthorityDirective } from '../../directives/has-autority.directive';
 import { EditClientComponent } from './components/edit-client/edit-client.component';
+import { SpinnerComponent } from '../../components/spinner/spinner.component';
 
 @Component({
   selector: 'app-ticket-details',
-  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent, EditClientComponent, HasAuthorityDirective],
+  imports: [FontAwesomeModule, ActivityComponent, DescriptionBoxComponent, EditAssignComponent, EditPriorityComponent, EditClientComponent, SpinnerComponent, HasAuthorityDirective],
   templateUrl: './ticket-details.component.html',
   styleUrl: './ticket-details.component.css'
 })
@@ -67,6 +68,9 @@ export class TicketDetailsComponent implements OnInit {
   status = Status;
 
   loading = signal(true);
+  processingComment = signal(false);
+  processingStatus = signal(false);
+  processingTitle = signal(false);
 
   ngOnInit(): void {
     this.loading.set(true);
@@ -117,10 +121,15 @@ export class TicketDetailsComponent implements OnInit {
         clientId: null
       }
 
+      this.processingStatus.set(true);
       this.ticketService.updateTicket(this.ticketId(), request).subscribe({
         next: (response) => {
           this.ticket.set(response);
+          this.processingStatus.set(false);
           this.activity.ngOnInit(); 
+        },
+        error: () => {
+          this.processingStatus.set(false);
         }
       }) 
     }
@@ -157,11 +166,16 @@ export class TicketDetailsComponent implements OnInit {
       clientId: null
     }
 
+    this.processingTitle.set(true);
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
       next: (response) => {
         this.toggleEditTitle();
         this.ticket.set(response);
+        this.processingTitle.set(false);
         this.activity.ngOnInit();
+      },
+      error: () => {
+        this.processingTitle.set(false);
       }
     })
   }
@@ -214,10 +228,15 @@ export class TicketDetailsComponent implements OnInit {
         message: message.value
       }
 
+      this.processingComment.set(true);
       this.commentService.createComment(request).subscribe({
         next: () => {
           message.value = '';
+          this.processingComment.set(false);
           this.activity.ngOnInit()
+        },
+        error: () => {
+          this.processingComment.set(false);
         }
       })
     }

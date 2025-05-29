@@ -2,6 +2,9 @@
   background-color: #ebebeb;
   font-weight: bold;
 }
+.active .badge {
+  background-color: #d4d4d4;
+}
 
 .navbar, .nav-toggle {
   display: none;

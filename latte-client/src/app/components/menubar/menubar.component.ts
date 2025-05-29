@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { recentNotification } from '../../state/notification/notification.selector';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { totalTickets } from '../../state/ticket/ticket.selector';
 
 @Component({
   selector: 'app-menubar',
@@ -28,9 +29,11 @@ export class MenubarComponent implements OnInit {
 
   version = signal(environment.VERSION);
   hasRecentNotification$: Observable<boolean>;
+  ticketCount$: Observable<number>;
 
   constructor(private store: Store<AppState>) {
     this.hasRecentNotification$ = store.select(recentNotification);
+    this.ticketCount$ = store.select(totalTickets);
   }
 
   ngOnInit(): void {

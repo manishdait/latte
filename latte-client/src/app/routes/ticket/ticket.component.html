@@ -3,15 +3,17 @@
 
   <div class="text-secondary-400 border-[.1em] border-primary-400 rounded-md">
     <section class="flex items-center justify-between border-b-[.1em] border-primary-400">
-      <div class="relative p-2">
-        <div class="w-[9rem] flex items-center justify-between text-[.9rem] border-[.1em] border-primary-400 rounded-md bg-primary-100 py-1 px-2 cursor-pointer" (click)="toggleStatusFilter()">
-          <span>{{ status() }}</span>
+      <div class="relative w-full p-2">
+        <div class="w-[min(10rem,100%)] flex items-center justify-between text-[.9rem] border-[.1em] border-primary-400 rounded-md bg-primary-100 py-1 px-2 cursor-pointer" (click)="toggleStatusFilter()">
+          <div class="flex items-center gap-1">
+            <span>{{ status() }}</span>
+          </div>
           <fa-icon class="text-[.8rem]" [class]="{'rotate-180': statusFilter()}" [icon]="'angle-down'" />
         </div>
 
         @if (statusFilter()) {
-          <div class="absolute">
-            <ul class="w-[9rem] bg-primary-100 border-[.1em] border-primary-400 rounded-md list-none mt-1">
+          <div class="absolute w-[min(100%,10rem)]">
+            <ul class="w-[min(10rem,100%)] bg-primary-100 border-[.1em] border-primary-400 rounded-md list-none mt-1">
               @for (val of availableStatus; track val) {
                 @if (val !== status()) {
                   <li class="text-[.9rem] not-last:border-b-[.1em] border-primary-400 py-1 px-2 cursor-pointer hover:bg-primary-200" (click)="setStatus(val)">{{ val }}</li>

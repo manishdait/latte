@@ -6,10 +6,11 @@ import { TicketService } from '../../../../service/ticket.service';
 import { UserService } from '../../../../service/user.service';
 import { fontawsomeIcons } from '../../../../shared/fa-icons';
 import { DropdownComponent } from '../../../../components/dropdown/dropdown.component';
+import { SpinnerComponent } from '../../../../components/spinner/spinner.component';
 
 @Component({
   selector: 'app-edit-assign',
-  imports: [ReactiveFormsModule, DropdownComponent],
+  imports: [ReactiveFormsModule, DropdownComponent, SpinnerComponent],
   templateUrl: './edit-assign.component.html',
   styleUrl: './edit-assign.component.css'
 })
@@ -31,10 +32,15 @@ export class EditAssignComponent implements OnInit {
 
   form: FormGroup;
 
+  loading = signal(false);
+  processing = signal(false);
+
   constructor() {
+    this.loading.set(true);
     this.userService.fetchUserList(this.page(), this.size()).subscribe((data) => {
       this.engineers.set(data.content);
       this.hasNext.set(data.next);
+      this.loading.set(false);
     })
 
     this.form = new FormGroup({
@@ -43,7 +49,7 @@ export class EditAssignComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form.controls['assignedToi'].setValue(this.value())
+    this.form.controls['assignedTo'].setValue(this.value())
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
 
@@ -53,10 +59,11 @@ export class EditAssignComponent implements OnInit {
 
   showMore() {
     this.page.update(count => count + 1);
-
+    this.loading.set(true);
     this.userService.fetchUserList(this.page(), this.size()).subscribe((data) => {
       this.engineers.update(arr => arr.concat(data.content));
       this.hasNext.set(data.next);
+      this.loading.set(false);
     })
   }
 
@@ -70,10 +77,16 @@ export class EditAssignComponent implements OnInit {
       clientId: null
     }
 
+    this.processing.set(true);
+    this.form.disable();
     this.ticketService.updateTicket(this.ticketId(), request).subscribe({
       next: (response) => {
         this.changes.emit(true);
         this.toggleCancel();
+      },
+      error: (err) => {
+        this.processing.set(false);
+        this.form.enable();
       }
     })
   }

@@ -10,7 +10,7 @@ import { TicketService } from '../../service/ticket.service';
 import { fontawsomeIcons } from '../../shared/fa-icons';
 import { AppState } from '../../state/app.state';
 import { setCloseCount, setOpenCount, setTicketCount, setTickets } from '../../state/ticket/ticket.action';
-import { closeTickets, openTickets, tickets } from '../../state/ticket/ticket.selector';
+import { closeTickets, openTickets, tickets, totalTickets } from '../../state/ticket/ticket.selector';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { TableItemComponent } from '../../components/table-item/table-item.component';
 import { CardItemComponent } from '../../components/card-item/card-item.component';
@@ -28,8 +28,9 @@ export class TicketComponent implements OnInit {
 
   tickets$: Observable<TicketResponse[]>;
 
-  openCount$: Observable<number>;
-  closeCount$: Observable<number>;
+  totalTickets$: Observable<number>;
+  openTickets$: Observable<number>;
+  closeTickets$: Observable<number>;
 
   availableStatus = ['All Tickets', 'Open Tickets', 'Closed Tickets'];
   status = signal<string>('All Tickets');
@@ -47,20 +48,12 @@ export class TicketComponent implements OnInit {
 
   constructor(private store: Store<AppState>) {
     this.tickets$ = store.select(tickets);
-    this.openCount$ = store.select(openTickets);
-    this.closeCount$ = store.select(closeTickets);
+    this.totalTickets$ = store.select(totalTickets);
+    this.openTickets$ = store.select(openTickets);
+    this.closeTickets$ = store.select(closeTickets);
   }
 
   ngOnInit(): void {
-    this.ticketService.fetchTicktsInfo().subscribe({
-      next: (response) => {
-        const info =  response as any;
-        this.store.dispatch(setOpenCount({count: info.open_tickets}))
-        this.store.dispatch(setCloseCount({count: info.closed_tickets}))
-        this.store.dispatch(setTicketCount({count: info.open_tickets + info.closed_tickets}))
-      }
-    })
-
     this.getTickets();
     this.faLibrary.addIcons(...fontawsomeIcons);
   }
@@ -96,8 +89,8 @@ export class TicketComponent implements OnInit {
         next: (response) => {
           this.ticketPage()['previous'] = response.previous;
           this.ticketPage()['next'] = response.next;
-  
           this.store.dispatch(setTickets({tickets: response.content}));
+          this.store.dispatch(setTicketCount({count: response.totalElement}));
           this.loading.set(false);
         }
       });
@@ -107,8 +100,12 @@ export class TicketComponent implements OnInit {
         next: (response) => {
           this.ticketPage()['previous'] = response.previous;
           this.ticketPage()['next'] = response.next;
-  
           this.store.dispatch(setTickets({tickets: response.content}));
+          if (status === 'OPEN') {
+            this.store.dispatch(setOpenCount({count: response.totalElement}));
+          } else {
+            this.store.dispatch(setCloseCount({count: response.totalElement}));
+          }
           this.loading.set(false);
         }
       });
