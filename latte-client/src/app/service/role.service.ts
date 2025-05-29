@@ -25,10 +25,6 @@ export class RoleService {
     return this.client.get<{[key: string]: number}>(`${URL}/count`);
   }
 
-  createRole(request: RoleRequest): Observable<Role> {
-    return this.client.post<Role>(`${URL}`, request);
-  }
-
   updateRole(id: number, request: RoleRequest): Observable<Role> {
     return this.client.patch<Role>(`${URL}/${id}`, request);
   }
