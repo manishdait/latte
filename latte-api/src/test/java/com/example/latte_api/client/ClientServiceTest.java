@@ -74,7 +74,7 @@ public class ClientServiceTest {
 
   @Test
   void shouldReturnClientResponse_forGivenId() {
-    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true);
+    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true, List.of());
 
     final Long id = 101L;
 
@@ -117,7 +117,7 @@ public class ClientServiceTest {
   @Test
   void shouldUpdateClient() {
     final Client updatedClient = Mockito.mock(Client.class);
-    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true);
+    final Client client = new Client(101L, "Bob", "bo@test.in", "+918989898989", true, List.of());
     
     final ClientRequest request = new ClientRequest("NewBob", "newbob@test.in", "+912323232323");
     final Long id = 101L;

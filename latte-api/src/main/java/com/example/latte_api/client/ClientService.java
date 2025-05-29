@@ -1,5 +1,7 @@
 package com.example.latte_api.client;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ public class ClientService {
       .email(request.email())
       .phone(request.phone())
       .deletable(true)
+      .tickets(List.of())
       .build();
     
     clientRepository.save(client);
