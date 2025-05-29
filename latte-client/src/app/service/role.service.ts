@@ -13,6 +13,10 @@ const URL: string = `${environment.API_ENDPOINT}/roles`;
 export class RoleService {
   constructor(private client: HttpClient) {}
 
+  createRole(request: RoleRequest): Observable<Role> {
+    return this.client.post<Role>(`${URL}`, request);
+  }
+
   getRoles(page: number, size: number): Observable<Page<Role>> {
     return this.client.get<Page<Role>>(`${URL}?page=${page}&size=${size}`);
   }
@@ -21,9 +25,6 @@ export class RoleService {
     return this.client.get<Role>(`${URL}/${id}`);
   }
 
-  getCount(): Observable<{[key: string]: number}> {
-    return this.client.get<{[key: string]: number}>(`${URL}/count`);
-  }
 
   updateRole(id: number, request: RoleRequest): Observable<Role> {
     return this.client.patch<Role>(`${URL}/${id}`, request);
