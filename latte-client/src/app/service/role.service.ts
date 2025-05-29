@@ -25,7 +25,6 @@ export class RoleService {
     return this.client.get<Role>(`${URL}/${id}`);
   }
 
-
   updateRole(id: number, request: RoleRequest): Observable<Role> {
     return this.client.patch<Role>(`${URL}/${id}`, request);
   }
