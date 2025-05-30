@@ -49,5 +49,9 @@ export const routes: Routes = [
       }
     ],
     canActivate: [homeGuard]
+  },
+  {
+    path: '**',
+    loadComponent: () => import('./page/not-found/not-found.component').then(c => c.NotFoundComponent)
   }
 ];

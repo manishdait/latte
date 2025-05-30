@@ -24,7 +24,8 @@ import {
   faRotate,
   faInbox,
   faCheck,
-  faUserTie
+  faUserTie,
+  faTriangleExclamation
 } from '@fortawesome/free-solid-svg-icons'
 
 export const fontawsomeIcons: IconDefinition[] = [
@@ -52,5 +53,6 @@ export const fontawsomeIcons: IconDefinition[] = [
   faRotate, 
   faInbox,
   faCheck,
-  faUserTie
+  faUserTie,
+  faTriangleExclamation
 ];
