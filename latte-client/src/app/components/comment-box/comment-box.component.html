@@ -1,8 +1,8 @@
 <div class="w-full border-[.1em] overflow-hidden rounded-md" [class]="owner()? 'border-blue-400' : 'border-primary-400'">
-  <div class="flex items-center justify-between gap-2 text-base border-b-[.1em] px-2 py-1" [class]="owner()? 'bg-blue-600/5 border-blue-400' : 'bg-primary-200 border-primary-400'">
-    <div class="flex flex-wrap gap-2">
+  <div class="flex flex-wrap items-center justify-between gap-2 text-base border-b-[.1em] px-2 py-1" [class]="owner()? 'bg-blue-600/5 border-blue-400' : 'bg-primary-200 border-primary-400'">
+    <div class="flex flex-wrap gap-1">
       <span class="text-[.9rem] font-medium text-secondary-400">{{ activity().author }}</span>
-      <span class="text-[.9rem] text-secondary-200">{{ 'commented ' + getDate(activity().createdAt) }}</span>
+      <span class="text-[.8rem] text-secondary-200">{{ 'commented ' + getDate(activity().createdAt) }}</span>
     </div>
 
     @if (owner()) {

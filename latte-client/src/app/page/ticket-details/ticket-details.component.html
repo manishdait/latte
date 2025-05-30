@@ -89,7 +89,7 @@
 
       <app-activity [ticketId]="ticketId()" #activity/>
 
-      <div class="min-w-[300px] flex flex-col justify-center gap-4 py-4">
+      <div class="w-full flex flex-col justify-center gap-4 py-4">
         <textarea class="w-full h-32 text-base text-secondary-400 border-[.1em] border-primary-400 rounded-md p-2 focus:border-primary-600" placeholder="Enter a comment..." [disabled]="processingComment()"  #message></textarea>
         
         <div class="flex flex-wrap justify-end gap-2">
@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <div class="min-w-[240px] h-fit grow">
+    <div class="min-w-[min(240px,100%)] h-fit grow">
       <div class="w-full flex flex-col gap-1 text-base border-b-[.1em] border-primary-400 py-2">
         <span class="text-[.9rem] text-secondary-400 font-medium mb-1">Client</span>
         @if (loading()) {
