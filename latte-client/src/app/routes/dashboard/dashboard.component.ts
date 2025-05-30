@@ -42,6 +42,13 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     this.ticketService.fetchTicktsInfo().subscribe({
+      next: (res) => {
+        this.store.dispatch(setOpenCount({count: res['open_tickets']}));
+        this.store.dispatch(setCloseCount({count: res['closed_tickets']}));
+        this.store.dispatch(setTicketCount({count: res['total_tickets']}));
+      }
+    });
     this.loading.set(true);
     this.ticketService.fetchPagedTickets(0, 5).subscribe({
       next: (res) => {
