@@ -29,8 +29,9 @@
   left: 0;
   top: 0;
   overflow: hidden;
-  background: url(../../../../../public/asset/check.svg) center no-repeat;
-  border: .1em solid #0066ff;
+  background: url(../../../../../public/asset/check.svg) no-repeat;
+  background-size: contain;
+  border: .1em solid #2b6eff;
   border-radius: .1em;
 }
 
