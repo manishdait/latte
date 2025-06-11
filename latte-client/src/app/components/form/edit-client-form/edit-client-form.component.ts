@@ -21,7 +21,7 @@ export class EditClientFormComponent implements OnInit {
   form: FormGroup;
   formErrors = signal(false);
 
-  processing = signal(true);
+  processing = signal(false);
 
   constructor(private alertService: AlertService) {
     this.form = new FormGroup({
