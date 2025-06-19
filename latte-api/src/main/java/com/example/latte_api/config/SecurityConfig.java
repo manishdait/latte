@@ -126,6 +126,8 @@ public class SecurityConfig {
         "/latte-api/v1/clients/**"
       ).hasAuthority(IAuthority.DELETE_CLIENT.getAuthority());
 
+      request.requestMatchers("/latte-api/v1/smtp").hasRole("Admin");
+
       request.anyRequest().authenticated();
     });
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

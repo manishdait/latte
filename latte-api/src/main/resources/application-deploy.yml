@@ -15,4 +15,5 @@ security:
 
 latte:
   client-url: ${CLIENT_URL}
+  secret: ${SECRET}
     

@@ -13,5 +13,10 @@
     "name": "latte.client-url",
     "type": "java.lang.String",
     "description": "Latte client url"
+  },
+  {
+    "name": "latte.secret",
+    "type": "java.lang.String",
+    "description": "Secret key for encrytion of credentials"
   }
 ]}
