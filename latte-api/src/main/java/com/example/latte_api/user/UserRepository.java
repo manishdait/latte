@@ -6,10 +6,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.latte_api.role.Role;
 
+/*
+ * User Repository
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByEmailOrFirstname(String email, String firstname);
   Optional<User> findByFirstname(String firstname);
   Optional<User> findByEmail(String email);
+  
   List<User> findByRole(Role role);
   List<User> findByDeletable(boolean deletable);
 }

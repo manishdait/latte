@@ -1,5 +1,8 @@
 package com.example.latte_api.user;
 
+import static com.example.latte_api.TestUtils.TEST_EMAIL_STEWIE;
+import static com.example.latte_api.TestUtils.TEST_FIRSTNAME_STEWIE;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,9 @@ import com.example.latte_api.user.dto.ResetPasswordRequest;
 import com.example.latte_api.user.dto.UserRequest;
 import com.example.latte_api.user.dto.UserResponse;
 
+/*
+ * User Controller Test
+ */
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -64,7 +70,7 @@ public class UserControllerTest {
 
     User superUser = User.builder()
       .firstname("SuperUser")
-      .email("superuser@test.in")
+      .email("superuser@dev.in")
       .password(passwordEncoder.encode("password"))
       .editable(false)
       .deletable(false)
@@ -73,7 +79,7 @@ public class UserControllerTest {
 
     User adminUser = User.builder()
       .firstname("Admin")
-      .email("admin@test.in")
+      .email("admin@dev.in")
       .password(passwordEncoder.encode("password"))
       .editable(true)
       .deletable(true)
@@ -82,7 +88,7 @@ public class UserControllerTest {
 
     User commonUser = User.builder()
       .firstname("User")
-      .email("common@test.in")
+      .email("user@dev.in")
       .editable(true)
       .deletable(true)
       .password(passwordEncoder.encode("password"))
@@ -106,10 +112,10 @@ public class UserControllerTest {
   @Test
   void shouldReturnPagedUserResponse_whenRequestsUserList_byUserHavingProperAuthority() { 
     // user::create || user::edit || user::delete || user::reset-password
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResponseEntity<PagedEntity<UserResponse>> response = testRestTemplate.exchange(
       BASE_URI,
@@ -124,10 +130,10 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenRequestsUserList_donotHaveProperAuhtority() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -152,14 +158,14 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturnPagedUser_asStringList() {
-    final AuthResponse cred = userCred();
+  void shouldReturnPagedUserFirstname_asListOfString() {
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResponseEntity<PagedEntity<String>> response = testRestTemplate.exchange(
-      BASE_URI + "/list",
+      BASE_URI + "/names",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<PagedEntity<String>>() {}
@@ -170,9 +176,9 @@ public class UserControllerTest {
   }
 
   @Test
-  void shouldReturnForbidden_whenPagedUser_asStringList_requestMissingAuthHeaders() {
+  void shouldReturnForbidden_whenPagedUserFirstnaem_asStringList_requestMissingAuthHeaders() {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/list",
+      BASE_URI + "/names",
       HttpMethod.GET,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -183,13 +189,13 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnUserResponse_ofAuthenticatedUser() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/info",
+      BASE_URI + "/me",
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       UserResponse.class
@@ -199,7 +205,7 @@ public class UserControllerTest {
 
     final UserResponse user = response.getBody();
     Assertions.assertThat(user.firstname()).isEqualTo("User");
-    Assertions.assertThat(user.email()).isEqualTo("common@test.in");
+    Assertions.assertThat(user.email()).isEqualTo("user@dev.in");
     Assertions.assertThat(user.role().role()).isEqualTo("User");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -208,7 +214,7 @@ public class UserControllerTest {
   @Test
   void shouldReturnForbidden_whenUserInfo_requestMissingAuthorizationHeader() {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-     BASE_URI + "/info",
+     BASE_URI + "/me",
       HttpMethod.GET,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -220,15 +226,15 @@ public class UserControllerTest {
   @Test
   void shouldReturnUserResponse_byEmail_whenRequestsUserInfo_byUserHavingProperAuthorities() {
     // user::create || user::edit || user::delete || user::reset-password
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/info/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       UserResponse.class
@@ -236,7 +242,7 @@ public class UserControllerTest {
 
     final UserResponse user = response.getBody();
     Assertions.assertThat(user.firstname()).isEqualTo("User");
-    Assertions.assertThat(user.email()).isEqualTo("common@test.in");
+    Assertions.assertThat(user.email()).isEqualTo("user@dev.in");
     Assertions.assertThat(user.role().role()).isEqualTo("User");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -244,15 +250,15 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUserInfoByEmailRequest_byUserNotHavingAuthorities() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/info/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.GET,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -263,10 +269,10 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUserInfoByEmailRequest_missingAuthorizationHeader() {
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/info/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.GET,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -277,15 +283,15 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_withNewDetails() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "User");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -294,8 +300,8 @@ public class UserControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
     final UserResponse user = response.getBody();
-    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
-    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.firstname()).isEqualTo(TEST_FIRSTNAME_STEWIE);
+    Assertions.assertThat(user.email()).isEqualTo(TEST_EMAIL_STEWIE);
     Assertions.assertThat(user.role().role()).isEqualTo("User");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -303,15 +309,15 @@ public class UserControllerTest {
 
   @Test
   void shouldUpdateAuthenticatedUser_verifyThat_itNotChangeRole() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "Admin");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -320,8 +326,8 @@ public class UserControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
     final UserResponse user = response.getBody();
-    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
-    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.firstname()).isEqualTo(TEST_FIRSTNAME_STEWIE);
+    Assertions.assertThat(user.email()).isEqualTo(TEST_EMAIL_STEWIE);
     Assertions.assertThat(user.role().role()).isEqualTo("User");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -329,7 +335,7 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserRequest_missingAuthorizationHeader() {
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "User");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI,
@@ -343,15 +349,15 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnBadRequest_whenUpdateUserRequest_ifUserIsNotEditable() {
-    final AuthResponse cred = superCred();
+    final AuthResponse auth = superLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE,"Admin");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me",
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -363,16 +369,16 @@ public class UserControllerTest {
   @Test
   void shouldUpdateUserByEmail_whenRequestsUpdate_byUserHavingAuthorities() {
     // user::edit
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
-    final String _user = "common@test.in";
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "User");
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -381,8 +387,8 @@ public class UserControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     final UserResponse user = response.getBody();
 
-    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
-    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.firstname()).isEqualTo(TEST_FIRSTNAME_STEWIE);
+    Assertions.assertThat(user.email()).isEqualTo(TEST_EMAIL_STEWIE);
     Assertions.assertThat(user.role().role()).isEqualTo("User");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -391,16 +397,16 @@ public class UserControllerTest {
   @Test
   void shouldUpdateUserByEmail_andChangeRole_whenRequestsUpdate_byUserHavingAuthorities() {
     // user::edit
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
-    final String _user = "common@test.in";
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "Admin");
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -409,8 +415,8 @@ public class UserControllerTest {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
     final UserResponse user = response.getBody();
-    Assertions.assertThat(user.firstname()).isEqualTo("Stewie");
-    Assertions.assertThat(user.email()).isEqualTo("stewie@test.in");
+    Assertions.assertThat(user.firstname()).isEqualTo(TEST_FIRSTNAME_STEWIE);
+    Assertions.assertThat(user.email()).isEqualTo(TEST_EMAIL_STEWIE);
     Assertions.assertThat(user.role().role()).isEqualTo("Admin");
     Assertions.assertThat(user.editable()).isEqualTo(true);
     Assertions.assertThat(user.deletable()).isEqualTo(true);
@@ -418,16 +424,16 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserByEmail_forUserNotHavingAuthorities() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
-    final String _user = "common@test.in";
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "Admin");
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.PUT,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -438,11 +444,11 @@ public class UserControllerTest {
 
   @Test
   void shouldReturnForbidden_whenUpdateUserByEmail_missingAuthorizationHeader() {
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "Admin");
-    final String _user = "common@test.in";
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "Admin");
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.PUT,
       new HttpEntity<>(request),
       UserResponse.class
@@ -453,15 +459,15 @@ public class UserControllerTest {
 
   @Test
   void shouldResetPassword_forAuthenticatedUser() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -472,15 +478,15 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveBadRequest_whenResetPassword_forAuthenticatedUser_andUpdatePasswordNotMatchConfirmPassword() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "UpdatePass");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -494,7 +500,7 @@ public class UserControllerTest {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI,
+      BASE_URI + "/me/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, null),
       ErrorResponse.class
@@ -506,16 +512,16 @@ public class UserControllerTest {
   @Test
   void shouldResetPassword_byEmail_whenuserRequestChanges_forUserHavingAuthorities() {
     // user::reset-password
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<UserResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail + "/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       UserResponse.class
@@ -527,16 +533,16 @@ public class UserControllerTest {
   @Test
   void shouldGiveBadRequest_whenResetPassword_byEmail_whenRequestChanges_andUpdatedPasswordNotMatchConfirmPassword_forValidAuthorityUser() {
     // user::reset-password
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "UpdatePass");
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+       BASE_URI + "/" + userEmail + "/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -547,16 +553,16 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveForbidden_whenResetPassword_byEmail_forUserNotHavingAuthorities() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail + "/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, headers),
       ErrorResponse.class
@@ -568,10 +574,10 @@ public class UserControllerTest {
   @Test
   void shouldGiveForbidden_whenResetPassword_byEmail_missingAuthorizationHeader() {
     final ResetPasswordRequest request = new ResetPasswordRequest("Updated Pass", "Updated Pass");
-    final String user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + user,
+      BASE_URI + "/" + userEmail + "/password",
       HttpMethod.PATCH,
       new HttpEntity<>(request, null),
       ErrorResponse.class
@@ -583,17 +589,17 @@ public class UserControllerTest {
   @Test
   void shouldDeleteUser_byEmail_whenRequested_byUserHavingAuthority() {
     // user::delete
-    final Map<String, Object> expected = Map.of("key", "common@test.in", "deleted", true);
+    final Map<String, Object> expected = Map.of("key", "user@dev.in", "deleted", true);
 
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<Map<String, Object>> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       new ParameterizedTypeReference<Map<String, Object>>() {}
@@ -605,15 +611,15 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveForbidden_whenUserDeletedByEmail_whenRequested_byUserNotHavingAuthority() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -624,10 +630,10 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveForbidden_whenUserDeletedByEmail_whenRequesteMissingAuthorizationHeader() {
-    final String _user = "common@test.in";
+    final String userEmail = "user@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.DELETE,
       new HttpEntity<>(null),
       ErrorResponse.class
@@ -638,15 +644,15 @@ public class UserControllerTest {
 
   @Test
   void shouldGiveBadRequest_whenUserDeletedByEmail_whenUserIsNotDeletable() {
-    final AuthResponse cred = superCred();
+    final AuthResponse auth = superLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final String _user = "superuser@test.in";
+    final String userEmail = "superuser@dev.in";
 
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
-      BASE_URI + "/" + _user,
+      BASE_URI + "/" + userEmail,
       HttpMethod.DELETE,
       new HttpEntity<>(null, headers),
       ErrorResponse.class
@@ -654,20 +660,20 @@ public class UserControllerTest {
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
   }
+
   // Helpers
-
-  private AuthResponse superCred() {
-    final AuthRequest request = new AuthRequest("superuser@test.in", "password");
+  private AuthResponse superLogin() {
+    final AuthRequest request = new AuthRequest("superuser@dev.in", "password");
     return authenticate(request);
   }
 
-  private AuthResponse adminCred() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "password");
+  private AuthResponse adminLogin() {
+    final AuthRequest request = new AuthRequest("admin@dev.in", "password");
     return authenticate(request);
   }
 
-  private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("common@test.in", "password");
+  private AuthResponse userLogin() {
+    final AuthRequest request = new AuthRequest("user@dev.in", "password");
     return authenticate(request);
   }
 

@@ -1,5 +1,11 @@
 package com.example.latte_api.user;
 
+import static com.example.latte_api.TestUtils.TEST_FIRSTNAME_PETER;
+import static com.example.latte_api.TestUtils.TEST_FIRSTNAME_LOUIS;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_PETER;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_LOUIS;
+import static com.example.latte_api.TestUtils.createTestUserPeter;
+
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -16,8 +22,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import com.example.latte_api.role.Role;
-
+/*
+ * User Repository Test
+ */
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -30,16 +37,9 @@ public class UserRepositoryTest {
   @Autowired
   private UserRepository userRepository;
 
-  private User user = User.builder()
-    .firstname("Peter")
-    .email("peter@test.in")
-    .password("Peter01")
-    .role(Role.builder().id(101L).role("ROLE_USER").build())
-    .build();
-
   @BeforeEach
   void setup() {
-    userRepository.save(user);
+    userRepository.save(createTestUserPeter());
   }
 
   @AfterEach
@@ -55,7 +55,7 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_userOptional_forValidEmail() {
-    final String email = "peter@test.in";
+    final String email = TEST_EMAIL_PETER;
     final Optional<User> result = userRepository.findByEmail(email);
 
     Assertions.assertThat(result).isPresent();
@@ -63,7 +63,7 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_emptyOptional_forInvalidEmail() {
-    final String email = "louis@test.in";
+    final String email = TEST_EMAIL_LOUIS;
     final Optional<User> result = userRepository.findByEmail(email);
 
     Assertions.assertThat(result).isEmpty();
@@ -71,7 +71,7 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_userOptional_forValidFirstname() {
-    final String firstname = "Peter";
+    final String firstname = TEST_FIRSTNAME_PETER;
     final Optional<User> result = userRepository.findByFirstname(firstname);
 
     Assertions.assertThat(result).isPresent();
@@ -79,7 +79,7 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_emptyOptional_forInvalidFirstname() {
-    final String firstname = "Louis";
+    final String firstname = TEST_FIRSTNAME_LOUIS;
     final Optional<User> result = userRepository.findByFirstname(firstname);
 
     Assertions.assertThat(result).isEmpty();
@@ -87,8 +87,8 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_userOptional_ifEmailOrFirstname_isValid() {
-    final String firstname = "Peter";
-    final String email = "stewie@test.in";
+    final String firstname = TEST_FIRSTNAME_PETER;
+    final String email = TEST_EMAIL_LOUIS;
     final Optional<User> result = userRepository.findByEmailOrFirstname(email, firstname);
 
     Assertions.assertThat(result).isPresent();
@@ -96,8 +96,8 @@ public class UserRepositoryTest {
 
   @Test
   void shouldReturn_emptyOptional_ifEmailAndFirstname_isInvalid() {
-    final String firstname = "Louis";
-    final String email = "louis@test.in";
+    final String firstname = TEST_FIRSTNAME_LOUIS;
+    final String email = TEST_EMAIL_LOUIS;
     final Optional<User> result = userRepository.findByEmailOrFirstname(email, firstname);
 
     Assertions.assertThat(result).isEmpty();

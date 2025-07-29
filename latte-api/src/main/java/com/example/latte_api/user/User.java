@@ -33,6 +33,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/*
+ * User Entitiy
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -83,7 +86,7 @@ public class User extends AbstractAuditingEntity implements UserDetails, Princip
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     List<SimpleGrantedAuthority> authorities = new ArrayList<>(this.role.getAuthorities());
-    authorities.add(new SimpleGrantedAuthority(this.role.getRole()));
+    authorities.add(new SimpleGrantedAuthority("ROLE_"+this.role.getRole()));
     return authorities;
   }
 
@@ -92,11 +95,12 @@ public class User extends AbstractAuditingEntity implements UserDetails, Princip
   }
 
   public boolean hasAuthority(String authority) {
-    for (GrantedAuthority _authority : getAuthorities()) {
+    for (GrantedAuthority _authority : this.role.getAuthorities()) {
       if (_authority.getAuthority().equals(authority)) {
         return true;
       }
     }
+    
     return false;
   }
 }

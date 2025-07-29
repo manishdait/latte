@@ -23,6 +23,9 @@ import com.example.latte_api.user.dto.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 
+/*
+ * User Controller
+ */
 @RestController
 @RequestMapping("/latte-api/v1/users")
 @RequiredArgsConstructor
@@ -30,49 +33,94 @@ public class UserController {
   private final UserService userService;
   private final PasswordService passwordService;
 
+  /*
+   * Retrieves a paginated list of all users with full details.
+   */
   @GetMapping()
-  public ResponseEntity<PagedEntity<UserResponse>> getUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers(page, size));
+  public ResponseEntity<PagedEntity<UserResponse>> getUsers(
+    @RequestParam(defaultValue = "0") int pageNumber, 
+    @RequestParam(defaultValue = "10") int pageSize
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers(pageNumber, pageSize));
   }
 
-  @GetMapping("/list")
-  public ResponseEntity<PagedEntity<String>> getUserList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getUserList(page, size));
+  /*
+   * Retrieves a paginated list containing only the first names of users.
+   */
+  @GetMapping("/names")
+  public ResponseEntity<PagedEntity<String>> getPagedUserFirstname(
+    @RequestParam(defaultValue = "0") int pageNumber, 
+    @RequestParam(defaultValue = "10") int pageSize
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getPagedUserFirstnames(pageNumber, pageSize));
   }
 
-  @GetMapping("/info")
-  public ResponseEntity<UserResponse> getInfo(Authentication authentication) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(authentication));
+  /*
+   * Retrieves the details of the currently authenticated user.
+   */
+  @GetMapping("/me")
+  public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentUser(authentication));
   }
 
-  @GetMapping("/info/{email}")
-  public ResponseEntity<UserResponse> getInfoForUser(@PathVariable String email) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(email));
+  /*
+   * Retrieves the details of a specific user by their email address.
+   */
+  @GetMapping("/{userEmail}")
+  public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String userEmail) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByEmail(userEmail));
   }
 
-  @PutMapping()
-  public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest request, Authentication authentication) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(request, authentication));
+  /*
+   * Updates the details of the currently authenticated user.
+   */
+  @PutMapping("/me")
+  public ResponseEntity<UserResponse> updateCurrentUser(
+    @RequestBody UserRequest request, 
+    Authentication authentication
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.updateCurrentUser(request, authentication));
   }
 
-  @PutMapping("/{email}")
-  public ResponseEntity<UserResponse> updateUserByEmail(@RequestBody UserRequest request, @PathVariable String email) {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(request, email));
+  /*
+   * Updates the details of a specific user by their email address.
+   */
+  @PutMapping("/{userEmail}")
+  public ResponseEntity<UserResponse> updateUserByEmail(
+    @RequestBody UserRequest request, 
+    @PathVariable String userEmail
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserByEmail(request, userEmail));
   }
 
-  @PatchMapping()
-  public ResponseEntity<UserResponse> resetUserPassword(@RequestBody ResetPasswordRequest request, Authentication authentication) {
+  /*
+   * Resets the password for the currently authenticated user.
+   */
+  @PatchMapping("/me/password")
+  public ResponseEntity<UserResponse> resetCurrentUserPassword(
+    @RequestBody ResetPasswordRequest request, 
+    Authentication authentication
+  ) {
     return ResponseEntity.status(HttpStatus.OK).body(passwordService.resetPassword(request, authentication));
   }
 
-  @PatchMapping("/{email}")
-  public ResponseEntity<UserResponse> resetUserPassword(@RequestBody ResetPasswordRequest request, @PathVariable String email) {
-    return ResponseEntity.status(HttpStatus.OK).body(passwordService.resetPassword(request, email));
+  /*
+   * Resets the password for a specific user by their email address.
+   */
+  @PatchMapping("/{userEmail}/password")
+  public ResponseEntity<UserResponse> resetUserPasswordByEmail(
+    @RequestBody ResetPasswordRequest request, 
+    @PathVariable String userEmail
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(passwordService.resetPassword(request, userEmail));
   }
 
-  @DeleteMapping("/{email}")
-  public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String email) {
-    userService.deleteUser(email);
-    return ResponseEntity.status(HttpStatus.OK).body(Map.of("key", email, "deleted", true));
+  /*
+   * Deletes a user by their email address.
+   */
+  @DeleteMapping("/{userEmail}")
+  public ResponseEntity<Map<String, Object>> deleteUserByEmail(@PathVariable String userEmail) {
+    userService.deleteUserByEmail(userEmail);
+    return ResponseEntity.status(HttpStatus.OK).body(Map.of("key", userEmail, "deleted", true));
   }
 }

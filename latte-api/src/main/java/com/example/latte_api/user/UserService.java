@@ -27,9 +27,14 @@ import com.example.latte_api.user.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/*
+ * User Service
+ */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserDetailsService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
@@ -38,15 +43,32 @@ public class UserService implements UserDetailsService {
 
   private final UserMapper userMapper;
 
+  /**
+   * Loads user details by username (email).
+   *
+   * @param username The email address of the user.
+   * @return UserDetails object if found.
+   * @throws UsernameNotFoundException if the user is not found.
+   */
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByEmail(username).orElseThrow(
-      () -> new UsernameNotFoundException(String.format("User with username:`%s` not found", username))
-    );
+    log.info("Attempting to load user by username: {}", username);
+
+    return userRepository.findByEmail(username).orElseThrow(() -> {
+      log.warn("User with username: {} not found during authentication.", username);
+      throw new UsernameNotFoundException(String.format("User with username:`%s` not found", username));
+    });
   }
 
-  public PagedEntity<UserResponse> getUsers(int number, int size) {
-    Pageable pageable = PageRequest.of(number, size, Sort.by(Direction.DESC, "createdAt"));
+  /**
+   * Retrieves a paginated list of all users with detailed information.
+   * 
+   * @param pageNumber The page number (0-indexed).
+   * @param pageSize The number of items per page.
+   * @return A PagedEntity containing UserResponse.
+   */
+  public PagedEntity<UserResponse> getUsers(int pageNumber, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Direction.DESC, "createdAt"));
     Page<User> page = userRepository.findAll(pageable);
 
     PagedEntity<UserResponse> response = new PagedEntity<>();
@@ -54,11 +76,19 @@ public class UserService implements UserDetailsService {
     response.setPrevious(page.hasPrevious());
     response.setTotalElement(page.getTotalElements());
     response.setContent(page.getContent().stream().map(u -> userMapper.mapToUserDto(u)).toList());
+
     return response;
   }
 
-  public PagedEntity<String> getUserList(int number, int size) {
-    Pageable pageable = PageRequest.of(number, size);
+  /**
+   * Retrieves a paginated list of only user first names.
+   *
+   * @param pageNumber The page number.
+   * @param pageSize The number of items per page.
+   * @return A PagedEntity containing user first names as Strings.
+   */
+  public PagedEntity<String> getPagedUserFirstnames(int pageNumber, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNumber, pageSize);
     Page<User> page = userRepository.findAll(pageable);
 
     PagedEntity<String> response = new PagedEntity<>();
@@ -66,27 +96,50 @@ public class UserService implements UserDetailsService {
     response.setPrevious(page.hasPrevious());
     response.setTotalElement(page.getTotalElements());
     response.setContent(page.getContent().stream().map(u -> u.getFirstname()).toList());
+
     return response;
   }
 
-  public UserResponse getUser(Authentication authentication) {
+  /**
+   * Retrieves the details of the currently authenticated user.
+   *
+   * @param authentication The Spring Security Authentication object.
+   * @return UserResponse DTO of the current user.
+   */
+  public UserResponse getCurrentUser(Authentication authentication) {
     User user = (User) authentication.getPrincipal();
     return userMapper.mapToUserDto(user);
   }
 
-  public UserResponse getUser(String email) {
-    User user = userRepository.findByEmail(email).orElseThrow(
-      () -> new EntityNotFoundException("User not found")
+  /**
+   * Retrieves user details by their email address.
+   *
+   * @param email The email address of the user.
+   * @return UserResponse DTO of the found user.
+   * @throws EntityNotFoundException if the user is not found.
+   */
+  public UserResponse getUserByEmail(String userEmail) {
+    User user = userRepository.findByEmail(userEmail).orElseThrow(
+      () -> new EntityNotFoundException(String.format("User with email '%s' not found.", userEmail))
     );
+    
     return userMapper.mapToUserDto(user);
   }
 
+  /**
+   * Updates the details of the currently authenticated user.
+   *
+   * @param request The UserRequest DTO containing updated user information.
+   * @param authentication The Spring Security Authentication object.
+   * @return UserResponse DTO of the updated user.
+   * @throws IllegalStateException if the user is not editable.
+   */
   @Transactional
-  public UserResponse updateUser(UserRequest request, Authentication authentication) {
+  public UserResponse updateCurrentUser(UserRequest request, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
 
     if (!user.isEditable()) {
-      throw new IllegalStateException("User cannot be edited");
+      throw new IllegalStateException(String.format("User '%s' cannot be edited.", user.getEmail()));
     }
 
     user.setEmail(request.email());
@@ -96,14 +149,23 @@ public class UserService implements UserDetailsService {
     return userMapper.mapToUserDto(user);
   }
 
+  /**
+   * Updates the details of a specific user identified by their email address.
+   *
+   * @param request The UserRequest DTO containing updated user information.
+   * @param userEmail The email address of the user to update.
+   * @return UserResponse DTO of the updated user.
+   * @throws EntityNotFoundException if the user or specified role is not found.
+   * @throws IllegalStateException if the user is not editable.
+   */
   @Transactional
-  public UserResponse updateUser(UserRequest request, String _user) {
-    User user = userRepository.findByEmail(_user).orElseThrow(
-      () -> new EntityNotFoundException("User not found")
+  public UserResponse updateUserByEmail(UserRequest request, String userEmail) {
+    User user = userRepository.findByEmail(userEmail).orElseThrow(
+      () -> new EntityNotFoundException(String.format("User with email '%s' not found for update.", userEmail))
     );
 
     if (!user.isEditable()) {
-      throw new IllegalStateException("User cannot be edited");
+      throw new IllegalStateException(String.format("User '%s' cannot be edited.", userEmail));
     }
 
     user.setEmail(request.email());
@@ -111,7 +173,7 @@ public class UserService implements UserDetailsService {
 
     if (!request.role().equals(user.getRole().getRole())) {
       Role role = roleRepository.findByRole(request.role()).orElseThrow(
-        () -> new EntityNotFoundException("Role not found")
+        () -> new EntityNotFoundException(String.format("Role '%s' not found.", request.role()))
       );
       user.setRole(role);
     }
@@ -120,14 +182,22 @@ public class UserService implements UserDetailsService {
     return userMapper.mapToUserDto(user);
   }
 
+  /**
+   * Deletes a user by their email address, reassigning their created tickets and activities
+   * to a admin user. Assigned tickets are unassigned.
+   *
+   * @param userEmail The email address of the user to delete.
+   * @throws EntityNotFoundException if the user to delete or the admin user is not found.
+   * @throws IllegalStateException if the user is not deletable.
+   */
   @Transactional
-  public void deleteUser(String _user) {
-    User user = userRepository.findByEmail(_user).orElseThrow(
-      () -> new EntityNotFoundException("User not found")
+  public void deleteUserByEmail(String userEmail) {
+    User user = userRepository.findByEmail(userEmail).orElseThrow(
+      () -> new EntityNotFoundException(String.format("User with email '%s' not found for deletion.", userEmail))
     );
 
     if (!user.isDeletable()) {
-      throw new IllegalStateException("User cannot be deleted");
+      throw new IllegalStateException(String.format("User '%s' cannot be deleted.", userEmail));
     }
 
     User admin = userRepository.findByDeletable(false).get(0);

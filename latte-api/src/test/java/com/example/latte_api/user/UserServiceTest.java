@@ -1,5 +1,15 @@
 package com.example.latte_api.user;
 
+import static com.example.latte_api.TestUtils.TEST_AUTHORITY_READ;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_ADMIN;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_LOUIS;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_PETER;
+import static com.example.latte_api.TestUtils.TEST_EMAIL_STEWIE;
+import static com.example.latte_api.TestUtils.TEST_FIRSTNAME_STEWIE;
+import static com.example.latte_api.TestUtils.createAuthority;
+import static com.example.latte_api.TestUtils.createRole;
+import static com.example.latte_api.TestUtils.createTestUserAdmin;
+import static com.example.latte_api.TestUtils.createTestUserPeter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,7 +37,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.example.latte_api.activity.ActivityRepository;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.RoleRepository;
-import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.shared.PagedEntity;
 import com.example.latte_api.ticket.TicketRepository;
 import com.example.latte_api.user.dto.UserRequest;
@@ -36,6 +45,9 @@ import com.example.latte_api.user.mapper.UserMapper;
 
 import jakarta.persistence.EntityNotFoundException;
 
+/*
+ * User Service Test
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
   private UserService userService;
@@ -74,7 +86,7 @@ public class UserServiceTest {
     final User user = Mockito.mock(User.class);
 
     // given
-    final String email = "peter@test.in";
+    final String email = TEST_EMAIL_PETER;
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
@@ -90,7 +102,7 @@ public class UserServiceTest {
   @Test
   void shouldThrow_exception_forInvalidUserEmail() {
     // given
-    final String email = "louis@gmail.com";
+    final String email = TEST_EMAIL_LOUIS;
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -107,13 +119,13 @@ public class UserServiceTest {
     final Page<User> userPage = Mockito.mock(Page.class);
 
     // given
-    final int page = 0;
-    final int size = 10;
+    final int pageNumber = 0;
+    final int pageSize = 10;
 
     // when
     when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
 
-    final PagedEntity<UserResponse> result = userService.getUsers(page, size);
+    final PagedEntity<UserResponse> result = userService.getUsers(pageNumber, pageSize);
 
     // then
     verify(userRepository, times(1)).findAll(any(Pageable.class));
@@ -131,13 +143,13 @@ public class UserServiceTest {
     final Page<User> userPage = Mockito.mock(Page.class);
 
     // given
-    final int page = 0;
-    final int size = 10;
+    final int pageNumber = 0;
+    final int pageSize = 10;
 
     // when
     when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
 
-    final PagedEntity<String> result = userService.getUserList(page, size);
+    final PagedEntity<String> result = userService.getPagedUserFirstnames(pageNumber, pageSize);
 
     // then
     verify(userRepository, times(1)).findAll(any(Pageable.class));
@@ -159,7 +171,7 @@ public class UserServiceTest {
     when(authentication.getPrincipal()).thenReturn(user);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserResponse result = userService.getUser(authentication);
+    final UserResponse result = userService.getCurrentUser(authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -175,13 +187,13 @@ public class UserServiceTest {
     final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
-    final String email = "peter@test.in";
+    final String email = TEST_EMAIL_PETER;
     
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserResponse result = userService.getUser(email);
+    final UserResponse result = userService.getUserByEmail(email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -198,7 +210,7 @@ public class UserServiceTest {
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-    Assertions.assertThatThrownBy(() -> userService.getUser(email))
+    Assertions.assertThatThrownBy(() -> userService.getUserByEmail(email))
       .isInstanceOf(EntityNotFoundException.class);
   }
 
@@ -206,15 +218,7 @@ public class UserServiceTest {
   void shouldReturn_updatedUserDto_forAuhtenticatedUser() {
     // mock
     final Authentication authentication = Mockito.mock(Authentication.class);
-    final User user = User.builder()
-      .id(101L)
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password("Peter@01")
-      .editable(true)
-      .deletable(true)
-      .role(Role.builder().role("User").authorities(List.of(Authority.builder().authority("ticket::create").build())).build())
-      .build();
+    final User user = createTestUserPeter();
     final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
@@ -224,7 +228,7 @@ public class UserServiceTest {
     when(authentication.getPrincipal()).thenReturn(user);
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserResponse result = userService.updateUser(request, authentication);
+    final UserResponse result = userService.updateCurrentUser(request, authentication);
 
     // then
     verify(authentication, times(1)).getPrincipal();
@@ -241,26 +245,18 @@ public class UserServiceTest {
   @Test
   void shouldReturn_updatedUserDto_forGivenEmail() {
     // mock
-    final User user = User.builder()
-      .id(101L)
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password("Peter@01")
-      .editable(true)
-      .deletable(true)
-      .role(Role.builder().role("User").build())
-      .build();
+    final User user = createTestUserPeter();
     final UserResponse userDto = Mockito.mock(UserResponse.class);
 
     // given
-    final String email = "peter@test.in";
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
+    final String email = TEST_EMAIL_PETER;
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "User");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserResponse result = userService.updateUser(request, email);
+    final UserResponse result = userService.updateUserByEmail(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -277,38 +273,30 @@ public class UserServiceTest {
   @Test
   void shouldThrow_exceptionOnUpdate_forInvalidEmail() {
     // given
-    final String email = "louis@gmail.com";
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "USER");
+    final String email = TEST_EMAIL_LOUIS;
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "USER");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> userService.updateUser(request, email))
+    Assertions.assertThatThrownBy(() -> userService.updateUserByEmail(request, email))
       .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
   void shouldThrow_exceptionOnUpdate_forUserNotEditable() {
-    final User user = User.builder()
-      .id(101L)
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password("Peter@01")
-      .editable(false)
-      .deletable(true)
-      .role(Role.builder().role("USER").build())
-      .build();
+    final User user = createTestUserAdmin();
 
     // given
-    final String email = "peter@test.com";
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "User");
+    final String email = TEST_EMAIL_ADMIN;
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "User");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
     // then
-    Assertions.assertThatThrownBy(() -> userService.updateUser(request, email))
+    Assertions.assertThatThrownBy(() -> userService.updateUserByEmail(request, email))
       .isInstanceOf(IllegalStateException.class);
   }
 
@@ -316,28 +304,20 @@ public class UserServiceTest {
   @Test
   void shouldReturn_updatedUserDto_withRole_forGivenEmail() {
     // mock
-    final User user = User.builder()
-      .id(101L)
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password("Peter@01")
-      .editable(true)
-      .deletable(true)
-      .role(Role.builder().role("USER").build())
-      .build();
+    final User user = createTestUserPeter();
     final UserResponse userDto = Mockito.mock(UserResponse.class);
-    final Role role = Role.builder().id(101L).role("ADMIN").build();
+    final Role role = createRole("Test Role", createAuthority(TEST_AUTHORITY_READ));
 
     // given
-    final String email = "peter@test.in";
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "ADMIN");
+    final String email = TEST_EMAIL_PETER;
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE,  "ADMIN");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(roleRepository.findByRole(request.role())).thenReturn(Optional.of(role));
     when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-    final UserResponse result = userService.updateUser(request, email);
+    final UserResponse result = userService.updateUserByEmail(request, email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -356,26 +336,18 @@ public class UserServiceTest {
   @Test
   void shouldThrow_exceptionOnUpdate_ifRoleNotPresent() {
     // mock
-    final User user = User.builder()
-      .id(101L)
-      .firstname("Peter")
-      .email("peter@test.in")
-      .password("Peter@01")
-      .editable(true)
-      .deletable(true)
-      .role(Role.builder().role("USER").build())
-      .build();
+    final User user = createTestUserPeter();
 
     // given
-    final String email = "peter@test.in";
-    final UserRequest request = new UserRequest("Stewie", "stewie@test.in", "TEST");
+    final String email = TEST_EMAIL_PETER;
+    final UserRequest request = new UserRequest(TEST_FIRSTNAME_STEWIE, TEST_EMAIL_STEWIE, "TEST");
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(roleRepository.findByRole(request.role())).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> userService.updateUser(request, email))
+    Assertions.assertThatThrownBy(() -> userService.updateUserByEmail(request, email))
       .isInstanceOf(EntityNotFoundException.class);
   }
 
@@ -386,7 +358,7 @@ public class UserServiceTest {
     final User admin = Mockito.mock(User.class);
 
     // given
-    final String email = "peter@test.in";
+    final String email = TEST_EMAIL_PETER;
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
@@ -396,7 +368,7 @@ public class UserServiceTest {
     when(ticketRepository.findByCreatedBy(user)).thenReturn(List.of());
     when(activityRepository.findByAuthor(user)).thenReturn(List.of());
 
-    userService.deleteUser(email);
+    userService.deleteUserByEmail(email);
 
     // then
     verify(userRepository, times(1)).findByEmail(email);
@@ -413,26 +385,26 @@ public class UserServiceTest {
     final User user = Mockito.mock(User.class);
 
     // given
-    final String email = "peter@test.in";
+    final String email = TEST_EMAIL_ADMIN;
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
     when(user.isDeletable()).thenReturn(false);
     // then
-    Assertions.assertThatThrownBy(() -> userService.deleteUser(email))
+    Assertions.assertThatThrownBy(() -> userService.deleteUserByEmail(email))
       .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   void shouldthrow_exception_onDelete_forInvalidEmail() {
     // given
-    final String email = "louis@test.in";
+    final String email = TEST_EMAIL_LOUIS;
 
     // when
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
     // then
-    Assertions.assertThatThrownBy(() -> userService.deleteUser(email))
+    Assertions.assertThatThrownBy(() -> userService.deleteUserByEmail(email))
       .isInstanceOf(EntityNotFoundException.class);
   }
 }
