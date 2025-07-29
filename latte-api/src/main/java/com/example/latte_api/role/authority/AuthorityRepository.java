@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+/*
+ * Authority Repository
+ */
 public interface AuthorityRepository extends JpaRepository<Authority, Long>{
-  Optional<Authority> findByAuthority(String authority);
+  Optional<Authority> findByAuthorityIgnoreCase(String authority);
 }

@@ -19,6 +19,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/*
+ * Authority Entity
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

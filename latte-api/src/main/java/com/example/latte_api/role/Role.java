@@ -26,6 +26,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/*
+ * Role Entity
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

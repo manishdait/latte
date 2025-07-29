@@ -1,5 +1,8 @@
 package com.example.latte_api.role.authority;
 
+import static com.example.latte_api.TestUtils.TEST_AUTHORITY_READ;
+import static com.example.latte_api.TestUtils.createAuthority;
+
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -16,10 +19,16 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+/*
+ * Authority Repository Test
+ */
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = {"spring.flyway.enabled=false", "spring.jpa.hibernate.ddl-auto=update"})
+@TestPropertySource(properties = {
+  "spring.flyway.enabled=false", 
+  "spring.jpa.hibernate.ddl-auto=update"
+})
 public class AuthorityRepositoryTest {
   @Container
   @ServiceConnection
@@ -28,11 +37,9 @@ public class AuthorityRepositoryTest {
   @Autowired
   private AuthorityRepository authorityRepository;
 
-  private Authority authority = Authority.builder().authority("my::authority").build();
-
   @BeforeEach
   void setup() {
-    authorityRepository.save(authority);
+    authorityRepository.save(createAuthority(TEST_AUTHORITY_READ));
   }
 
   @AfterEach
@@ -48,16 +55,24 @@ public class AuthorityRepositoryTest {
 
   @Test
   void shouldReturn_authorityOptional_forValidAuthority() {
-    final String authority = "my::authority";
-    final Optional<Authority> result = authorityRepository.findByAuthority(authority);
+    final String authority = TEST_AUTHORITY_READ;
+    final Optional<Authority> result = authorityRepository.findByAuthorityIgnoreCase(authority);
+
+    Assertions.assertThat(result).isPresent();
+  }
+
+  @Test
+  void shouldReturn_authorityOptional_forValidAuthority_DifferentCases() {
+    final String authority = TEST_AUTHORITY_READ.toLowerCase();
+    final Optional<Authority> result = authorityRepository.findByAuthorityIgnoreCase(authority);
 
     Assertions.assertThat(result).isPresent();
   }
 
   @Test
   void shouldReturn_emptyOptional_forInvalidAuthority() {
-    final String authority = "not-my::authority";
-    final Optional<Authority> result = authorityRepository.findByAuthority(authority);
+    final String authority = "unknown::authority";
+    final Optional<Authority> result = authorityRepository.findByAuthorityIgnoreCase(authority);
 
     Assertions.assertThat(result).isEmpty();
   }

@@ -8,10 +8,16 @@ import org.mapstruct.factory.Mappers;
 import com.example.latte_api.role.Role;
 import com.example.latte_api.role.dto.RoleResponse;
 
+/*
+ * Role Mapper
+ */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface RoleMapper {
   RoleMapper INSTANT = Mappers.getMapper(RoleMapper.class);
 
-  @Mapping(target = "authorities", expression = "java(role.getAuthorities().stream().map(a -> a.getAuthority()).toList())")
+  @Mapping(
+    target = "authorities", 
+    expression = "java(role.getAuthorities().stream().map(a -> a.getAuthority()).toList())"
+  )
   RoleResponse mapToRoleResponse(Role role);
 }

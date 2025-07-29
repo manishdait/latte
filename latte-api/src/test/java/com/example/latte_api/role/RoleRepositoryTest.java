@@ -1,6 +1,9 @@
 package com.example.latte_api.role;
 
-import java.util.List;
+import static com.example.latte_api.TestUtils.TEST_AUTHORITY_READ;
+import static com.example.latte_api.TestUtils.createAuthority;
+import static com.example.latte_api.TestUtils.createRole;
+
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -20,10 +23,16 @@ import org.testcontainers.utility.DockerImageName;
 import com.example.latte_api.role.authority.Authority;
 import com.example.latte_api.role.authority.AuthorityRepository;
 
+/*
+ * Role Repository Test
+ */
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = {"spring.flyway.enabled=false", "spring.jpa.hibernate.ddl-auto=update"})
+@TestPropertySource(properties = {
+  "spring.flyway.enabled=false", 
+  "spring.jpa.hibernate.ddl-auto=update"
+})
 public class RoleRepositoryTest {
   @Container
   @ServiceConnection
@@ -37,9 +46,10 @@ public class RoleRepositoryTest {
 
   @BeforeEach
   void setup() {
-    Authority authority = Authority.builder().authority("user::autho").build();
+    Authority authority = createAuthority(TEST_AUTHORITY_READ);
     authorityRepository.save(authority);
-    Role role = Role.builder().role("User").authorities(List.of(authority)).build();
+
+    Role role = createRole("USER", authority);
     roleRepository.save(role);
   }
 
@@ -57,17 +67,15 @@ public class RoleRepositoryTest {
 
   @Test
   void shouldReturn_roleOptional_forValidRole() {
-    final String role = "User";
+    final String role = "USER";
     final Optional<Role> result = roleRepository.findByRole(role);
-
     Assertions.assertThat(result).isPresent();
   }
 
   @Test
   void shouldReturn_emptyOptional_forInalidRole() {
-    final String role = "Admin";
+    final String role = "ADMIN";
     final Optional<Role> result = roleRepository.findByRole(role);
-
     Assertions.assertThat(result).isEmpty();
   }
 }

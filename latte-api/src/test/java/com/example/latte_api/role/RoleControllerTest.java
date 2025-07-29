@@ -35,6 +35,9 @@ import com.example.latte_api.user.User;
 import com.example.latte_api.user.UserRepository;
 import com.example.latte_api.user.dto.UserResponse;
 
+/*
+ * Role Controller Test
+ */
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -64,7 +67,7 @@ public class RoleControllerTest {
 
     User adminUser = User.builder()
       .firstname("Admin")
-      .email("admin@test.in")
+      .email("admin@dev.in")
       .password(passwordEncoder.encode("password"))
       .role(admin)
       .editable(true)
@@ -73,7 +76,7 @@ public class RoleControllerTest {
 
     User commonUser = User.builder()
       .firstname("User")
-      .email("common@test.in")
+      .email("user@dev.in")
       .password(passwordEncoder.encode("password"))
       .role(user)
       .editable(true)
@@ -95,10 +98,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldReturn_listOfRoles() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final ResponseEntity<PagedEntity<RoleResponse>> response = testRestTemplate.exchange(
       BASE_URI,
@@ -124,12 +127,40 @@ public class RoleControllerTest {
   }
 
   @Test
+  void shouldReturn_getRole_byId() {
+    final AuthResponse auth = adminLogin();
+    
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + auth.accessToken());
+    
+    final RoleRequest createRequest = new RoleRequest("Dev", List.of("ticket::create"));
+    
+    final ResponseEntity<RoleResponse> createResponse = testRestTemplate.exchange(
+      BASE_URI,
+      HttpMethod.POST,
+      new HttpEntity<>(createRequest, headers),
+      RoleResponse.class
+    );
+    Assertions.assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+    final ResponseEntity<RoleResponse> getResponse = testRestTemplate.exchange(
+      BASE_URI + "/" + createResponse.getBody().id(),
+      HttpMethod.GET,
+      new HttpEntity<>(null, headers),
+      RoleResponse.class
+    );
+
+    Assertions.assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Assertions.assertThat(getResponse.getBody()).isNotNull();
+  }
+
+  @Test
   void shouldReturn_roleResponse_onRoleCreate_byUserHavingAuthority() {
     // role::create
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final RoleRequest request = new RoleRequest("Dev", List.of("ticket::create"));
 
@@ -151,10 +182,10 @@ public class RoleControllerTest {
   void shouldReturn_badRequest_onRoleCreate_forDuplicateRole_forUserHavingAuthority() {
     // role::create
     // User, Admin are added by flyway
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final RoleRequest request = new RoleRequest("Admin", List.of("ticket::create"));
 
@@ -170,10 +201,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldReturn_forbidden_onRoleCreate_forUserNotHavingAuthority() {
-    final AuthResponse cred = userCred();
+    final AuthResponse auth = userLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final RoleRequest request = new RoleRequest("Dev", List.of("ticket::create"));
 
@@ -190,27 +221,27 @@ public class RoleControllerTest {
   @Test
   void shouldReturn_roleResponse_onRoleUpdate_byUserHavingAuthority() {
     // role::edit
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final RoleRequest roleRequest = new RoleRequest("Dev", List.of("ticket::create"));
+    final RoleRequest createRequest = new RoleRequest("Dev", List.of("ticket::create"));
 
-    RoleResponse role = testRestTemplate.exchange(
+    RoleResponse createRole = testRestTemplate.exchange(
       BASE_URI,
       HttpMethod.POST,
-      new HttpEntity<>(roleRequest, headers),
+      new HttpEntity<>(createRequest, headers),
       RoleResponse.class
     ).getBody();
 
-    final long id = role.id();
-    final RoleRequest request = new RoleRequest("R2", List.of("ticket::edit"));
+    final long id = createRole.id();
+    final RoleRequest updateRequest = new RoleRequest("R2", List.of("ticket::edit"));
 
     final ResponseEntity<RoleResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
       HttpMethod.PATCH,
-      new HttpEntity<>(request, headers),
+      new HttpEntity<>(updateRequest, headers),
       RoleResponse.class
     );
 
@@ -223,10 +254,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_notFound_onRoleUpdate_forInvalidId() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final long id = 300L;
     final RoleRequest request = new RoleRequest("R2", List.of("ticket::edit"));
@@ -243,10 +274,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_badRequest_onRoleUpdate_ifRoleNotEditable() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final long id = 101L; // ADMIN role
     final RoleRequest request = new RoleRequest("R2", List.of("ticket::edit"));
@@ -263,24 +294,24 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_forbidden_onRoleUpdate_ifUserDoNotHaveAuthority() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse adminAuth = adminLogin();
 
-    final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    final HttpHeaders adminHeaders = new HttpHeaders();
+    adminHeaders.add("Authorization", "Bearer " + adminAuth.accessToken());
 
-    final RoleRequest roleRequest = new RoleRequest("Dev", List.of("ticket::create"));
+    final RoleRequest createRequest = new RoleRequest("Dev", List.of("ticket::create"));
 
     RoleResponse role = testRestTemplate.exchange(
       BASE_URI,
       HttpMethod.POST,
-      new HttpEntity<>(roleRequest, headers),
+      new HttpEntity<>(createRequest, adminHeaders),
       RoleResponse.class
     ).getBody();
 
-    final AuthResponse _cred = userCred();
+    final AuthResponse userAuth = userLogin();
 
-    final HttpHeaders _headers = new HttpHeaders();
-    _headers.add("Authorization", "Bearer " + _cred.accessToken());
+    final HttpHeaders userHeaders = new HttpHeaders();
+    userHeaders.add("Authorization", "Bearer " + userAuth.accessToken());
 
     final long id = role.id();
     final RoleRequest request = new RoleRequest("R2", List.of("ticket::edit"));
@@ -288,7 +319,7 @@ public class RoleControllerTest {
     final ResponseEntity<ErrorResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id,
       HttpMethod.PATCH,
-      new HttpEntity<>(request, _headers),
+      new HttpEntity<>(request, userHeaders),
       ErrorResponse.class
     );
 
@@ -301,17 +332,17 @@ public class RoleControllerTest {
   @Test
   void shouldDelete_roleAndUpdateUserToNewRole() {
     // role::delete
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
-    final RoleRequest roleRequest = new RoleRequest("Dev", List.of("ticket::create"));
+    final RoleRequest createRequest = new RoleRequest("Dev", List.of("ticket::create"));
 
     RoleResponse role = testRestTemplate.exchange(
       BASE_URI,
       HttpMethod.POST,
-      new HttpEntity<>(roleRequest, headers),
+      new HttpEntity<>(createRequest, headers),
       RoleResponse.class
     ).getBody();
 
@@ -341,10 +372,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_badRequest_onDelete_ifRoleNotDeletable() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final long id = 101L;
     final long newId = 102L;
@@ -361,10 +392,10 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_notFound_onDelete_ifRoleNotExists() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse auth = adminLogin();
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    headers.add("Authorization", "Bearer " + auth.accessToken());
 
     final long id = 300L;
     final long newId = 102L;
@@ -381,24 +412,24 @@ public class RoleControllerTest {
 
   @Test
   void shouldGive_forbidden_onDelete_ifUserDonNotHaveAuthority() {
-    final AuthResponse cred = adminCred();
+    final AuthResponse adminAuth = adminLogin();
 
-    final HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + cred.accessToken());
+    final HttpHeaders adminHeaders = new HttpHeaders();
+    adminHeaders.add("Authorization", "Bearer " + adminAuth.accessToken());
 
-    final RoleRequest roleRequest = new RoleRequest("Dev", List.of("ticket::create"));
+    final RoleRequest createRequest = new RoleRequest("Dev", List.of("ticket::create"));
 
     RoleResponse role = testRestTemplate.exchange(
       BASE_URI,
       HttpMethod.POST,
-      new HttpEntity<>(roleRequest, headers),
+      new HttpEntity<>(createRequest, adminHeaders),
       RoleResponse.class
     ).getBody();
 
-    final AuthResponse _cred = userCred();
+    final AuthResponse userAuth = userLogin();
 
-    final HttpHeaders _headers = new HttpHeaders();
-    _headers.add("Authorization", "Bearer " + _cred.accessToken());
+    final HttpHeaders userHeaders = new HttpHeaders();
+    userHeaders.add("Authorization", "Bearer " + userAuth.accessToken());
 
     final long id = role.id();
     final long newId = 101L;
@@ -406,7 +437,7 @@ public class RoleControllerTest {
     final ResponseEntity<RoleResponse> response = testRestTemplate.exchange(
       BASE_URI + "/" + id + "/update-to/" + newId,
       HttpMethod.DELETE,
-      new HttpEntity<>(null, _headers),
+      new HttpEntity<>(null, userHeaders),
       RoleResponse.class
     );
 
@@ -416,15 +447,16 @@ public class RoleControllerTest {
     roleRepository.deleteById(id);
   }
 
+
   // Helpers
 
-  private AuthResponse adminCred() {
-    final AuthRequest request = new AuthRequest("admin@test.in", "password");
+  private AuthResponse adminLogin() {
+    final AuthRequest request = new AuthRequest("admin@dev.in", "password");
     return authenticate(request);
   }
 
-  private AuthResponse userCred() {
-    final AuthRequest request = new AuthRequest("common@test.in", "password");
+  private AuthResponse userLogin() {
+    final AuthRequest request = new AuthRequest("user@dev.in", "password");
     return authenticate(request);
   }
 
