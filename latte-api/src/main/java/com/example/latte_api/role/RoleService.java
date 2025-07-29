@@ -63,9 +63,7 @@ public class RoleService {
    * @throws EntityNotFoundException if the role with the given ID is not found.
    */
   public RoleResponse getRole(Long id) {
-    Role role = roleRepository.findById(id).orElseThrow(
-      () -> new EntityNotFoundException("Role not found with ID: " + id)
-    );
+    Role role = findRoleById(id);
     return roleMapper.mapToRoleResponse(role);
   }
 
@@ -86,9 +84,7 @@ public class RoleService {
     List<Authority> authorities = new ArrayList<>();
 
     for (String authority : request.authorities()) {
-      authorities.add(authorityRepository.findByAuthorityIgnoreCase(authority).orElseThrow(
-        () -> new EntityNotFoundException("Authority '" + authority + "' does not exist.")
-      ));
+      authorities.add(findAuthority(authority));
     }
 
     Role role = Role.builder()
@@ -114,9 +110,7 @@ public class RoleService {
    */
   @Transactional
   public RoleResponse updateRole(Long id, RoleRequest request) {
-    Role role = roleRepository.findById(id).orElseThrow(
-      () -> new EntityNotFoundException("Role not found with ID: " + id)
-    );
+    Role role = findRoleById(id);
 
     if (!role.isEditable()) {
       throw new IllegalStateException("Role '" + role.getRole() + "' cannot be edited.");
@@ -131,11 +125,8 @@ public class RoleService {
 
     if (request.authorities() != null) {
       List<Authority> authorities = new ArrayList<>();
-
       for (String authority : request.authorities()) {
-        authorities.add(authorityRepository.findByAuthorityIgnoreCase(authority).orElseThrow(
-          () -> new EntityNotFoundException("Authority '" + authority + "' does not exist.")
-        ));
+        authorities.add(findAuthority(authority));
       }
 
       role.setAuthorities(authorities);
@@ -160,17 +151,13 @@ public class RoleService {
       throw new IllegalArgumentException("Cannot delete role and reassign users to the same role");
     }
 
-    Role prevRole = roleRepository.findById(roleToDeleteId).orElseThrow(
-      () -> new EntityNotFoundException("Role to delete not found with ID: " + roleToDeleteId)
-    );
+    Role prevRole = findRoleById(roleToDeleteId);
 
     if(!prevRole.isDeletable()) {
       throw new IllegalStateException("Role '" + prevRole.getRole() + "' cannot be deleted.");
     }
 
-    Role newRole = roleRepository.findById(roleToReassignId).orElseThrow(
-      () -> new EntityNotFoundException("New role for users not found with ID: " + roleToReassignId)
-    );
+    Role newRole = findRoleById(roleToReassignId);
       
     List<User> users = userRepository.findByRole(prevRole);
     users.stream().forEach(u -> u.setRole(newRole));
@@ -178,5 +165,31 @@ public class RoleService {
     userRepository.saveAll(users);
 
     roleRepository.delete(prevRole);
+  }
+
+  /**
+   * Helper method to find a Role by its ID.
+   * 
+   * @param roleId The ID of the role to find.
+   * @return The found Role entity.
+   * @throws EntityNotFoundException If the role is not found.
+   */
+  private Role findRoleById(Long roleId) {
+    return roleRepository.findById(roleId).orElseThrow(
+      () -> new EntityNotFoundException("Role not found with ID: " + roleId)
+    );
+  }
+
+  /**
+   * Helper method to find a Authority.
+   * 
+   * @param authority The name of the authority to find.
+   * @return The found Authority entity.
+   * @throws EntityNotFoundException If the authority is not found.
+   */
+  private Authority findAuthority(String authority) {
+    return authorityRepository.findByAuthorityIgnoreCase(authority).orElseThrow(
+      () -> new EntityNotFoundException("Authority '" + authority + "' does not exist.")
+    );
   }
 }
