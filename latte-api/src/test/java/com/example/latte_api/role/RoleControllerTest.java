@@ -88,6 +88,12 @@ public class RoleControllerTest {
   @AfterEach
   void purge() {
     userRepository.deleteAll();
+    List<Role> rolesToDelete = roleRepository.findAll();
+    for (Role role : rolesToDelete) {
+      if (!"Admin".equals(role.getRole()) && !"User".equals(role.getRole())) {
+        roleRepository.delete(role);
+      }
+    }
   }
 
   @Test
