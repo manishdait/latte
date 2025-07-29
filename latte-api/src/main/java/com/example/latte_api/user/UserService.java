@@ -119,10 +119,7 @@ public class UserService implements UserDetailsService {
    * @throws EntityNotFoundException if the user is not found.
    */
   public UserResponse getUserByEmail(String userEmail) {
-    User user = userRepository.findByEmail(userEmail).orElseThrow(
-      () -> new EntityNotFoundException(String.format("User with email '%s' not found.", userEmail))
-    );
-    
+    User user = findUserByEmail(userEmail);
     return userMapper.mapToUserDto(user);
   }
 
@@ -160,9 +157,7 @@ public class UserService implements UserDetailsService {
    */
   @Transactional
   public UserResponse updateUserByEmail(UserRequest request, String userEmail) {
-    User user = userRepository.findByEmail(userEmail).orElseThrow(
-      () -> new EntityNotFoundException(String.format("User with email '%s' not found for update.", userEmail))
-    );
+    User user = findUserByEmail(userEmail);
 
     if (!user.isEditable()) {
       throw new IllegalStateException(String.format("User '%s' cannot be edited.", userEmail));
@@ -192,9 +187,7 @@ public class UserService implements UserDetailsService {
    */
   @Transactional
   public void deleteUserByEmail(String userEmail) {
-    User user = userRepository.findByEmail(userEmail).orElseThrow(
-      () -> new EntityNotFoundException(String.format("User with email '%s' not found for deletion.", userEmail))
-    );
+    User user = findUserByEmail(userEmail);
 
     if (!user.isDeletable()) {
       throw new IllegalStateException(String.format("User '%s' cannot be deleted.", userEmail));
@@ -221,5 +214,18 @@ public class UserService implements UserDetailsService {
     
     ticketRepository.saveAll(assignedTickets);
     userRepository.delete(user);
+  }
+
+  /**
+   * Helper method to find a User by its email.
+   * 
+   * @param userEmail The email of the user to find.
+   * @return The found User entity.
+   * @throws EntityNotFoundException If the user is not found.
+   */
+  private User findUserByEmail(String userEmail) {
+    return userRepository.findByEmail(userEmail).orElseThrow(
+      () -> new EntityNotFoundException(String.format("User with email '%s' not found.", userEmail))
+    );
   }
 }
